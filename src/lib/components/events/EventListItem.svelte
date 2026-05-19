@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { Calendar, Clock, MapPin } from 'lucide-svelte';
 	import type { EventItem } from '$lib/data/events';
+	import EventPoster from '$lib/components/events/EventPoster.svelte';
 
 	let { event, last = false }: { event: EventItem; last?: boolean } = $props();
 
-	const isExternal = $derived(event.href.startsWith('http'));
+	const hasLink = $derived(Boolean(event.href));
+	const isExternal = $derived(Boolean(event.href?.startsWith('http')));
 </script>
 
 <article
@@ -12,31 +14,22 @@
 	class:border-b={!last}
 >
 	<div class="flex flex-col gap-8 sm:flex-row sm:items-start">
-		<a
-			href={event.href}
-			class="block shrink-0 border border-line"
-			target={isExternal ? '_blank' : undefined}
-			rel={isExternal ? 'noopener noreferrer' : undefined}
-		>
-			<img
-				src={event.posterUrl}
-				alt={event.title}
-				width={168}
-				height={168}
-				class="aspect-square size-[168px] object-cover"
-			/>
-		</a>
+		<EventPoster {event} />
 
 		<div class="flex min-w-0 flex-1 flex-col gap-4">
 			<h2 class="text-[1.35rem] leading-tight font-semibold tracking-[-0.01em]">
-				<a
-					href={event.href}
-					class="no-underline hover:underline"
-					target={isExternal ? '_blank' : undefined}
-					rel={isExternal ? 'noopener noreferrer' : undefined}
-				>
+				{#if hasLink}
+					<a
+						href={event.href}
+						class="no-underline hover:underline"
+						target={isExternal ? '_blank' : undefined}
+						rel={isExternal ? 'noopener noreferrer' : undefined}
+					>
+						{event.title}
+					</a>
+				{:else}
 					{event.title}
-				</a>
+				{/if}
 			</h2>
 
 			<ul class="flex flex-col gap-2 font-mono text-[12px]">
@@ -56,14 +49,16 @@
 
 			<p class="max-w-xl text-[14px] leading-[1.55]">{event.description}</p>
 
-			<a
-				href={event.href}
-				class="link-arrow mt-auto w-fit text-[13px]"
-				target={isExternal ? '_blank' : undefined}
-				rel={isExternal ? 'noopener noreferrer' : undefined}
-			>
-				→ detail události
-			</a>
+			{#if hasLink}
+				<a
+					href={event.href}
+					class="link-arrow mt-auto w-fit text-[13px]"
+					target={isExternal ? '_blank' : undefined}
+					rel={isExternal ? 'noopener noreferrer' : undefined}
+				>
+					→ detail události
+				</a>
+			{/if}
 		</div>
 	</div>
 </article>

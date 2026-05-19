@@ -4,9 +4,10 @@
 	import Hero from '$lib/components/Hero.svelte';
 	import GameOfLife from '$lib/components/GameOfLife.svelte';
 	import FeaturedEvent from '$lib/components/FeaturedEvent.svelte';
+	import UpcomingEvents from '$lib/components/UpcomingEvents.svelte';
 	import Manifesto from '$lib/components/about/Manifesto.svelte';
 	import LibraryLinks from '$lib/components/LibraryLinks.svelte';
-	import { featuredEvent } from '$lib/data/events';
+	import { featuredEvent, upcomingEvents } from '$lib/data/events';
 	import { libraryPreview } from '$lib/data/library';
 	import { siteMeta } from '$lib/data/placeholder';
 </script>
@@ -27,8 +28,11 @@
 			<GameOfLife />
 		</div>
 
-		<div id="udalosti" class="cell lg:col-span-3">
+		<div id="udalosti" class="cell lg:col-span-2 lg:border-r lg:border-line">
 			<FeaturedEvent event={featuredEvent} />
+		</div>
+		<div class="cell lg:col-span-1">
+			<UpcomingEvents events={upcomingEvents} />
 		</div>
 
 		<div class="cell-roomy lg:col-span-2 lg:border-r lg:border-line">

@@ -26,7 +26,7 @@ export const joinOptions: JoinOption[] = [
 		label: 'Uspořádej událost',
 		description:
 			'Workshop, diskuse, setkání — navrhni formát a termín. My pomůžeme s propagací, ty s obsahem.',
-		href: '/kontakt',
+		href: '/platformy',
 		linkLabel: '→ napiš nám',
 		icon: 'event'
 	},
@@ -34,16 +34,16 @@ export const joinOptions: JoinOption[] = [
 		label: 'Připoj se online',
 		description:
 			'Zatím hlavně git a setkání — e-mail a Matrix brzy. Ptej se, sdílej odkazy, navrhni téma na další večer.',
-		href: '/kontakt',
-		linkLabel: '→ kontakt',
+		href: '/platformy',
+		linkLabel: '→ kde nás najdete?',
 		icon: 'online'
 	},
 	{
 		label: 'Napiš text',
 		description:
 			'Essej, poznámka, záznam z workshopu. Bez redakční rady — texty procházejí komunitou, ne schvalováním shora.',
-		href: '/kontakt',
-		linkLabel: '→ kontakt',
+		href: '/platformy',
+		linkLabel: '→ kde nás najdete?',
 		icon: 'write'
 	},
 	{
@@ -58,7 +58,7 @@ export const joinOptions: JoinOption[] = [
 		label: 'Nabídni prostor',
 		description:
 			'Máš klub, hackerspace nebo salonek? Hostujeme se u vás. Prostor nás nedefinuje, ale setkání ano.',
-		href: '/kontakt',
+		href: '/platformy',
 		linkLabel: '→ napiš nám',
 		icon: 'space'
 	},

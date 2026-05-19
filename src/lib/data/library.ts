@@ -45,7 +45,7 @@ export const libraryIntro = {
 export const libraryContribute = {
 	text: 'Chybí kniha? Napiš nám.',
 	links: [
-		{ label: '→ kontakt', href: '/kontakt' },
+		{ label: '→ kde nás najdete?', href: '/platformy' },
 		{ label: '→ zapojit se', href: '/zapojit-se' }
 	]
 };

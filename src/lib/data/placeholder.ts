@@ -28,7 +28,7 @@ export const hero = {
 	tagline:
 		'Komunita kolem suverénních technologií, paralelních struktur a nehierarchických forem organizace.',
 	ctas: [
-		{ label: 'manifesto', href: '/#manifesto' },
+		{ label: 'více o konceptu', href: '/#manifesto' },
 		{ label: 'zapojit se', href: '/zapojit-se' }
 	]
 };
@@ -72,7 +72,7 @@ export const githubOrg = 'https://github.com/heterarchy-society';
 export const githubWebRepo = 'https://github.com/heterarchy-society/heterarchy.cz';
 
 export const footerLinks: FooterLink[] = [
-	{ label: 'kontakt', href: '/kontakt' },
+	{ label: 'kde nás najdete?', href: '/platformy' },
 	{ label: 'git', href: githubOrg }
 ];
 
