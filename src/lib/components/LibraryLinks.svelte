@@ -1,30 +1,36 @@
 <script lang="ts">
-	import { Archive, Asterisk, Book, Wrench } from 'lucide-svelte';
-	import type { LibraryLink } from '$lib/data/placeholder';
+	import { bookPath, type LibraryBook } from '$lib/data/library';
 
-	let { links }: { links: LibraryLink[] } = $props();
+	let { books }: { books: LibraryBook[] } = $props();
 
-	const icons = {
-		book: Book,
-		asterisk: Asterisk,
-		wrench: Wrench,
-		archive: Archive
-	} as const;
+	const previewItems = $derived(
+		books.length > 0
+			? books.map((b) => ({ href: bookPath(b.id), src: b.coverUrl, alt: b.title }))
+			: Array.from({ length: 4 }, (_, i) => ({
+					href: '/knihovna',
+					src: '/book-placeholder.svg',
+					alt: '',
+					key: `placeholder-${i}`
+				}))
+	);
 </script>
 
 <section>
-	<p class="label">Knihovna / zdroje</p>
+	<p class="label">Knihovna</p>
 
-	<ul class="font-mono text-[13px]">
-		{#each links as link, i}
-			{@const Icon = icons[link.icon]}
-			<li class:border-b-0={i === links.length - 1} class="border-b border-black">
-				<a href={link.href} class="flex items-center gap-3 py-4 no-underline hover:underline">
-					<Icon size={14} strokeWidth={1.25} />
-					<span class="flex-1">{link.label}</span>
-					<span>→</span>
-				</a>
-			</li>
+	<div class="mb-5 grid grid-cols-4 gap-2">
+		{#each previewItems as item (item.href + item.src)}
+			<a href={item.href} class="block no-underline">
+				<img
+					src={item.src}
+					alt={item.alt}
+					width={80}
+					height={120}
+					class="aspect-[2/3] w-full border border-line object-cover transition-opacity hover:opacity-80"
+				/>
+			</a>
 		{/each}
-	</ul>
+	</div>
+
+	<a href="/knihovna" class="link-arrow text-[13px]">→ knihovna</a>
 </section>

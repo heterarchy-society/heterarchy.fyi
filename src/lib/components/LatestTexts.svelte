@@ -8,9 +8,9 @@
 <section id="texty">
 	<p class="label">Nejnovější texty</p>
 
-	<div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:divide-x lg:divide-black">
-		{#each articles as article}
-			<TextCard {article} />
+	<div>
+		{#each articles as article, i}
+			<TextCard {article} last={i === articles.length - 1} />
 		{/each}
 	</div>
 </section>

@@ -2,14 +2,15 @@
 	import { Calendar, Clock, MapPin } from 'lucide-svelte';
 	import type { EventItem } from '$lib/data/events';
 
-	let { event }: { event: EventItem } = $props();
+	let { event, last = false }: { event: EventItem; last?: boolean } = $props();
 
 	const isExternal = $derived(event.href.startsWith('http'));
 </script>
 
-<section>
-	<p class="label">Doporučená událost</p>
-
+<article
+	class="border-line py-8 lg:py-10"
+	class:border-b={!last}
+>
 	<div class="flex flex-col gap-8 sm:flex-row sm:items-start">
 		<a
 			href={event.href}
@@ -26,7 +27,7 @@
 			/>
 		</a>
 
-		<div class="flex min-w-0 flex-1 flex-col gap-4 pt-1">
+		<div class="flex min-w-0 flex-1 flex-col gap-4">
 			<h2 class="text-[1.35rem] leading-tight font-semibold tracking-[-0.01em]">
 				<a
 					href={event.href}
@@ -53,7 +54,7 @@
 				</li>
 			</ul>
 
-			<p class="max-w-md text-[14px] leading-[1.55]">{event.description}</p>
+			<p class="max-w-xl text-[14px] leading-[1.55]">{event.description}</p>
 
 			<a
 				href={event.href}
@@ -65,4 +66,4 @@
 			</a>
 		</div>
 	</div>
-</section>
+</article>

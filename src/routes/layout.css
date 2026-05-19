@@ -2,6 +2,8 @@
 
 @theme {
 	--color-bg: #f2f0eb;
+	--color-bg-muted: #e8e6de;
+	--color-line: #c8c6be;
 	--font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 	--font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
@@ -22,24 +24,76 @@
 
 @layer components {
 	.cell {
-		@apply border-b border-black px-8 py-8;
+		@apply border-b border-line px-8 py-8;
+	}
+
+	.cell-compact {
+		@apply border-b border-line px-8 py-6 lg:py-7;
+	}
+
+	.cell-roomy {
+		@apply border-b border-line px-8 py-10 lg:px-10 lg:py-12;
 	}
 
 	.cell-right {
-		@apply border-b border-black px-8 py-8 lg:border-l;
+		@apply border-b border-line px-8 py-8 lg:border-l;
 	}
 
 	.label {
-		@apply mb-6 font-mono text-[10px] tracking-[0.2em] uppercase;
+		@apply mb-6 font-mono text-[10px] tracking-[0.2em] whitespace-nowrap uppercase;
+	}
+
+	.page-lead {
+		@apply text-[1.5rem] leading-[1.4] tracking-[-0.01em] whitespace-nowrap lg:text-[1.625rem];
+	}
+
+	.book-detail-title {
+		@apply text-[1.5rem] leading-[1.35] font-semibold tracking-[-0.01em] text-balance lg:text-[1.625rem];
 	}
 
 	.link-arrow {
-		@apply font-mono underline decoration-black/40 underline-offset-[3px] hover:decoration-black;
+		@apply font-mono underline decoration-line underline-offset-[3px] hover:decoration-black/60;
 	}
 
 	.poster-grain {
 		background-color: #000;
 		background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
 		background-size: 100px 100px;
+	}
+
+	.manifesto-prose {
+		@apply text-[15px] leading-[1.7] text-black/90;
+	}
+
+	.manifesto-prose h2 {
+		@apply mb-6 font-mono text-[10px] tracking-[0.2em] uppercase;
+	}
+
+	.manifesto-prose p {
+		@apply mb-6;
+	}
+
+	.manifesto-prose p strong {
+		@apply font-semibold text-black;
+	}
+
+	.manifesto-prose blockquote {
+		@apply mt-10 mb-0 border-l border-line py-1 pl-6 not-italic;
+	}
+
+	.manifesto-prose blockquote p {
+		@apply mb-3 italic;
+	}
+
+	.manifesto-prose blockquote p:last-child {
+		@apply mb-0 font-mono text-[11px] not-italic text-black/55;
+	}
+
+	.manifesto-prose hr:last-of-type {
+		@apply my-10 border-line;
+	}
+
+	.manifesto-prose em {
+		@apply font-mono text-[11px] not-italic text-black/45;
 	}
 }

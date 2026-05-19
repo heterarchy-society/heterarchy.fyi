@@ -1,0 +1,58 @@
+import { libraryBooks as booksByAdded } from './books';
+import type { BookFormat, BookLanguage, LibraryBook, LibraryLink } from './library-types';
+
+/** Seřazeno podle roku vydání, nejnovější první */
+export const libraryBooks: LibraryBook[] = [...booksByAdded].sort(
+	(a, b) => Number(b.year ?? 0) - Number(a.year ?? 0)
+);
+
+export type { BookFormat, BookLanguage, LibraryBook, LibraryLink } from './library-types';
+
+export const formatLabels: Record<BookFormat, string> = {
+	ebook: 'e-book',
+	pdf: 'PDF',
+	web: 'web',
+	print: 'tištěná'
+};
+
+export const languageLabels: Record<BookLanguage, string> = {
+	en: 'angličtina',
+	cs: 'čeština',
+	de: 'němčina'
+};
+
+export function bookPath(id: string): string {
+	return `/knihovna/${id}`;
+}
+
+export function getBookById(id: string): LibraryBook | undefined {
+	return libraryBooks.find((b) => b.id === id);
+}
+
+export const libraryName = 'Komunitní svobodomyslná knihovna';
+
+export const libraryLocation = {
+	name: 'LibertyLoft',
+	city: 'Praha',
+	note: 'Fyzické kopie si můžete vypůjčit na poličce.'
+};
+
+export const libraryIntro = {
+	label: 'Knihovna',
+	lead: 'E-booky i fyzické kopie — u každého titulu jazyk, formáty a odkazy.'
+};
+
+export const libraryContribute = {
+	text: 'Chybí kniha? Napiš nám.',
+	links: [
+		{ label: '→ kontakt', href: '/kontakt' },
+		{ label: '→ zapojit se', href: '/zapojit-se' }
+	]
+};
+
+export const libraryMeta = {
+	title: `${libraryName} — The Heterarchy Society`,
+	description: `${libraryName} — katalog a polička v LibertyLoftu, Praha.`
+};
+
+export const libraryPreview = libraryBooks.slice(0, 4);
