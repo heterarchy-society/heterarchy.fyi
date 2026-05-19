@@ -1,0 +1,45 @@
+@import 'tailwindcss';
+
+@theme {
+	--color-bg: #f2f0eb;
+	--font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+	--font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+@layer base {
+	html {
+		@apply antialiased;
+	}
+
+	body {
+		@apply bg-bg font-sans text-[14px] leading-normal text-black;
+	}
+
+	a {
+		@apply underline-offset-[3px];
+	}
+}
+
+@layer components {
+	.cell {
+		@apply border-b border-black px-8 py-8;
+	}
+
+	.cell-right {
+		@apply border-b border-black px-8 py-8 lg:border-l;
+	}
+
+	.label {
+		@apply mb-6 font-mono text-[10px] tracking-[0.2em] uppercase;
+	}
+
+	.link-arrow {
+		@apply font-mono underline decoration-black/40 underline-offset-[3px] hover:decoration-black;
+	}
+
+	.poster-grain {
+		background-color: #000;
+		background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
+		background-size: 100px 100px;
+	}
+}
