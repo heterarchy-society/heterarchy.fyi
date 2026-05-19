@@ -12,7 +12,7 @@ Něco z toho už existuje. Něco se teprve hledá. Část je technologie, část
 
 Neučíme. Zkoumáme společně. Kdo umí, ukáže. Kdo neumí, ptá se. Nikdo nevede, protože není kam vést.
 
-Nemáme sídlo. Hostujeme se v různých prostorech, ale žádný z nich nás nedefinuje. Jsme tam kde jsou naši lidé — všude a nikde zároveň. Vše je forkovatelné. Pokud se z nás stane instituce, selhali jsme.
+Nemáme sídlo. Hostujeme se v různých prostorech, ale žádný z nich nás nedefinuje. Jsme tam kde jsou naši lidé — všude a nikde zároveň. Pokud se z nás stane instituce, selhali jsme.
 
 > *„Změny můžeme jedině žít: k lidskosti se nemůžeme zkrátka promyslet. Každý z nás, každá skupina, se musí stát vzorem toho, co toužíme stvořit.“*
 >

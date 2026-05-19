@@ -28,7 +28,7 @@ export const values: ValueItem[] = [
 	},
 	{
 		title: 'Otevřeně',
-		description: 'Vše je forkovatelné. Sdílíme a stavíme spolu.',
+		description: 'Sdílíme a stavíme spolu.',
 		icon: 'squares'
 	},
 	{

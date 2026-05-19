@@ -1,5 +1,3 @@
-import { LUMA_AI_SVOBODA } from '$lib/data/events';
-
 export type JoinOption = {
 	label: string;
 	description: string;
@@ -35,7 +33,7 @@ export const joinOptions: JoinOption[] = [
 	{
 		label: 'Připoj se online',
 		description:
-			'Matrix, e-mail nebo git — kanály bez hierarchie. Ptej se, sdílej odkazy, navrhni téma na další večer.',
+			'Zatím hlavně git a setkání — e-mail a Matrix brzy. Ptej se, sdílej odkazy, navrhni téma na další večer.',
 		href: '/kontakt',
 		linkLabel: '→ kontakt',
 		icon: 'online'
@@ -67,8 +65,8 @@ export const joinOptions: JoinOption[] = [
 	{
 		label: 'Forkni a uprav',
 		description:
-			'Web, manifesto, nástroje — vše je forkovatelné. Pokud něco chybí, přidej to. Pokud něco nefunguje, oprav to.',
-		href: 'https://github.com',
+			'Web, manifesto, nástroje. Pokud něco chybí, přidej to. Pokud něco nefunguje, oprav to.',
+		href: 'https://github.com/heterarchy-society/heterarchy.cz',
 		linkLabel: '→ git',
 		icon: 'fork',
 		external: true
@@ -78,5 +76,5 @@ export const joinOptions: JoinOption[] = [
 export const joinMeta = {
 	title: 'Zapojit se — The Heterarchy Society',
 	description:
-		'Jak se zapojit do The Heterarchy Society — setkání, komunita, texty a forkovatelné nástroje.'
+		'Jak se zapojit do The Heterarchy Society — setkání, komunita, texty a nástroje.'
 };

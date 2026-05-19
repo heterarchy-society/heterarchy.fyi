@@ -68,11 +68,12 @@ export const latestTexts: TextArticle[] = [
 	}
 ];
 
+export const githubOrg = 'https://github.com/heterarchy-society';
+export const githubWebRepo = 'https://github.com/heterarchy-society/heterarchy.cz';
+
 export const footerLinks: FooterLink[] = [
 	{ label: 'kontakt', href: '/kontakt' },
-	{ label: 'newsletter', href: '#' },
-	{ label: 'git', href: '#' },
-	{ label: 'rss', href: '#' }
+	{ label: 'git', href: githubOrg }
 ];
 
 export const siteMeta = {
@@ -80,5 +81,6 @@ export const siteMeta = {
 	description:
 		'Komunita kolem suverénních technologií, decentralizovaných systémů a nehierarchických forem organizace.',
 	version: '0.1',
-	footerNotice: 'The Heterarchy Society · vše je forkovatelné'
+	sourceHref: githubWebRepo,
+	footerNotice: 'The Heterarchy Society'
 };

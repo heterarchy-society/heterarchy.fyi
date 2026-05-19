@@ -8,9 +8,23 @@
 		<nav class="flex flex-wrap items-center justify-center gap-x-1.5 lg:justify-self-center">
 			{#each footerLinks as link, i}
 				{#if i > 0}<span aria-hidden="true">·</span>{/if}
-				<a href={link.href} class="no-underline hover:underline">{link.label}</a>
+				<a
+					href={link.href}
+					class="no-underline hover:underline"
+					target={link.href.startsWith('http') ? '_blank' : undefined}
+					rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+				>
+					{link.label}
+				</a>
 			{/each}
 		</nav>
-		<p class="lg:justify-self-end">verze {siteMeta.version}</p>
+		<a
+			href={siteMeta.sourceHref}
+			class="no-underline hover:underline lg:justify-self-end"
+			target="_blank"
+			rel="noopener noreferrer"
+		>
+			verze {siteMeta.version}
+		</a>
 	</div>
 </footer>
