@@ -87,7 +87,7 @@
 				</div>
 
 				{#if filteredBooks.length > 0}
-					<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+					<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
 						{#each filteredBooks as book (book.id)}
 							<article class="border-r border-b border-line p-5 lg:p-6">
 								<LibraryBookCard {book} large />
