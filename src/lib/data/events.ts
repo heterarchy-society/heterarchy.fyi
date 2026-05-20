@@ -25,8 +25,7 @@ export const events: EventItem[] = [
 		time: '17:00–21:00',
 		title: 'AI x svoboda vol. II (TBD)',
 		location: 'TBD, Praha',
-		description:
-			'Umělá inteligence mění svět rychleji, než jsme schopni reflektovat. Jak si zachovat svobodu v éře algoritmů? Večer diskusí, příkladů a praktických nástrojů.',
+		description: 'Druhý díl se připravuje. Dáme vědět.',
 	}
 ];
 
