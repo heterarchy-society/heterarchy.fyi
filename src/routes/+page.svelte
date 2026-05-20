@@ -8,6 +8,8 @@
 	import Manifesto from '$lib/components/about/Manifesto.svelte';
 	import LibraryLinks from '$lib/components/LibraryLinks.svelte';
 	import { featuredEvent, upcomingEvents } from '$lib/data/events';
+
+	const sidebarEvents = upcomingEvents.filter((e) => e.date !== 'TBD');
 	import { libraryPreview } from '$lib/data/library';
 	import { siteMeta } from '$lib/data/placeholder';
 </script>
@@ -32,7 +34,7 @@
 			<FeaturedEvent event={featuredEvent} />
 		</div>
 		<div class="cell lg:col-span-1">
-			<UpcomingEvents events={upcomingEvents} />
+			<UpcomingEvents events={sidebarEvents} />
 		</div>
 
 		<div class="cell-roomy lg:col-span-2 lg:border-r lg:border-line">
