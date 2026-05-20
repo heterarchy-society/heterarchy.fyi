@@ -7,7 +7,7 @@
 {#snippet eventRow(event: EventItem, linked: boolean)}
 	<span class="pt-px leading-snug">{event.date}</span>
 	<div class="min-w-0">
-		<p class="leading-snug" class:group-hover:underline={linked}>{event.title}</p>
+		<p class="font-mono leading-snug" class:group-hover:underline={linked}>{event.title}</p>
 		<p class="mt-1 text-[11px] leading-snug text-black/60">{event.location}</p>
 	</div>
 	{#if linked}

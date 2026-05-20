@@ -16,7 +16,7 @@
 		<EventPoster {event} />
 
 		<div class="flex min-w-0 flex-1 flex-col gap-4 pt-1">
-			<h2 class="text-[1.35rem] leading-tight font-semibold tracking-[-0.01em]">
+			<h2 class="font-mono text-[1.25rem] leading-snug tracking-[-0.01em] lg:text-[1.35rem]">
 				{#if hasLink}
 					<a
 						href={event.href}
