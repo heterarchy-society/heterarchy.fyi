@@ -38,7 +38,7 @@
 		<section class="cell-roomy">
 			<p class="label">{libraryIntro.label}</p>
 
-			<h1 class="page-lead mb-4 max-w-2xl whitespace-normal">{libraryName}</h1>
+			<h1 class="page-lead mb-4">{libraryName}</h1>
 
 			<p class="mb-8 max-w-xl text-[15px] leading-[1.65] text-black/75">{libraryIntro.lead}</p>
 

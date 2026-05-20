@@ -14,7 +14,7 @@
 	class:border-b={!last}
 >
 	<div class="flex flex-col gap-8 sm:flex-row sm:items-start">
-		<EventPoster {event} />
+		<EventPoster {event} size={240} />
 
 		<div class="flex min-w-0 flex-1 flex-col gap-4">
 			<h2 class="text-[1.35rem] leading-tight font-semibold tracking-[-0.01em]">

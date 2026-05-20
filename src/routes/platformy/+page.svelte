@@ -16,7 +16,7 @@
 		<section class="cell-roomy">
 			<p class="label">{contactIntro.title}</p>
 
-			<p class="page-lead mb-6 max-w-2xl whitespace-normal">{contactIntro.lead}</p>
+			<p class="page-lead mb-6">{contactIntro.lead}</p>
 
 			<div class="flex flex-col gap-12">
 				<div>
@@ -51,10 +51,19 @@
 									rel={venue.external ? 'noopener noreferrer' : undefined}
 								>
 									<span class="font-mono text-[11px] tracking-wide uppercase">{venue.label}</span>
-									<span class="flex items-center gap-4">
-										<span class="text-[15px]">{venue.value}</span>
+									<span class="flex min-w-0 items-center gap-4">
+										<span class="min-w-0">
+											<span class="block text-[15px]">{venue.value}</span>
+											<span class="mt-1 block font-mono text-[11px] text-black/60">
+												{venue.city}, {venue.country}
+											</span>
+										</span>
 										{#if venue.logo}
-											<img src={venue.logo} alt={venue.label} class="h-7 w-auto object-contain mix-blend-multiply" />
+											<img
+												src={venue.logo}
+												alt={venue.label}
+												class="h-7 w-auto shrink-0 object-contain mix-blend-multiply"
+											/>
 										{/if}
 									</span>
 								</a>

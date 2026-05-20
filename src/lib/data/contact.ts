@@ -6,6 +6,11 @@ export type ContactChannel = {
 	logo?: string;
 };
 
+export type OfflineVenue = ContactChannel & {
+	city: string;
+	country: string;
+};
+
 export const contactIntro = {
 	title: 'Kde nás najdete?',
 	lead: 'Jsme tam, kde jsou naši lidé.'
@@ -13,7 +18,7 @@ export const contactIntro = {
 
 export const onlineChannels: ContactChannel[] = [
 	{
-		label: 'Git',
+		label: 'GitHub',
 		value: 'github.com/heterarchy-society',
 		href: 'https://github.com/heterarchy-society',
 		external: true
@@ -22,13 +27,22 @@ export const onlineChannels: ContactChannel[] = [
 
 export const offlineIntro = 'Nemáme vlastní prostor. Aktuálně nás hostují tyto místa:';
 
-export const offlineVenues: ContactChannel[] = [
+export const offlineVenues: OfflineVenue[] = [
 	{
 		label: 'LibertyLoft',
 		value: 'libertyloft.cz',
+		city: 'Praha',
+		country: 'Česko',
 		href: 'https://libertyloft.cz',
-		external: true,
-		logo: '/logo-libertyloft.png'
+		external: true
+	},
+	{
+		label: 'Bordel',
+		value: 'bordel.wtf',
+		city: 'Praha',
+		country: 'Česko',
+		href: 'https://bordel.wtf',
+		external: true
 	}
 ];
 

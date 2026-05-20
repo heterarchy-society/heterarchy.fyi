@@ -44,7 +44,7 @@
 	}
 
 	.page-lead {
-		@apply text-[1.5rem] leading-[1.4] tracking-[-0.01em] whitespace-nowrap lg:text-[1.625rem];
+		@apply max-w-2xl text-[1.5rem] leading-[1.4] tracking-[-0.01em] text-balance lg:text-[1.625rem];
 	}
 
 	.book-detail-title {
