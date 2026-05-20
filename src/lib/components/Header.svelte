@@ -17,7 +17,10 @@
 
 <header class="border-b border-line">
 	<div class="flex items-center justify-between px-8 py-5">
-		<a href="/" class="font-mono no-underline hover:underline">heterarchy.cz</a>
+		<a href="/" class="flex items-center gap-2.5 no-underline hover:opacity-75">
+			<img src="/logo.svg" alt="Heterarchy" class="h-7 w-auto" />
+			<span class="font-mono text-[13px]">heterarchy.cz</span>
+		</a>
 
 		<nav class="hidden items-center gap-x-8 font-mono text-[13px] lg:flex" aria-label="Hlavní navigace">
 			{#each navItems as item}
