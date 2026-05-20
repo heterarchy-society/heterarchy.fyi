@@ -9,15 +9,15 @@ export type JoinOption = {
 
 export const joinIntro = {
 	title: 'Zapojit se',
-	lead: 'Nemáme členy, přihlášky ani výbor. Stačí přijít, něco přinést nebo něco rozšířit.',
-	note: 'Každý formát je dobrovolný. Nikdo nic nečeká — ale vždy je kam přispět.'
+	lead: 'Přijď, přines něco, nebo něco uprav.',
+	note: null
 };
 
 export const joinOptions: JoinOption[] = [
 	{
 		label: 'Přijď na setkání',
 		description:
-			'Nejjednodušší vstup. Poslouchej, ptej se, představ svůj projekt. Registrace není povinná, ale pomůže nám s prostorem.',
+			'Poslouchej, ptej se, představ projekt. Registrace pomůže s prostorem, ale není nutná.',
 		href: '/udalosti',
 		linkLabel: '→ nadcházející události',
 		icon: 'meeting'
@@ -25,7 +25,7 @@ export const joinOptions: JoinOption[] = [
 	{
 		label: 'Uspořádej událost',
 		description:
-			'Workshop, diskuse, setkání — navrhni formát a termín. My pomůžeme s propagací, ty s obsahem.',
+			'Navrhni téma, formát a termín. Prostor a propagace se dohodnou.',
 		href: '/platformy',
 		linkLabel: '→ napiš nám',
 		icon: 'event'
@@ -33,7 +33,7 @@ export const joinOptions: JoinOption[] = [
 	{
 		label: 'Připoj se online',
 		description:
-			'Zatím hlavně git a setkání — e-mail a Matrix brzy. Ptej se, sdílej odkazy, navrhni téma na další večer.',
+			'Jsme na více místech. Ptej se, sdílej, navrhni téma.',
 		href: '/platformy',
 		linkLabel: '→ kde nás najdete?',
 		icon: 'online'
@@ -41,15 +41,15 @@ export const joinOptions: JoinOption[] = [
 	{
 		label: 'Napiš text',
 		description:
-			'Essej, poznámka, záznam z workshopu. Bez redakční rady — texty procházejí komunitou, ne schvalováním shora.',
+			'Esej, poznámka, záznam ze setkání. Texty procházejí komunitou.',
 		href: '/platformy',
 		linkLabel: '→ kde nás najdete?',
 		icon: 'write'
 	},
 	{
-		label: 'Přečti knihu / daruj do knihovny',
+		label: 'Knihovna',
 		description:
-			'Vypůjč si knihu v LibertyLoftu, nebo přines vlastní na poličku. Katalog je online.',
+			'Vypůjč si knihu v LibertyLoftu nebo přines vlastní. Katalog je online.',
 		href: '/knihovna',
 		linkLabel: '→ knihovna',
 		icon: 'book'
@@ -57,7 +57,7 @@ export const joinOptions: JoinOption[] = [
 	{
 		label: 'Nabídni prostor',
 		description:
-			'Máš klub, hackerspace nebo salonek? Hostujeme se u vás. Prostor nás nedefinuje, ale setkání ano.',
+			'Máš klub, hackerspace nebo salonek? Ozvěme se.',
 		href: '/platformy',
 		linkLabel: '→ napiš nám',
 		icon: 'space'
@@ -65,7 +65,7 @@ export const joinOptions: JoinOption[] = [
 	{
 		label: 'Forkni a uprav',
 		description:
-			'Web, manifesto, nástroje. Pokud něco chybí, přidej to. Pokud něco nefunguje, oprav to.',
+			'Web, manifesto, nástroje — vše je na gitu. Chybí něco? Přidej to.',
 		href: 'https://github.com/heterarchy-society/heterarchy.cz',
 		linkLabel: '→ git',
 		icon: 'fork',
