@@ -24,6 +24,9 @@
 
 			<div>
 				{#each confirmed as event, i}
+					<p class="text-[1.1rem] tracking-[-0.01em] text-black" class:mt-12={i > 0} style="margin-bottom: -1.5rem;">
+						{event.date}
+					</p>
 					<EventListItem {event} last={i === confirmed.length - 1} />
 				{/each}
 			</div>
