@@ -28,7 +28,7 @@ export const hero = {
 	tagline:
 		'Komunita kolem suverénních technologií, paralelních struktur a nehierarchických forem organizace.',
 	ctas: [
-		{ label: 'více o konceptu', href: '/#manifesto' },
+		{ label: 'koncept', href: '/#manifesto' },
 		{ label: 'zapojit se', href: '/zapojit-se' }
 	]
 };
