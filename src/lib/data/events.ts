@@ -15,7 +15,7 @@ export const events: EventItem[] = [
 		title: 'AI x svoboda vol. I',
 		location: 'LibertyLoft, Praha',
 		description:
-			'Umělá inteligence mění svět rychleji, než jsme schopni reflektovat. Jak si zachovat svobodu v éře algoritmů? Večer diskusí, příkladů a praktických nástrojů.',
+			'​Každá technologie, která přišla s příslibem osvobození, nakonec posloužila tomu, kdo ji ovládl. S AI to může dopadnout stejně – nebo jinak, pokud budeme dost rychlí a informovaní.',
 		href: 'https://luma.com/tsdo0qej',
 		posterUrl:
 			'https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,background=white,quality=75,width=400,height=400/uploads/x4/c5e5796e-b40a-44eb-890a-462df2a0deba.png'
