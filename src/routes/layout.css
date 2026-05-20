@@ -48,7 +48,7 @@
 	}
 
 	.book-detail-title {
-		@apply text-[1.5rem] leading-[1.35] font-semibold tracking-[-0.01em] text-balance lg:text-[1.625rem];
+		@apply font-mono text-[1.5rem] leading-[1.35] tracking-[-0.01em] text-balance lg:text-[1.625rem];
 	}
 
 	.link-arrow {
