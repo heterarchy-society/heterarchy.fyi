@@ -7,6 +7,7 @@
 	import UpcomingEvents from '$lib/components/UpcomingEvents.svelte';
 	import Manifesto from '$lib/components/about/Manifesto.svelte';
 	import LibraryLinks from '$lib/components/LibraryLinks.svelte';
+	import Partners from '$lib/components/Partners.svelte';
 	import { featuredEvent, upcomingEvents } from '$lib/data/events';
 
 	const sidebarEvents = upcomingEvents.filter((e) => e.date !== 'TBD');
@@ -42,6 +43,9 @@
 		</div>
 		<div class="cell-roomy lg:col-span-1">
 			<LibraryLinks books={libraryPreview} />
+			<div class="-mx-8 mt-8 border-t border-line px-8 pt-8 lg:-mx-10 lg:px-10">
+				<Partners />
+			</div>
 		</div>
 	</main>
 

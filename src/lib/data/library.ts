@@ -32,9 +32,9 @@ export function getBookById(id: string): LibraryBook | undefined {
 export const libraryName = 'Komunitní svobodomyslná knihovna';
 
 export const libraryLocation = {
-	name: 'LibertyLoft',
+	name: 'Bordel',
 	city: 'Praha',
-	note: 'Fyzické kopie si můžete vypůjčit na poličce.'
+	note: 'Fyzické kopie si půjčíte na poličce (připravujeme!).'
 };
 
 export const libraryIntro = {
@@ -51,7 +51,7 @@ export const libraryContribute = {
 };
 
 export const libraryMeta = {
-	title: `${libraryName} — The Heterarchy Society`,
+	title: 'Knihovna — The Heterarchy Society',
 	description: `${libraryName} — katalog a polička v LibertyLoftu, Praha.`
 };
 
