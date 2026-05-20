@@ -21,7 +21,7 @@
 	let lastTick = 0;
 	let resizeTimer: ReturnType<typeof setTimeout> | undefined;
 
-	const alivePixel = new Uint8ClampedArray([0, 0, 0, 255]);
+	const alivePixel = new Uint8ClampedArray([100, 98, 94, 255]);
 	const deadPixel = new Uint8ClampedArray([250, 248, 244, 255]);
 
 	function thresholds() {
