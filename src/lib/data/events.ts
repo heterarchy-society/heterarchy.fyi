@@ -6,6 +6,7 @@ export type EventItem = {
 	description: string;
 	href?: string;
 	posterUrl?: string;
+	preparation?: boolean;
 };
 
 export const events: EventItem[] = [
@@ -23,9 +24,20 @@ export const events: EventItem[] = [
 	{
 		date: 'Červen 2026',
 		time: '17:00–21:00',
-		title: 'AI x svoboda vol. II (TBD)',
-		location: 'TBD, Praha',
+		title: 'AI x svoboda vol. II',
+		location: 'Praha',
 		description: 'Druhý díl se připravuje. Dáme vědět.',
+		preparation: true
+	},
+	{
+		date: 'TBD',
+		time: 'TBD',
+		title: 'Unfork',
+		location: 'TBD',
+		description:
+			'Konference pro ty, kdo budují alternativy k tradičním institucím — svobodný software, krypto-anarchismus, kooperativní ekonomika a suverénní infrastruktura.',
+		href: 'https://unfork.now/',
+		preparation: true
 	}
 ];
 

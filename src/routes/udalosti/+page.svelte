@@ -3,6 +3,9 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import EventListItem from '$lib/components/events/EventListItem.svelte';
 	import { events, eventsIntro, eventsMeta } from '$lib/data/events';
+
+	const confirmed = events.filter((e) => !e.preparation);
+	const inPreparation = events.filter((e) => e.preparation);
 </script>
 
 <svelte:head>
@@ -20,11 +23,33 @@
 			<p class="page-lead mb-10">{eventsIntro.lead}</p>
 
 			<div>
-				{#each events as event, i}
-					<EventListItem {event} last={i === events.length - 1} />
+				{#each confirmed as event, i}
+					<EventListItem {event} last={i === confirmed.length - 1} />
 				{/each}
 			</div>
 		</section>
+
+		{#if inPreparation.length > 0}
+			<section class="cell-roomy">
+				<p class="label mb-6">Připravujeme</p>
+
+				<ul class="flex flex-col">
+					{#each inPreparation as event, i}
+						<li class="border-line font-mono py-6" class:border-t={i > 0}>
+							<p class="text-[1rem] leading-snug tracking-[-0.01em]">
+								{#if event.href}
+									<a href={event.href} target="_blank" rel="noopener noreferrer" class="no-underline hover:underline">{event.title}</a>
+								{:else}
+									{event.title}
+								{/if}
+							</p>
+							<p class="mt-1 text-[12px] text-black/50">{event.date} · {event.location}</p>
+							<p class="mt-2 max-w-xl text-[13px] leading-[1.55] text-black/60">{event.description}</p>
+						</li>
+					{/each}
+				</ul>
+			</section>
+		{/if}
 
 		<section class="cell-roomy">
 			<p class="max-w-xl text-[15px] leading-[1.65] text-black/75">

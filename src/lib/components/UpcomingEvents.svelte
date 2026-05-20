@@ -8,7 +8,12 @@
 	<span class="pt-px leading-snug">{event.date}</span>
 	<div class="min-w-0">
 		<p class="font-mono leading-snug" class:group-hover:underline={linked}>{event.title}</p>
-		<p class="mt-1 text-[11px] leading-snug text-black/60">{event.location}</p>
+		{#if event.location && event.location !== 'TBD'}
+			<p class="mt-1 text-[11px] leading-snug text-black/60">{event.location}</p>
+		{/if}
+		{#if event.preparation}
+			<span class="mt-1 inline-block font-mono text-[10px] uppercase tracking-wider text-black/40">Připravujeme</span>
+		{/if}
 	</div>
 	{#if linked}
 		<span class="justify-self-end pt-px group-hover:underline">→</span>
@@ -23,22 +28,20 @@
 	{:else}
 		<ul class="font-mono text-[13px]">
 			{#each events as event, i}
-				{@const hasLink = Boolean(event.href)}
+				{@const hasLink = Boolean(event.href) && !event.preparation}
 				{@const external = Boolean(event.href?.startsWith('http'))}
 				<li class:border-b-0={i === events.length - 1} class="border-b border-line">
 					{#if hasLink}
 						<a
 							href={event.href}
-							class="group grid grid-cols-[minmax(3.5rem,max-content)_1fr_auto] items-start gap-4 py-4 no-underline"
+							class="group grid grid-cols-[7rem_1fr_auto] items-start gap-4 py-4 no-underline"
 							target={external ? '_blank' : undefined}
 							rel={external ? 'noopener noreferrer' : undefined}
 						>
 							{@render eventRow(event, true)}
 						</a>
 					{:else}
-						<div
-							class="grid grid-cols-[minmax(3.5rem,max-content)_1fr] items-start gap-4 py-4"
-						>
+						<div class="grid grid-cols-[7rem_1fr] items-start gap-4 py-4">
 							{@render eventRow(event, false)}
 						</div>
 					{/if}
