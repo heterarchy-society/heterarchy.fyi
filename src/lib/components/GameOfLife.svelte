@@ -5,7 +5,6 @@
 	const CELL_PX = 6;
 	const TICK_MS = 200;
 	const STABLE_LIMIT = 14;
-	const INITIAL_DENSITY = 0.3;
 	const MIN_CELLS = 12;
 	const MAX_CELLS = 5000;
 
@@ -23,7 +22,7 @@
 	let resizeTimer: ReturnType<typeof setTimeout> | undefined;
 
 	const alivePixel = new Uint8ClampedArray([0, 0, 0, 102]);
-	const deadPixel = new Uint8ClampedArray([242, 240, 235, 255]);
+	const deadPixel = new Uint8ClampedArray([250, 248, 244, 255]);
 
 	function thresholds() {
 		const cells = cols * rows;
@@ -38,13 +37,54 @@
 		return r * cols + c;
 	}
 
-	function randomGrid(density = INITIAL_DENSITY) {
+	/** Počet živých buněk — nízký/vysoký náhodně, častěji kolem rovnováhy (~25 %). */
+	function randomInitialPopulation() {
+		const cells = cols * rows;
+		const { target, low, critical } = thresholds();
+		const roll = Math.random();
+
+		if (roll < 0.12) {
+			return critical + Math.floor(Math.random() * Math.max(1, low - critical));
+		}
+		if (roll < 0.22) {
+			return low + Math.floor(Math.random() * Math.max(1, target - low));
+		}
+		if (roll < 0.78) {
+			const spread = Math.max(8, Math.floor(target * 0.22));
+			return Math.max(critical, target + Math.floor((Math.random() - 0.5) * 2 * spread));
+		}
+		if (roll < 0.9) {
+			const high = Math.floor(cells * 0.38);
+			return target + Math.floor(Math.random() * Math.max(1, high - target));
+		}
+		return Math.floor(cells * 0.32) + Math.floor(Math.random() * Math.floor(cells * 0.18));
+	}
+
+	function randomGridWithPopulation(count: number) {
 		const cells = cols * rows;
 		const g = new Uint8Array(cells);
-		for (let i = 0; i < cells; i++) {
-			g[i] = Math.random() < density ? 1 : 0;
+		let need = Math.max(0, Math.min(cells, count));
+
+		for (let i = 0; i < cells && need > 0; i++) {
+			if (Math.random() < need / (cells - i)) {
+				g[i] = 1;
+				need--;
+			}
 		}
+
 		return g;
+	}
+
+	function randomGrid() {
+		return randomGridWithPopulation(randomInitialPopulation());
+	}
+
+	/** Nová náhodná populace (klik, start, auto-restart). */
+	function seedGrid() {
+		if (cols === 0 || rows === 0) return false;
+		current = randomGrid();
+		stableTicks = 0;
+		return true;
 	}
 
 	function population(g: Uint8Array) {
@@ -167,8 +207,7 @@
 		const pop = population(current);
 
 		if (pop < critical || stableTicks >= STABLE_LIMIT) {
-			current = randomGrid();
-			stableTicks = 0;
+			seedGrid();
 		} else if (pop < target) {
 			const deficit = target - pop;
 			const batch =
@@ -186,8 +225,7 @@
 			applyLayout();
 			return;
 		}
-		current = randomGrid();
-		stableTicks = 0;
+		seedGrid();
 		draw();
 	}
 
@@ -207,14 +245,14 @@
 			nextRows = Math.max(MIN_CELLS, Math.floor(nextRows * scale));
 		}
 
-		if (nextCols === cols && nextRows === rows && current.length > 0) return;
+		const sameSize = nextCols === cols && nextRows === rows;
+		if (sameSize && population(current) > 0) return;
 
 		cols = nextCols;
 		rows = nextRows;
-		current = randomGrid();
 		next = new Uint8Array(cols * rows);
-		stableTicks = 0;
 		imageData = null;
+		seedGrid();
 
 		canvasEl.width = cols;
 		canvasEl.height = rows;
@@ -240,11 +278,20 @@
 		if (!browser || !wrapEl || !canvasEl) return;
 
 		applyLayout();
+
+		// První mount: layout někdy ještě nemá rozměry — znovu nasadit náhodnou populaci.
+		const seedWhenReady = requestAnimationFrame(() => {
+			if (cols === 0 || population(current) === 0) {
+				applyLayout();
+			}
+		});
+
 		const observer = new ResizeObserver(scheduleLayout);
 		observer.observe(wrapEl);
 		frameId = requestAnimationFrame(loop);
 
 		return () => {
+			cancelAnimationFrame(seedWhenReady);
 			observer.disconnect();
 			cancelAnimationFrame(frameId);
 			clearTimeout(resizeTimer);
