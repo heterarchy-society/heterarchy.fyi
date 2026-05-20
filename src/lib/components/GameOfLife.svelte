@@ -2,12 +2,11 @@
 	import { browser } from '$app/environment';
 	import { onDestroy } from 'svelte';
 
-	const CELL_PX = 6;
+	const CELL_PX = 4;
 	const TICK_MS = 200;
 	const STABLE_LIMIT = 14;
-	const MIN_CELLS = 12;
-	const MAX_CELLS = 5000;
-
+	const MIN_CELLS = 16;
+	const MAX_CELLS = 12000;
 	let wrapEl = $state<HTMLDivElement | null>(null);
 	let canvasEl = $state<HTMLCanvasElement | null>(null);
 	let imageData: ImageData | null = null;
@@ -17,11 +16,12 @@
 	let current: Uint8Array = new Uint8Array(0);
 	let next: Uint8Array = new Uint8Array(0);
 	let stableTicks = 0;
+	let liveCount = $state(0);
 	let frameId = 0;
 	let lastTick = 0;
 	let resizeTimer: ReturnType<typeof setTimeout> | undefined;
 
-	const alivePixel = new Uint8ClampedArray([0, 0, 0, 102]);
+	const alivePixel = new Uint8ClampedArray([0, 0, 0, 255]);
 	const deadPixel = new Uint8ClampedArray([250, 248, 244, 255]);
 
 	function thresholds() {
@@ -37,27 +37,35 @@
 		return r * cols + c;
 	}
 
-	/** Počet živých buněk — nízký/vysoký náhodně, častěji kolem rovnováhy (~25 %). */
+	/** Počáteční počet — řídce až středně; náhodná mřížka nad ~25 % rychle vymírá. */
 	function randomInitialPopulation() {
 		const cells = cols * rows;
-		const { target, low, critical } = thresholds();
+		const { critical } = thresholds();
 		const roll = Math.random();
 
-		if (roll < 0.12) {
-			return critical + Math.floor(Math.random() * Math.max(1, low - critical));
+		if (roll < 0.3) {
+			const min = Math.max(critical, Math.floor(cells * 0.02));
+			const max = Math.max(min + 1, Math.floor(cells * 0.07));
+			return min + Math.floor(Math.random() * (max - min));
 		}
-		if (roll < 0.22) {
-			return low + Math.floor(Math.random() * Math.max(1, target - low));
+		if (roll < 0.65) {
+			const min = Math.floor(cells * 0.07);
+			const max = Math.floor(cells * 0.13);
+			return min + Math.floor(Math.random() * Math.max(1, max - min));
 		}
-		if (roll < 0.78) {
-			const spread = Math.max(8, Math.floor(target * 0.22));
-			return Math.max(critical, target + Math.floor((Math.random() - 0.5) * 2 * spread));
+		if (roll < 0.88) {
+			const min = Math.floor(cells * 0.13);
+			const max = Math.floor(cells * 0.19);
+			return min + Math.floor(Math.random() * Math.max(1, max - min));
 		}
-		if (roll < 0.9) {
-			const high = Math.floor(cells * 0.38);
-			return target + Math.floor(Math.random() * Math.max(1, high - target));
+		if (roll < 0.96) {
+			const min = Math.floor(cells * 0.19);
+			const max = Math.floor(cells * 0.26);
+			return min + Math.floor(Math.random() * Math.max(1, max - min));
 		}
-		return Math.floor(cells * 0.32) + Math.floor(Math.random() * Math.floor(cells * 0.18));
+		const min = Math.floor(cells * 0.26);
+		const max = Math.floor(cells * 0.32);
+		return min + Math.floor(Math.random() * Math.max(1, max - min));
 	}
 
 	function randomGridWithPopulation(count: number) {
@@ -194,6 +202,7 @@
 		}
 
 		ctx.putImageData(imageData, 0, 0);
+		liveCount = population(current);
 	}
 
 	function step() {
@@ -307,7 +316,7 @@
 
 <div
 	bind:this={wrapEl}
-	class="h-full min-h-[220px] w-full cursor-pointer"
+	class="relative h-full min-h-[220px] w-full cursor-pointer"
 	role="button"
 	tabindex="0"
 	title="Klikni pro nové rozložení"
@@ -325,4 +334,10 @@
 		class="pointer-events-none block h-full w-full [image-rendering:pixelated]"
 		aria-hidden="true"
 	></canvas>
+	<span
+		class="pointer-events-none absolute right-3 bottom-3 font-mono text-[11px] tabular-nums tracking-wide text-black [text-shadow:0_0_14px_#fff,0_0_8px_#fff,0_0_3px_#fff,0_1px_0_#faf8f4]"
+		aria-hidden="true"
+	>
+		{liveCount}
+	</span>
 </div>
