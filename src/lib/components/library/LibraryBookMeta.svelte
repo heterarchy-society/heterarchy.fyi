@@ -17,7 +17,5 @@
 	<span class="text-black/35"> · </span>
 	<span>{formatText}</span>
 	{#if book.physical}
-		<span class="text-black/35"> · </span>
-		<span>LibertyLoft</span>
 	{/if}
 </p>

@@ -29,14 +29,6 @@ export const offlineIntro = 'Nemáme vlastní prostor. Aktuálně nás hostují 
 
 export const offlineVenues: OfflineVenue[] = [
 	{
-		label: 'LibertyLoft',
-		value: 'libertyloft.cz',
-		city: 'Praha',
-		country: 'Česko',
-		href: 'https://libertyloft.cz',
-		external: true
-	},
-	{
 		label: 'Bordel',
 		value: 'bordel.wtf',
 		city: 'Praha',

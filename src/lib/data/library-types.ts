@@ -17,7 +17,7 @@ export type LibraryBook = {
 	description: string;
 	language: BookLanguage[];
 	formats: BookFormat[];
-	/** K dispozici na poličce v LibertyLoftu */
+	/** K dispozici fyzicky */
 	physical: boolean;
 	links: LibraryLink[];
 	source?: { name: string; href: string };

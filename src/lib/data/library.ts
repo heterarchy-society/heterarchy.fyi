@@ -52,7 +52,7 @@ export const libraryContribute = {
 
 export const libraryMeta = {
 	title: 'Knihovna — The Heterarchy Society',
-	description: `${libraryName} — katalog a polička v LibertyLoftu, Praha.`
+	description: `${libraryName} — katalog knih The Heterarchy Society.`
 };
 
 export const libraryPreview = libraryBooks.slice(0, 4);

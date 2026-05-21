@@ -49,7 +49,7 @@ export const joinOptions: JoinOption[] = [
 	{
 		label: 'Knihovna',
 		description:
-			'Vypůjč si knihu v LibertyLoftu nebo přines vlastní. Katalog je online.',
+			'Vypůjč si knihu z naší knihovny nebo přines vlastní. Katalog je online.',
 		href: '/knihovna',
 		linkLabel: '→ knihovna',
 		icon: 'book'
