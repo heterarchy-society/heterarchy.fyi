@@ -5,14 +5,7 @@
 
 	const term = $derived($page.url.searchParams.get('term') ?? '');
 	const slug = $derived(term.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''));
-	const fileContent = $derived(`---
-name: ${term}
-type: concept
-keywords: []
-resources: []
----
-
-${term} is ...`);
+	const fileContent = $derived(`---\nname: ${term}\ntype: concept\nkeywords: []\nresources: []\n---\n\n${term} is ...`);
 	const newFileUrl = $derived(
 		`https://github.com/heterarchy-society/glossary/new/main/glossary?filename=${encodeURIComponent(slug + '.md')}&value=${encodeURIComponent(fileContent)}`
 	);
@@ -43,7 +36,7 @@ ${term} is ...`);
 					Glosář je otevřený projekt — každý může přidat nový výraz nebo opravit existující.
 				</p>
 				<p>
-					Pokud víš, co tento pojem znamená, přidej ho na GitHubu. Stačí pár vět — zbytek komunita doplní.
+					Nové pojmy se přidávají v angličtině. Stačí pár vět — překlad komunita doplní.
 				</p>
 			</div>
 
@@ -54,7 +47,7 @@ ${term} is ...`);
 					rel="noopener noreferrer"
 					class="link-arrow text-[13px]"
 				>
-					→ přidat pojem na GitHubu
+					→ přidat anglický pojem na GitHubu
 				</a>
 				<a
 					href="https://github.com/heterarchy-society/glossary"

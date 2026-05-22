@@ -23,7 +23,8 @@
 			if (resolved?.target) {
 				return `<a href="/glosar/${slugForId(resolved.target)}">${key}</a>`;
 			}
-			return `<a href="/glosar/chybi?term=${encodeURIComponent(key)}" class="missing-term">${key}</a>`;
+			const missingTerm = resolved?.key ?? key;
+			return `<a href="/glosar/chybi?term=${encodeURIComponent(missingTerm)}" class="missing-term">${key}</a>`;
 		});
 	}
 
