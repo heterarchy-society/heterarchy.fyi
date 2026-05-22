@@ -27,3 +27,4 @@ vite.config.ts.timestamp-*
 
 # Fetched at build time
 src/lib/data/glossary.json
+src/lib/data/books.json

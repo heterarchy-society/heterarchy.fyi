@@ -32,10 +32,10 @@ preview:
 check-translations:
 	$(BUN) scripts/check-translations.js
 
-## fetch-data: fetch glossary data from remote
+## fetch-data: fetch glossary and books data from remote
 .PHONY: fetch-data
 fetch-data:
-	$(BUN) scripts/fetch-glossary.js
+	$(BUN) scripts/fetch-data.js
 
 ## check: run svelte-check and type checking
 .PHONY: check
