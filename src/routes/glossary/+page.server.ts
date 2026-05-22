@@ -34,10 +34,7 @@ function getContributors(): Contributor[] {
 
 async function fetchChangelog(): Promise<ChangelogEntry[]> {
 	try {
-		// Self-signed cert on glossary.data.heterarchy.fyi — bypass TLS verification
-		process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 		const res = await fetch('https://glossary.data.heterarchy.fyi/changelog.json');
-		process.env.NODE_TLS_REJECT_UNAUTHORIZED = '1';
 		if (!res.ok) return [];
 		return await res.json();
 	} catch {

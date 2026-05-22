@@ -2,7 +2,6 @@ import { writeFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA = resolve(__dirname, '../src/lib/data');
