@@ -135,12 +135,13 @@
 							<p class="label mb-3">Backlinks</p>
 							<ul class="flex flex-col gap-2">
 								{#each data.backlinks as bl}
+									{@const blCs = (bl as any).translations?.cs}
 									<li>
 										<a href="/glosar/{slugForId(bl.id)}" class="no-underline hover:underline leading-snug">
-											{bl.name}
+											{blCs?.name || bl.name}
 										</a>
 										{#if bl.type}
-											<span class="block text-[10px] text-black/35">{bl.type}</span>
+											<span class="block text-[10px] text-black/35">{blCs?.type || bl.type}</span>
 										{/if}
 									</li>
 								{/each}
@@ -153,9 +154,11 @@
 							<p class="label mb-3">Viz také</p>
 							<ul class="flex flex-col gap-2">
 								{#each seeAlso as link}
+									{@const linkTerm = data.allTerms?.find((t: any) => t.id === link.target)}
+									{@const linkName = (linkTerm as any)?.translations?.cs?.name || link.key}
 									<li>
 										<a href="/glosar/{slugForId(link.target)}" class="no-underline hover:underline">
-											{link.key}
+											{linkName}
 										</a>
 									</li>
 								{/each}
