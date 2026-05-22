@@ -29,7 +29,7 @@
 </script>
 
 <svelte:head>
-	<title>{m.books_page_title()} — The Heterarchy Society</title>
+	<title>{m.books_page_label()} — The Heterarchy Society</title>
 	<meta name="description" content={m.books_page_lead()} />
 </svelte:head>
 
