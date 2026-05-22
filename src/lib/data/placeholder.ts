@@ -73,7 +73,7 @@ export const githubOrg = 'https://github.com/heterarchy-society';
 export const githubWebRepo = 'https://github.com/heterarchy-society/heterarchy.cz';
 
 export const footerLinks: FooterLink[] = [
-	{ label: 'kde nás najdete?', href: '/platformy' },
+	{ label: 'kde nás najdete?', href: '/find-us' },
 	{ label: 'git', href: githubOrg }
 ];
 

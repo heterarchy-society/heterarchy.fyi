@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { MapPin } from 'lucide-svelte';
+	import { localizeUrl } from '$lib/i18n';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import LibraryBookMeta from '$lib/components/library/LibraryBookMeta.svelte';
-	import { formatLabels, languageLabels, libraryLocation } from '$lib/data/library';
+	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -11,10 +12,11 @@
 	const book = $derived(data.book);
 	let coverFailed = $state(false);
 	const coverSrc = $derived(coverFailed || !book.coverUrl ? '/book-placeholder.svg' : book.coverUrl);
+	const booksHref = $derived(localizeUrl('/books').pathname);
 </script>
 
 <svelte:head>
-	<title>{book.title} — Knihy</title>
+	<title>{book.title} — {m.books_page_title()}</title>
 	<meta name="description" content={book.description} />
 </svelte:head>
 
@@ -23,14 +25,14 @@
 
 	<main>
 		<section class="cell-roomy border-b border-line">
-			<a href="/knihy" class="link-arrow mb-8 inline-block text-[12px]">← knihovna</a>
+			<a href={booksHref} class="link-arrow mb-8 inline-block text-[12px]">{m.books_detail_back()}</a>
 
 			<div class="grid gap-10 lg:grid-cols-[minmax(200px,280px)_1fr] lg:gap-14">
 				<div class="mx-auto w-full max-w-70 lg:mx-0">
 					<div class="overflow-hidden border border-line bg-bg-muted">
 						<img
 							src={coverSrc}
-							alt="Obálka: {book.title}"
+							alt={m.books_detail_cover_alt({ title: book.title })}
 							width={280}
 							height={420}
 							class="aspect-2/3 w-full object-cover"
@@ -40,7 +42,7 @@
 				</div>
 
 				<div class="min-w-0">
-					<p class="label mb-4">Kniha</p>
+					<p class="label mb-4">{m.books_detail_label()}</p>
 
 					{#if book.year}
 						<p class="mb-2 font-mono text-[11px] text-black/50">{book.year}</p>
@@ -51,40 +53,21 @@
 
 					<LibraryBookMeta {book} fullLanguage />
 
-					<dl class="mt-6 grid gap-4 border-t border-line pt-6 font-mono text-[12px] sm:grid-cols-2">
-						<div>
-							<dt class="label mb-1">Jazyk</dt>
-							<dd class="text-black/75">
-								{book.language.map((l) => languageLabels[l]).join(', ')}
-							</dd>
-						</div>
-						<div>
-							<dt class="label mb-1">Formáty</dt>
-							<dd class="text-black/75">
-								{book.formats.map((f) => formatLabels[f]).join(', ')}
-							</dd>
-						</div>
-					</dl>
-
 					{#if book.physical}
-						<p
-							class="mt-6 flex items-center gap-2 border border-line px-4 py-3 font-mono text-[12px] text-black/70"
-						>
+						<p class="mt-6 flex items-center gap-2 border border-line px-4 py-3 font-mono text-[12px] text-black/70">
 							<MapPin size={14} strokeWidth={1.25} />
-							<span
-								>Fyzická kopie v {libraryLocation.name}, {libraryLocation.city}</span
-							>
+							<span>{m.books_detail_physical({ name: 'Bordel', city: 'Praha' })}</span>
 						</p>
 					{/if}
 
 					<div class="mt-8 max-w-2xl">
-						<p class="label mb-3">O knize</p>
+						<p class="label mb-3">{m.books_detail_about()}</p>
 						<p class="text-[15px] leading-[1.7] text-black/80">{book.description}</p>
 					</div>
 
 					{#if book.links.length > 0}
 						<div class="mt-8">
-							<p class="label mb-3">Kde číst / koupit</p>
+							<p class="label mb-3">{m.books_detail_where_to_read()}</p>
 							<ul class="flex flex-col gap-3">
 								{#each book.links as link}
 									<li>
@@ -112,7 +95,7 @@
 
 					{#if book.source}
 						<p class="mt-10 font-mono text-[11px] text-black/45">
-							Doporučeno v katalogu
+							{m.books_detail_recommended_in()}
 							<a href={book.source.href} class="underline" target="_blank" rel="noopener noreferrer">
 								{book.source.name}
 							</a>

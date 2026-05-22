@@ -2,6 +2,7 @@
 	import { Calendar, Clock, MapPin } from 'lucide-svelte';
 	import type { EventItem } from '$lib/data/events';
 	import EventPoster from '$lib/components/events/EventPoster.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	let { event }: { event: EventItem } = $props();
 
@@ -10,7 +11,7 @@
 </script>
 
 <section>
-	<p class="label">Doporučená událost</p>
+	<p class="label">{m.featured_event_label()}</p>
 
 	<div class="flex flex-col gap-8 sm:flex-row sm:items-start">
 		<EventPoster {event} />
@@ -55,7 +56,7 @@
 					target={isExternal ? '_blank' : undefined}
 					rel={isExternal ? 'noopener noreferrer' : undefined}
 				>
-					→ detail události
+					{m.featured_event_detail()}
 				</a>
 			{/if}
 		</div>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { EventItem } from '$lib/data/events';
+	import * as m from '$lib/paraglide/messages';
 
 	let { events }: { events: EventItem[] } = $props();
 </script>
@@ -12,7 +13,7 @@
 			<p class="mt-1 text-[11px] leading-snug text-black/60">{event.location}</p>
 		{/if}
 		{#if event.preparation}
-			<span class="mt-1 inline-block font-mono text-[10px] uppercase tracking-wider text-black/40">Připravujeme</span>
+			<span class="mt-1 inline-block font-mono text-[10px] uppercase tracking-wider text-black/40">{m.upcoming_events_in_preparation()}</span>
 		{/if}
 	</div>
 	{#if linked}
@@ -21,10 +22,10 @@
 {/snippet}
 
 <section>
-	<p class="label">Nadcházející události</p>
+	<p class="label">{m.upcoming_events_label()}</p>
 
 	{#if events.length === 0}
-		<p class="font-mono text-[12px] text-black/50">Zatím nic dalšího.</p>
+		<p class="font-mono text-[12px] text-black/50">{m.upcoming_events_empty()}</p>
 	{:else}
 		<ul class="font-mono text-[13px]">
 			{#each events as event, i}

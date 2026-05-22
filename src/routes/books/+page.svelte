@@ -1,17 +1,11 @@
 <script lang="ts">
 	import { MapPin, Search } from 'lucide-svelte';
+	import { localizeUrl } from '$lib/i18n';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import LibraryBookCard from '$lib/components/library/LibraryBookCard.svelte';
-	import {
-		libraryBooks,
-		libraryContribute,
-		libraryIntro,
-		libraryLocation,
-		libraryMeta,
-		libraryName,
-		type LibraryBook
-	} from '$lib/data/library';
+	import { libraryBooks, type LibraryBook } from '$lib/data/library';
+	import * as m from '$lib/paraglide/messages';
 
 	let query = $state('');
 
@@ -27,8 +21,8 @@
 </script>
 
 <svelte:head>
-	<title>{libraryMeta.title}</title>
-	<meta name="description" content={libraryMeta.description} />
+	<title>{m.books_page_title()} — The Heterarchy Society</title>
+	<meta name="description" content={m.books_page_lead()} />
 </svelte:head>
 
 <div class="min-h-screen w-full">
@@ -36,17 +30,17 @@
 
 	<main>
 		<section class="cell-roomy">
-			<p class="label">{libraryIntro.label}</p>
+			<p class="label">{m.books_page_label()}</p>
 
-			<h1 class="page-lead mb-4">{libraryName}</h1>
+			<h1 class="page-lead mb-4">{m.books_page_title()}</h1>
 
-			<p class="mb-8 max-w-xl text-[15px] leading-[1.65] text-black/75">{libraryIntro.lead}</p>
+			<p class="mb-8 max-w-xl text-[15px] leading-[1.65] text-black/75">{m.books_page_lead()}</p>
 
 			<div class="flex items-start gap-2.5 font-mono text-[12px]">
 				<MapPin size={14} strokeWidth={1.25} class="mt-0.5 shrink-0" />
 				<div>
-					<p class="font-semibold">{libraryLocation.name}, {libraryLocation.city}</p>
-					<p class="mt-1 text-black/60">{libraryLocation.note}</p>
+					<p class="font-semibold">Bordel, Praha</p>
+					<p class="mt-1 text-black/60">{m.books_page_location_note()}</p>
 				</div>
 			</div>
 		</section>
@@ -54,7 +48,7 @@
 		{#if libraryBooks.length > 0}
 			<section class="border-b border-line">
 				<div class="border-b border-line px-8 py-4 lg:px-10">
-					<label class="sr-only" for="library-search">Hledat v knihovně</label>
+					<label class="sr-only" for="library-search">{m.books_search_label()}</label>
 					<div class="relative max-w-md">
 						<Search
 							size={14}
@@ -66,7 +60,7 @@
 							id="library-search"
 							type="search"
 							bind:value={query}
-							placeholder="Hledat knihu, autora…"
+							placeholder={m.books_search_placeholder()}
 							class="w-full border-0 border-b border-line bg-transparent py-2 pr-8 pl-5 font-mono text-[13px] outline-none placeholder:text-black/40 focus:border-black"
 						/>
 						{#if isSearching}
@@ -75,13 +69,13 @@
 								class="absolute top-1/2 right-0 -translate-y-1/2 font-mono text-[11px] text-black/45 hover:text-black"
 								onclick={() => (query = '')}
 							>
-								zrušit
+								{m.books_search_cancel()}
 							</button>
 						{/if}
 					</div>
 					{#if isSearching}
 						<p class="mt-3 font-mono text-[11px] text-black/50">
-							Zobrazeno {filteredBooks.length} z {libraryBooks.length}
+							{m.books_search_showing({ count: String(filteredBooks.length), total: String(libraryBooks.length) })}
 						</p>
 					{/if}
 				</div>
@@ -96,18 +90,17 @@
 					</div>
 				{:else}
 					<p class="px-8 py-12 font-mono text-[13px] text-black/55 lg:px-10">
-						Nic nenalezeno. Zkus jiný výraz.
+						{m.books_no_results()}
 					</p>
 				{/if}
 			</section>
 		{/if}
 
 		<section class="cell-roomy" id="darovat">
-			<p class="max-w-xl text-[15px] leading-[1.65] text-black/75">{libraryContribute.text}</p>
+			<p class="max-w-xl text-[15px] leading-[1.65] text-black/75">{m.books_contribute_text()}</p>
 			<div class="mt-6 flex flex-wrap gap-x-8 gap-y-3">
-				{#each libraryContribute.links as link}
-					<a href={link.href} class="link-arrow text-[13px]">{link.label}</a>
-				{/each}
+				<a href={localizeUrl('/find-us')} class="link-arrow text-[13px]">{m.books_contribute_where()}</a>
+				<a href={localizeUrl('/join').pathname} class="link-arrow text-[13px]">{m.books_contribute_join()}</a>
 			</div>
 		</section>
 	</main>

@@ -2,15 +2,17 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import EventListItem from '$lib/components/events/EventListItem.svelte';
-	import { events, eventsIntro, eventsMeta } from '$lib/data/events';
+	import { localizeUrl } from '$lib/i18n';
+	import { events } from '$lib/data/events';
+	import * as m from '$lib/paraglide/messages';
 
 	const confirmed = events.filter((e) => !e.preparation);
 	const inPreparation = events.filter((e) => e.preparation);
 </script>
 
 <svelte:head>
-	<title>{eventsMeta.title}</title>
-	<meta name="description" content={eventsMeta.description} />
+	<title>{m.events_label()} — The Heterarchy Society</title>
+	<meta name="description" content={m.events_lead()} />
 </svelte:head>
 
 <div class="min-h-screen w-full">
@@ -18,9 +20,9 @@
 
 	<main>
 		<section class="cell-roomy">
-			<p class="label">Události</p>
+			<p class="label">{m.events_label()}</p>
 
-			<p class="page-lead mb-10">{eventsIntro.lead}</p>
+			<p class="page-lead mb-10">{m.events_lead()}</p>
 
 			<div>
 				{#each confirmed as event, i}
@@ -34,7 +36,7 @@
 
 		{#if inPreparation.length > 0}
 			<section class="cell-roomy">
-				<p class="label mb-6">Připravujeme</p>
+				<p class="label mb-6">{m.events_in_preparation()}</p>
 
 				<ul class="flex flex-col">
 					{#each inPreparation as event, i}
@@ -55,10 +57,8 @@
 		{/if}
 
 		<section class="cell-roomy">
-			<p class="max-w-xl text-[15px] leading-[1.65] text-black/75">
-				Máš nápad na formát nebo termín? Uspořádej událost s námi.
-			</p>
-			<a href="/zapojit-se" class="link-arrow mt-6 inline-block text-[13px]">→ zapojit se</a>
+			<p class="max-w-xl text-[15px] leading-[1.65] text-black/75">{m.events_cta_text()}</p>
+			<a href={localizeUrl('/join')} class="link-arrow mt-6 inline-block text-[13px]">{m.events_cta_link()}</a>
 		</section>
 	</main>
 

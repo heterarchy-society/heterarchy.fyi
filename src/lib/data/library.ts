@@ -22,7 +22,7 @@ export const languageLabels: Record<BookLanguage, string> = {
 };
 
 export function bookPath(id: string): string {
-	return `/knihy/${id}`;
+	return `/books/${id}`;
 }
 
 export function getBookById(id: string): LibraryBook | undefined {
@@ -45,7 +45,7 @@ export const libraryIntro = {
 export const libraryContribute = {
 	text: 'Chybí kniha? Napiš nám.',
 	links: [
-		{ label: '→ kde nás najdete?', href: '/platformy' },
+		{ label: '→ kde nás najdete?', href: '/find-us' },
 		{ label: '→ zapojit se', href: '/zapojit-se' }
 	]
 };

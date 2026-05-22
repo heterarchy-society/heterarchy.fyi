@@ -2,6 +2,8 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import DiffViewer from '$lib/components/DiffViewer.svelte';
+	import { localizeUrl } from '$lib/i18n';
+	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -18,6 +20,8 @@
 	let loading = $state(true);
 	let fetchError = $state<string | null>(null);
 
+	const historyHref = $derived(localizeUrl(`/glossary/${data.termId}/history`));
+
 	function formatDate(iso: string) {
 		return new Date(iso).toLocaleDateString('cs-CZ', {
 			day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -33,9 +37,9 @@
 				if (!res.ok) throw new Error(`HTTP ${res.status}`);
 				const history: HistoryEntry[] = await res.json();
 				entry = history.find((e) => e.hash === data.commitHash || e.hash.startsWith(data.commitHash)) ?? null;
-				if (!entry) throw new Error('Commit nenalezen');
+				if (!entry) throw new Error('Commit not found');
 			} catch (e: any) {
-				fetchError = e.message ?? 'Nepodařilo se načíst commit.';
+				fetchError = e.message ?? m.glossary_load_error();
 			} finally {
 				loading = false;
 			}
@@ -45,7 +49,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.commitHash.slice(0, 7)} · Historie — Glosář — The Heterarchy Society</title>
+	<title>{data.commitHash.slice(0, 7)} · {m.glossary_history_label()} — The Heterarchy Society</title>
 </svelte:head>
 
 <div class="min-h-screen w-full">
@@ -53,10 +57,10 @@
 
 	<main>
 		<section class="cell-roomy">
-			<a href="/glosar/{data.termSlug}/historie" class="label mb-4 inline-block hover:underline">← {data.termName}</a>
+			<a href={historyHref} class="label mb-4 inline-block hover:underline">{m.glossary_history_back({ name: data.termName })}</a>
 
 			{#if loading}
-				<p class="font-mono text-[13px] text-black/40">Načítám…</p>
+				<p class="font-mono text-[13px] text-black/40">{m.glossary_loading()}</p>
 			{:else if fetchError}
 				<p class="font-mono text-[13px] text-red-600">{fetchError}</p>
 			{:else if entry}

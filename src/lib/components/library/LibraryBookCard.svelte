@@ -1,13 +1,15 @@
 <script lang="ts">
+	import { localizeUrl } from '$lib/i18n';
 	import { bookPath, type LibraryBook } from '$lib/data/library';
 	import LibraryBookMeta from './LibraryBookMeta.svelte';
+	import * as m from '$lib/paraglide/messages';
 
 	let { book, large = false }: { book: LibraryBook; large?: boolean } = $props();
 
 	let coverFailed = $state(false);
 
 	const coverSrc = $derived(coverFailed || !book.coverUrl ? '/book-placeholder.svg' : book.coverUrl);
-	const href = $derived(bookPath(book.id));
+	const href = $derived(localizeUrl(bookPath(book.id)));
 </script>
 
 <a {href} class="group flex h-full flex-col no-underline text-inherit">
@@ -17,7 +19,7 @@
 	>
 		<img
 			src={coverSrc}
-			alt="Obálka: {book.title}"
+			alt={m.books_detail_cover_alt({ title: book.title })}
 			width={large ? 320 : 240}
 			height={large ? 480 : 360}
 			class="aspect-2/3 w-full object-cover"

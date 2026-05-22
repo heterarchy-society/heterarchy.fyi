@@ -12,7 +12,7 @@ export function load({ params }: Parameters<PageLoad>[0]) {
 	);
 
 	if (!term) {
-		error(404, 'Pojem nenalezen');
+		error(404, 'Term not found');
 	}
 
 	const cs = (term as any).translations?.cs ?? null;

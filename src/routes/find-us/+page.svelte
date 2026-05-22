@@ -1,11 +1,12 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
-	import { onlineChannels, offlineVenues, offlineIntro, contactIntro, contactMeta } from '$lib/data/contact';
+	import { onlineChannels, offlineVenues, contactMeta } from '$lib/data/contact';
+	import * as m from '$lib/paraglide/messages';
 </script>
 
 <svelte:head>
-	<title>{contactMeta.title}</title>
+	<title>{m.find_us_label()} — The Heterarchy Society</title>
 	<meta name="description" content={contactMeta.description} />
 </svelte:head>
 
@@ -14,13 +15,13 @@
 
 	<main>
 		<section class="cell-roomy">
-			<p class="label">{contactIntro.title}</p>
+			<p class="label">{m.find_us_label()}</p>
 
-			<p class="page-lead mb-6">{contactIntro.lead}</p>
+			<p class="page-lead mb-6">{m.find_us_lead()}</p>
 
 			<div class="flex flex-col gap-12">
 				<div>
-					<p class="font-mono text-[11px] tracking-wide uppercase mb-4 text-black/50">Online</p>
+					<p class="font-mono text-[11px] tracking-wide uppercase mb-4 text-black/50">{m.find_us_online()}</p>
 					<ul>
 						{#each onlineChannels as channel, i}
 							<li class:border-b-0={i === onlineChannels.length - 1} class="border-b border-line">
@@ -39,8 +40,8 @@
 				</div>
 
 				<div>
-					<p class="font-mono text-[11px] tracking-wide uppercase mb-4 text-black/50">Offline</p>
-					<p class="mb-4 max-w-xl text-[15px] leading-[1.65] text-black/75">{offlineIntro}</p>
+					<p class="font-mono text-[11px] tracking-wide uppercase mb-4 text-black/50">{m.find_us_offline()}</p>
+					<p class="mb-4 max-w-xl text-[15px] leading-[1.65] text-black/75">{m.find_us_offline_intro()}</p>
 					<ul>
 						{#each offlineVenues as venue, i}
 							<li class:border-b-0={i === offlineVenues.length - 1} class="border-b border-line">

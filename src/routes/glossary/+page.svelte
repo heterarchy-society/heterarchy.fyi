@@ -1,48 +1,59 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import { localizeUrl, getLocale } from '$lib/i18n';
+	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
-	function csName(term: any): string | null {
-		const cs = term.translations?.cs;
-		return cs?.name ? cs.name : null;
-	}
-
-	function csType(term: any): string | null {
-		const cs = term.translations?.cs;
-		return cs?.type ? cs.type : null;
-	}
-
 	function displayName(term: any): string {
-		return csName(term) ?? term.name;
+		if (getLocale() === 'cs') {
+			return term.translations?.cs?.name ?? term.name;
+		}
+		return term.name;
+	}
+
+	function displayType(term: any): string | null {
+		if (getLocale() === 'cs') {
+			return term.translations?.cs?.type ?? term.type ?? null;
+		}
+		return term.type ?? null;
+	}
+
+	function termHref(term: any): string {
+		// On CS locale use CS slug, on EN use EN id
+		const id = getLocale() === 'cs'
+			? (term.translations?.cs?.slug ?? term.id)
+			: term.id;
+		return localizeUrl(`/glossary/${id}`);
 	}
 
 	const letters = $derived(() => {
+		const locale = getLocale() === 'cs' ? 'cs' : 'en';
 		const set = new Set<string>();
 		for (const term of data.terms) set.add(displayName(term)[0].toUpperCase());
-		return [...set].sort((a, b) => a.localeCompare(b, 'cs'));
+		return [...set].sort((a, b) => a.localeCompare(b, locale));
 	});
 
 	const byLetter = $derived(() => {
+		const locale = getLocale() === 'cs' ? 'cs' : 'en';
 		const map = new Map<string, typeof data.terms>();
 		for (const term of data.terms) {
 			const l = displayName(term)[0].toUpperCase();
 			if (!map.has(l)) map.set(l, []);
 			map.get(l)!.push(term);
 		}
-		// sort each bucket by display name
 		for (const [, bucket] of map) {
-			bucket.sort((a, b) => displayName(a).localeCompare(displayName(b), 'cs'));
+			bucket.sort((a, b) => displayName(a).localeCompare(displayName(b), locale));
 		}
 		return map;
 	});
 </script>
 
 <svelte:head>
-	<title>Glosář — The Heterarchy Society</title>
-	<meta name="description" content="Glosář pojmů kolem suverénních technologií, kryptoanarchismu, soukromí a decentralizace." />
+	<title>{m.glossary_label()} — The Heterarchy Society</title>
+	<meta name="description" content={m.glossary_lead()} />
 </svelte:head>
 
 <div class="min-h-screen w-full">
@@ -50,8 +61,8 @@
 
 	<main>
 		<section class="cell-roomy">
-			<p class="label">Glosář</p>
-			<p class="page-lead mb-10">Pojmy, koncepty a technologie</p>
+			<p class="label">{m.glossary_label()}</p>
+			<p class="page-lead mb-10">{m.glossary_lead()}</p>
 
 			<nav class="mb-10 flex flex-wrap gap-2 font-mono text-[12px]">
 				{#each letters() as letter}
@@ -67,20 +78,18 @@
 						<p class="mb-4 font-mono text-[11px] tracking-[0.2em] uppercase text-black/30">{letter}</p>
 						<ul class="flex flex-col divide-y divide-line">
 							{#each byLetter().get(letter) ?? [] as term}
-								{@const translated = csName(term)}
+								{@const csTranslated = getLocale() === 'cs' && term.translations?.cs?.name}
+								{@const type = displayType(term)}
 								<li>
-									<a
-										href="/glosar/{(term as any).translations?.cs?.slug ?? term.id}"
-										class="group flex items-baseline gap-3 py-3 no-underline"
-									>
+									<a href={termHref(term)} class="group flex items-baseline gap-3 py-3 no-underline">
 										<span class="font-mono text-[14px] leading-snug">
 											<span class="group-hover:underline">{displayName(term)}</span>
-											{#if translated}
+											{#if csTranslated && term.translations.cs.name !== term.name}
 												<span class="text-black/35 no-underline"> ({term.name})</span>
 											{/if}
 										</span>
-										{#if term.type}
-											<span class="font-mono text-[10px] uppercase tracking-wider text-black/35 whitespace-nowrap">{csType(term) ?? term.type}</span>
+										{#if type}
+											<span class="font-mono text-[10px] uppercase tracking-wider text-black/35 whitespace-nowrap">{type}</span>
 										{/if}
 										<span class="ml-auto font-mono text-[12px] text-black/30 group-hover:text-black">→</span>
 									</a>
@@ -91,7 +100,7 @@
 				{/each}
 			</div>
 
-			<p class="mt-8 font-mono text-[11px] text-black/35">{data.terms.length} pojmů</p>
+			<p class="mt-8 font-mono text-[11px] text-black/35">{m.glossary_term_count({ count: String(data.terms.length) })}</p>
 		</section>
 	</main>
 

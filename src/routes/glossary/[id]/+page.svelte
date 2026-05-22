@@ -3,28 +3,39 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import { renderMarkdown } from '$lib/markdown';
 	import { page } from '$app/stores';
+	import { localizeUrl, getLocale } from '$lib/i18n';
+	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
 	const cs = $derived((data.term as any).translations?.cs ?? null);
-	const hasCs = $derived(cs?.name && cs?.description);
-	const lang = $derived($page.url.searchParams.get('lang') === 'en' ? 'en' : (hasCs ? 'cs' : 'en'));
+	const hasCs = $derived(!!(cs?.name && cs?.description));
+	// Use app locale: show Czech content only when app is in Czech AND translation exists
+	const showCs = $derived(getLocale() === 'cs' && hasCs);
 
-	const activeName = $derived(lang === 'cs' && hasCs ? cs.name : data.term.name);
-	const activeType = $derived(lang === 'cs' && cs?.type ? cs.type : data.term.type);
-	const activeDescription = $derived(lang === 'cs' && hasCs ? cs.description : data.term.description);
+	const activeName = $derived(showCs ? cs.name : data.term.name);
+	const activeType = $derived(showCs && cs?.type ? cs.type : data.term.type);
+	const activeDescription = $derived(showCs ? cs.description : data.term.description);
 
+	function slugForId(id: string): string {
+		const t = data.allTerms?.find((x: any) => x.id === id);
+		return (t as any)?.translations?.cs?.slug ?? id;
+	}
+
+	function termHref(id: string): string {
+		return localizeUrl(`/glossary/${slugForId(id)}`);
+	}
 
 	function processDescription(text: string, resolvedLinks: any[]): string {
 		let i = 0;
 		return text.replace(/\[\[([^\|\]]+)\|?([^\]]*)\]\]/g, (_, key) => {
 			const resolved = resolvedLinks[i++];
 			if (resolved?.target) {
-				return `<a href="/glosar/${slugForId(resolved.target)}">${key}</a>`;
+				return `<a href="${termHref(resolved.target)}">${key}</a>`;
 			}
 			const missingTerm = resolved?.key ?? key;
-			return `<a href="/glosar/chybi?term=${encodeURIComponent(missingTerm)}" class="missing-term">${key}</a>`;
+			return `<a href="${localizeUrl('/glossary/missing')}?term=${encodeURIComponent(missingTerm)}" class="missing-term">${key}</a>`;
 		});
 	}
 
@@ -33,10 +44,8 @@
 	const lastEdit = $derived((data.term as any).history?.[0]?.date ?? null);
 	const historyCount = $derived((data.term as any).history?.length ?? 0);
 
-	function slugForId(id: string): string {
-		const t = data.allTerms?.find((x: any) => x.id === id);
-		return (t as any)?.translations?.cs?.slug ?? id;
-	}
+	const glossaryHref = $derived(localizeUrl('/glossary'));
+	const historyHref = $derived(localizeUrl(`/glossary/${$page.params.id}/history`));
 
 	function formatDate(iso: string) {
 		return new Date(iso).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -44,7 +53,7 @@
 </script>
 
 <svelte:head>
-	<title>{activeName} — Glosář — The Heterarchy Society</title>
+	<title>{activeName} — {m.glossary_label()} — The Heterarchy Society</title>
 	<meta name="description" content={activeDescription.slice(0, 160).replace(/\[\[.*?\]\]/g, '')} />
 </svelte:head>
 
@@ -57,10 +66,10 @@
 
 				<!-- Left: main content -->
 				<div class="min-w-0">
-					<a href="/glosar" class="label mb-4 inline-block hover:underline">Glosář</a>
+					<a href={glossaryHref} class="label mb-4 inline-block hover:underline">{m.glossary_label()}</a>
 					<h1 class="page-lead mb-2">
 						{activeName}<!--
-					-->{#if lang === 'cs' && cs && cs.name !== data.term.name}&nbsp;<span class="text-black/35">({data.term.name})</span>{/if}
+					-->{#if showCs && cs.name !== data.term.name}&nbsp;<span class="text-black/35">({data.term.name})</span>{/if}
 					</h1>
 					{#if activeType}
 						<p class="mb-8 font-mono text-[11px] uppercase tracking-widest text-black/40">{activeType}</p>
@@ -73,33 +82,23 @@
 						{@html html}
 					</div>
 
-					{#if lang === 'cs' && hasCs}
-						<div class="mt-6 flex items-baseline justify-between gap-4 border-t border-line pt-4">
-							<p class="font-mono text-[11px] text-black/35">Přeloženo modelem {cs.model} · {formatDate(cs.translated_at)}</p>
-							<a href="?lang=en" class="font-mono text-[11px] text-black/40 hover:text-black no-underline hover:underline whitespace-nowrap">anglicky →</a>
-						</div>
-					{:else if lang === 'en' && hasCs}
-						<div class="mt-6 flex items-baseline justify-end border-t border-line pt-4">
-							<a href="?" class="font-mono text-[11px] text-black/40 hover:text-black no-underline hover:underline whitespace-nowrap">← česky</a>
-						</div>
-					{:else if !hasCs}
+					{#if showCs}
 						<div class="mt-6 border-t border-line pt-4">
-							<p class="font-mono text-[11px] text-black/35">Tento termín zatím nebyl přeložen.</p>
+							<p class="font-mono text-[11px] text-black/35">{m.glossary_translated_by({ model: cs.model, date: formatDate(cs.translated_at) })}</p>
+						</div>
+					{:else if getLocale() === 'cs' && !hasCs}
+						<div class="mt-6 border-t border-line pt-4">
+							<p class="font-mono text-[11px] text-black/35">{m.glossary_not_translated()}</p>
 						</div>
 					{/if}
 
 					{#if data.term.resources && data.term.resources.length > 0}
 						<div class="mt-10 border-t border-line pt-8">
-							<p class="label mb-4">Zdroje</p>
+							<p class="label mb-4">{m.glossary_sources()}</p>
 							<ul class="flex flex-col gap-3">
 								{#each data.term.resources as resource}
 									<li class="flex items-baseline gap-3">
-										<a
-											href={resource.url}
-											target="_blank"
-											rel="noopener noreferrer"
-											class="link-arrow text-[13px]"
-										>
+										<a href={resource.url} target="_blank" rel="noopener noreferrer" class="link-arrow text-[13px]">
 											→ {resource.title}
 										</a>
 										{#if resource.lang}
@@ -120,28 +119,29 @@
 							target="_blank"
 							rel="noopener noreferrer"
 							class="text-[11px] text-black/40 no-underline hover:underline hover:text-black"
-						>→ upravit na GitHubu</a>
-						<a
-							href="/glosar/{$page.params.id}/historie"
-							class="text-[11px] text-black/40 no-underline hover:underline hover:text-black"
-						>→ historie editací{#if historyCount > 0}&nbsp;({historyCount}){/if}</a>
+						>{m.glossary_edit_on_github()}</a>
+						<a href={historyHref} class="text-[11px] text-black/40 no-underline hover:underline hover:text-black">
+							{#if historyCount > 0}{m.glossary_edit_history_count({ count: String(historyCount) })}{:else}{m.glossary_edit_history()}{/if}
+						</a>
 						{#if lastEdit}
-							<p class="text-[10px] text-black/30">editováno {formatDate(lastEdit)}</p>
+							<p class="text-[10px] text-black/30">{m.glossary_last_edited({ date: formatDate(lastEdit) })}</p>
 						{/if}
 					</div>
 
 					{#if data.backlinks.length > 0}
 						<div>
-							<p class="label mb-3">Backlinks</p>
+							<p class="label mb-3">{m.glossary_backlinks()}</p>
 							<ul class="flex flex-col gap-2">
 								{#each data.backlinks as bl}
 									{@const blCs = (bl as any).translations?.cs}
+									{@const blName = getLocale() === 'cs' && blCs?.name ? blCs.name : bl.name}
+									{@const blType = getLocale() === 'cs' && blCs?.type ? blCs.type : bl.type}
 									<li>
-										<a href="/glosar/{slugForId(bl.id)}" class="no-underline hover:underline leading-snug">
-											{blCs?.name || bl.name}
+										<a href={termHref(bl.id)} class="no-underline hover:underline leading-snug">
+											{blName}
 										</a>
-										{#if bl.type}
-											<span class="block text-[10px] text-black/35">{blCs?.type || bl.type}</span>
+										{#if blType}
+											<span class="block text-[10px] text-black/35">{blType}</span>
 										{/if}
 									</li>
 								{/each}
@@ -151,13 +151,14 @@
 
 					{#if seeAlso.length > 0}
 						<div>
-							<p class="label mb-3">Viz také</p>
+							<p class="label mb-3">{m.glossary_see_also()}</p>
 							<ul class="flex flex-col gap-2">
 								{#each seeAlso as link}
 									{@const linkTerm = data.allTerms?.find((t: any) => t.id === link.target)}
-									{@const linkName = (linkTerm as any)?.translations?.cs?.name || link.key}
+									{@const linkCsName = (linkTerm as any)?.translations?.cs?.name}
+									{@const linkName = getLocale() === 'cs' && linkCsName ? linkCsName : link.key}
 									<li>
-										<a href="/glosar/{slugForId(link.target)}" class="no-underline hover:underline">
+										<a href={termHref(link.target)} class="no-underline hover:underline">
 											{linkName}
 										</a>
 									</li>
@@ -165,7 +166,6 @@
 							</ul>
 						</div>
 					{/if}
-
 				</aside>
 			</div>
 		</section>
