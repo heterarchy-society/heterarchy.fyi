@@ -570,6 +570,146 @@ export const libraryBooks: LibraryBook[] = [
 		source: { name: 'Internet Archive', href: 'https://archive.org/details/vanishing-culture-2026' }
 	},
 	{
+		id: 'free-culture',
+		title: 'Free Culture: How Big Media Uses Technology and the Law to Lock Down Culture and Control Creativity',
+		author: 'Lawrence Lessig',
+		year: '2004',
+		coverUrl: '/books/free-culture.gif',
+		description:
+			'Jak mediální giganti pomocí práva a technologie uzavírají kulturu — a proč je to katastrofa pro kreativitu. Lessig, zakladatel Creative Commons, staví případ pro otevřenou kulturu.',
+		language: ['en'],
+		formats: ['pdf', 'web'],
+		physical: false,
+		links: [
+			{
+				href: 'https://lessig.org/product/free-culture/',
+				label: '→ číst zdarma',
+				external: true
+			}
+		],
+		source: { name: 'Lawrence Lessig', href: 'https://lessig.org/product/free-culture/' }
+	},
+	{
+		id: 'public-domain',
+		title: 'The Public Domain: Enclosing the Commons of the Mind',
+		author: 'James Boyle',
+		year: '2008',
+		coverUrl: '/books/public-domain.jpg',
+		description:
+			'Jak se copyright rozrůstá a ničí kulturní commons. Boyle analyzuje "druhé ohrazování" — privatizaci idejí, která ohrožuje vědu, umění i internet. Volně dostupné online.',
+		language: ['en'],
+		formats: ['pdf', 'web'],
+		physical: false,
+		links: [
+			{
+				href: 'https://www.thepublicdomain.org/download/',
+				label: '→ stáhnout zdarma',
+				external: true
+			}
+		],
+		source: { name: 'Yale University Press', href: 'https://www.thepublicdomain.org/' }
+	},
+	{
+		id: 'copyrights-and-copywrongs',
+		title: 'Copyrights and Copywrongs: The Rise of Intellectual Property and How It Threatens Creativity',
+		author: 'Siva Vaidhyanathan',
+		year: '2001',
+		coverUrl: '/books/copyrights-and-copywrongs.jpg',
+		description:
+			'Historie toho, jak copyright byl unesen průmyslem — od Marka Twaina přes Disney až po digitální věk. Vaidhyanathan ukazuje, jak ochrana autorů přerostla v nástroj korporátní kontroly.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://nyupress.org/9780814788073/copyrights-and-copywrongs/',
+				label: '→ NYU Press',
+				external: true
+			}
+		],
+		source: { name: 'NYU Press', href: 'https://nyupress.org/9780814788073/copyrights-and-copywrongs/' }
+	},
+	{
+		id: 'starfish-and-spider',
+		title: 'The Starfish and the Spider: The Unstoppable Power of Leaderless Organizations',
+		author: 'Ori Brafman & Rod A. Beckstrom',
+		year: '2006',
+		coverUrl: '/books/starfish-and-spider.png',
+		description:
+			'Proč decentralizované organizace přežívají útoky, které by zničily centralizované. Brafman a Beckstrom mapují logiku leaderless hnutí — od AA přes Wikipedia až po al-Káidu.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://www.penguinrandomhouse.com/books/298985/the-starfish-and-the-spider-by-ori-brafman-and-rod-a-beckstrom/',
+				label: '→ web knihy',
+				external: true
+			}
+		],
+		source: { name: 'Portfolio', href: 'https://www.penguinrandomhouse.com/books/298985/the-starfish-and-the-spider-by-ori-brafman-and-rod-a-beckstrom/' }
+	},
+	{
+		id: 'working-in-public',
+		title: 'Working in Public: The Making and Maintenance of Open Source Software',
+		author: 'Nadia Eghbal',
+		year: '2020',
+		coverUrl: '/books/working-in-public.jpg',
+		description:
+			'Jak open source skutečně funguje — ne jako romantický komunismus, ale jako komplexní ekosystém s různými modely správy, motivace a udržitelnosti. Nejlepší současná analýza decentralizované tvorby.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://press.stripe.com/working-in-public',
+				label: '→ Stripe Press',
+				external: true
+			}
+		],
+		source: { name: 'Stripe Press', href: 'https://press.stripe.com/working-in-public' }
+	},
+	{
+		id: 'taz',
+		title: 'T.A.Z.: The Temporary Autonomous Zone, Ontological Anarchy, Poetic Terrorism',
+		author: 'Hakim Bey',
+		year: '1991',
+		coverUrl: '/books/taz.jpg',
+		description:
+			'Pirátské utopie, autonomní zóny a poetický terorismus — Hakim Bey definuje TAZ jako dočasný prostor svobody mimo dosah státu. Zakládající text autonomistické kultury a inspirace hackerspace hnutí.',
+		language: ['en'],
+		formats: ['pdf', 'web'],
+		physical: false,
+		links: [
+			{
+				href: 'https://archive.org/details/T.A.Z.TheTemporaryAutonomousZoneOntologicalAnarchyPoeticTerrorism',
+				label: '→ číst na archive.org',
+				external: true
+			}
+		],
+		source: { name: 'Internet Archive', href: 'https://archive.org/details/T.A.Z.TheTemporaryAutonomousZoneOntologicalAnarchyPoeticTerrorism' }
+	},
+	{
+		id: 'permanent-record',
+		title: 'Permanent Record',
+		author: 'Edward Snowden',
+		year: '2019',
+		coverUrl: '/books/permanent-record.jpg',
+		description:
+			'Snowden zevnitř popisuje globální sledovací aparát NSA — jak funguje, proč ho odhalil a co to stálo. Nejlepší osobní příběh o tom, co surveillance capitalism znamená v praxi.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://www.macmillanpublishers.com/ww/b/permanent-record',
+				label: '→ web knihy',
+				external: true
+			}
+		],
+		source: { name: 'Macmillan', href: 'https://www.macmillanpublishers.com/ww/b/permanent-record' }
+	},
+	{
 		id: 'for-a-new-liberty',
 		title: 'For a New Liberty: The Libertarian Manifesto',
 		author: 'Murray Rothbard',
