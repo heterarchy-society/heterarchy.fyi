@@ -4,6 +4,7 @@
 	import DiffViewer from '$lib/components/DiffViewer.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
+	import { browser } from '$app/environment';
 	import { localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
@@ -30,7 +31,7 @@
 			loadingEntries = true;
 			fetchError = null;
 			try {
-				const res = await fetch(`https://glossary.heterarchy.fyi/history/${data.termId}.json`);
+				const res = await fetch(`https://glossary.data.heterarchy.fyi/history/${data.termId}.json`);
 				if (!res.ok) throw new Error(`HTTP ${res.status}`);
 				allEntries = await res.json();
 			} catch (e: any) {
@@ -42,7 +43,7 @@
 		fetchHistory();
 	});
 
-	const commitHash = $derived(page.url.searchParams.get('commit'));
+	const commitHash = $derived(browser ? page.url.searchParams.get('commit') : null);
 	const selectedEntry = $derived(
 		commitHash ? (allEntries.find(e => e.hash === commitHash) ?? null) : null
 	);
