@@ -22,7 +22,7 @@
 	const letters = $derived(() => {
 		const set = new Set<string>();
 		for (const term of data.terms) set.add(displayName(term)[0].toUpperCase());
-		return [...set].sort();
+		return [...set].sort((a, b) => a.localeCompare(b, 'cs'));
 	});
 
 	const byLetter = $derived(() => {
