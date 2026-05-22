@@ -4,6 +4,7 @@
 	import { localizeUrl, getLocale } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
+	import type { ChangelogEntry } from './+page.server';
 
 	let { data }: { data: PageData } = $props();
 
@@ -22,11 +23,25 @@
 	}
 
 	function termHref(term: any): string {
-		// On CS locale use CS slug, on EN use EN id
 		const id = getLocale() === 'cs'
 			? (term.translations?.cs?.slug ?? term.id)
 			: term.id;
 		return localizeUrl(`/glossary/${id}`);
+	}
+
+	function termHrefById(id: string): string {
+		const term = data.terms.find((t: any) => t.id === id);
+		return termHref(term ?? { id, translations: {} });
+	}
+
+	function termNameById(id: string): string {
+		const term = data.terms.find((t: any) => t.id === id);
+		if (!term) return id;
+		return displayName(term);
+	}
+
+	function formatDate(iso: string): string {
+		return new Date(iso).toLocaleString(getLocale(), { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 	}
 
 	const letters = $derived(() => {
@@ -64,43 +79,86 @@
 			<p class="label">{m.glossary_label()}</p>
 			<p class="page-lead mb-10">{m.glossary_lead()}</p>
 
-			<nav class="mb-10 flex flex-wrap gap-2 font-mono text-[12px]">
-				{#each letters() as letter}
-					<a href="#{letter}" class="border border-line px-2 py-1 no-underline text-black/60 hover:border-black/40 hover:text-black">
-						{letter}
-					</a>
-				{/each}
-			</nav>
+			<div class="grid gap-16 lg:grid-cols-[1fr_480px]">
+				<!-- Left: term index -->
+				<div class="min-w-0">
+					<nav class="mb-10 flex flex-wrap gap-2 font-mono text-[12px]">
+						{#each letters() as letter}
+							<a href="#{letter}" class="border border-line px-2 py-1 no-underline text-black/60 hover:border-black/40 hover:text-black">
+								{letter}
+							</a>
+						{/each}
+					</nav>
 
-			<div>
-				{#each letters() as letter}
-					<div id={letter} class="border-t border-line pt-8 pb-6">
-						<p class="mb-4 font-mono text-[11px] tracking-[0.2em] uppercase text-black/30">{letter}</p>
-						<ul class="flex flex-col divide-y divide-line">
-							{#each byLetter().get(letter) ?? [] as term}
-								{@const csTranslated = getLocale() === 'cs' && term.translations?.cs?.name}
-								{@const type = displayType(term)}
-								<li>
-									<a href={termHref(term)} class="group flex items-baseline gap-3 py-3 no-underline">
-										<span class="font-mono text-[14px] leading-snug">
-											<span class="group-hover:underline">{displayName(term)}</span>
-											{#if csTranslated && term.translations?.cs?.name !== term.name}
-												<span class="text-black/35 no-underline"> ({term.name})</span>
-											{/if}
-										</span>
-										{#if type}
-											<span class="font-mono text-[10px] uppercase tracking-wider text-black/35 whitespace-nowrap">{type}</span>
-										{/if}
-										<span class="ml-auto font-mono text-[12px] text-black/30 group-hover:text-black">→</span>
-									</a>
+					<div>
+						{#each letters() as letter}
+							<div id={letter} class="border-t border-line pt-8 pb-6">
+								<p class="mb-4 font-mono text-[11px] tracking-[0.2em] uppercase text-black/30">{letter}</p>
+								<ul class="flex flex-col divide-y divide-line">
+									{#each byLetter().get(letter) ?? [] as term}
+										{@const csTranslated = getLocale() === 'cs' && term.translations?.cs?.name}
+										{@const type = displayType(term)}
+										<li>
+											<a href={termHref(term)} class="group flex items-baseline gap-3 py-3 no-underline">
+												<span class="font-mono text-[14px] leading-snug">
+													<span class="group-hover:underline">{displayName(term)}</span>
+													{#if csTranslated && term.translations?.cs?.name !== term.name}
+														<span class="text-black/35 no-underline"> ({term.name})</span>
+													{/if}
+												</span>
+												{#if type}
+													<span class="font-mono text-[10px] uppercase tracking-wider text-black/35 whitespace-nowrap">{type}</span>
+												{/if}
+												<span class="ml-auto font-mono text-[12px] text-black/30 group-hover:text-black">→</span>
+											</a>
+										</li>
+									{/each}
+								</ul>
+							</div>
+						{/each}
+					</div>
+
+					<p class="mt-8 font-mono text-[11px] text-black/35">{m.glossary_term_count({ count: String(data.terms.length) })}</p>
+				</div>
+
+				<!-- Right: changelog -->
+				{#if data.changelog.length > 0}
+					<aside class="border-t border-line pt-8 lg:border-t-0 lg:border-l lg:border-line lg:pl-8 lg:pt-0">
+						<p class="label mb-6">{m.glossary_changelog_label()}</p>
+						<ul class="flex flex-col font-mono text-[11px] divide-y divide-line">
+							{#each data.changelog as entry (entry.hash)}
+								<li class="py-4">
+									<div class="mb-2 flex items-baseline gap-2 text-black/35">
+										<span>{formatDate(entry.date)}</span>
+										<span class="text-black/20">·</span>
+										<span>{entry.author}</span>
+										<span class="text-black/20">·</span>
+										<a
+											href="https://github.com/heterarchy-society/glossary/commit/{entry.hash}"
+											target="_blank"
+											rel="noopener noreferrer"
+											class="no-underline hover:text-black hover:underline font-mono"
+										>{entry.hash.slice(0, 7)}</a>
+									</div>
+									<ul class="flex flex-col gap-1">
+										{#each entry.changes as change}
+											<li class="flex items-baseline gap-2">
+												<span class="shrink-0 text-[10px] uppercase tracking-wider {change.op === 'added' ? 'text-black/40' : 'text-black/30'}">
+													{change.op === 'added' ? m.glossary_changelog_op_added() : m.glossary_changelog_op_modified()}
+												</span>
+												<a href={termHrefById(change.id)} class="no-underline hover:underline leading-snug text-black/70">
+													{termNameById(change.id)}
+												</a>
+												<a href={localizeUrl(`/glossary/${change.id}/history/${entry.hash}`)} class="text-black/30 no-underline hover:underline hover:text-black shrink-0">(diff)</a>
+											</li>
+										{/each}
+									</ul>
 								</li>
 							{/each}
 						</ul>
-					</div>
-				{/each}
+					</aside>
+				{/if}
 			</div>
-
-			<p class="mt-8 font-mono text-[11px] text-black/35">{m.glossary_term_count({ count: String(data.terms.length) })}</p>
 		</section>
 	</main>
 
