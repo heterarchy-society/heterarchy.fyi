@@ -24,3 +24,6 @@ vite.config.ts.timestamp-*
 
 # Other
 .claude
+
+# Fetched at build time
+src/lib/data/glossary.json
