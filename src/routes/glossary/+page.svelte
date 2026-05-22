@@ -8,6 +8,10 @@
 
 	let { data }: { data: PageData } = $props();
 
+	const ghByName = $derived(
+		new Map(data.contributors.filter(c => c.gh_username).map(c => [c.name, c.gh_username!]))
+	);
+
 	function displayName(term: any): string {
 		if (getLocale() === 'cs') {
 			return term.translations?.cs?.name ?? term.name;
@@ -127,11 +131,19 @@
 						<p class="label mb-6">{m.glossary_changelog_label()}</p>
 						<ul class="flex flex-col font-mono text-[11px] divide-y divide-line">
 							{#each data.changelog as entry (entry.hash)}
+								{@const gh = ghByName.get(entry.author)}
 								<li class="py-4">
-									<div class="mb-2 flex items-baseline gap-2 text-black/35">
+									<div class="mb-2 flex items-center gap-2 text-black/35">
 										<span>{formatDate(entry.date)}</span>
 										<span class="text-black/20">·</span>
-										<span>{entry.author}</span>
+										{#if gh}
+											<a href="https://github.com/{gh}" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-1.5 no-underline hover:text-black">
+												<img src="https://github.com/{gh}.png?size=40" alt={gh} width={16} height={16} class="rounded-full border border-line opacity-75 transition-opacity group-hover:opacity-100" />
+												<span>{gh}</span>
+											</a>
+										{:else}
+											<span>{entry.author}</span>
+										{/if}
 										<span class="text-black/20">·</span>
 										<a
 											href="https://github.com/heterarchy-society/glossary/commit/{entry.hash}"
