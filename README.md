@@ -1,42 +1,72 @@
-# sv
+# heterarchy.cz
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Website for The Heterarchy Society, built with SvelteKit and Tailwind CSS.
 
-## Creating a project
+The site is a static Svelte app with pages for the homepage, events, library, platforms, joining the community, and about content. Most editable content lives in TypeScript data files under `src/lib/data`, with visual components in `src/lib/components`.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Tech Stack
+
+- SvelteKit
+- Svelte 5 runes
+- TypeScript
+- Tailwind CSS
+- Vite
+- Static adapter output to `build/`
+
+## Getting Started
+
+Install dependencies:
 
 ```sh
-# create a new project
-npx sv create my-app
+npm install
 ```
 
-To recreate this project with the same configuration:
-
-```sh
-# recreate this project
-bun x sv@0.15.3 create --template minimal --types ts --add tailwindcss="plugins:none" --install bun .
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Start the local development server:
 
 ```sh
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
+Run type and Svelte checks:
 
-To create a production version of your app:
+```sh
+npm run check
+```
+
+Create a production build:
 
 ```sh
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
+Preview the production build locally:
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+```sh
+npm run preview
+```
+
+## Project Structure
+
+```txt
+src/routes/              SvelteKit pages and route layouts
+src/lib/components/      Reusable UI components
+src/lib/data/            Site content and catalog data
+src/lib/content/         Markdown content
+static/                  Static assets served from the site root
+static/books/            Book cover images
+build/                   Generated static site output
+```
+
+## Editing Content
+
+- Books are defined in `src/lib/data/books.ts`.
+- Library labels and helpers are in `src/lib/data/library.ts`.
+- Events are defined in `src/lib/data/events.ts`.
+- About, join, partner, contact, and homepage metadata live in the other files in `src/lib/data`.
+- Public assets belong in `static/`; reference them from the app with root-relative paths such as `/books/example.jpg`.
+
+## Deployment
+
+The project uses `@sveltejs/adapter-static`. Running `npm run build` writes the static site to `build/`, which can be deployed to any static hosting provider.
+
+If the site is deployed under a subpath, set `BASE_PATH` before building.
