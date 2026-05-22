@@ -1,4 +1,4 @@
-# heterarchy.cz
+# heterarchy.fyi
 
 Website for The Heterarchy Society, built with SvelteKit and Tailwind CSS.
 

@@ -12,5 +12,5 @@ export const joinOptions: JoinOption[] = [
 	{ key: 'write',  href: '/find-us',   icon: 'write' },
 	{ key: 'books',  href: '/books',     icon: 'book' },
 	{ key: 'space',  href: '/find-us',   icon: 'space' },
-	{ key: 'fork',   href: 'https://github.com/heterarchy-society/heterarchy.cz', icon: 'fork', external: true },
+	{ key: 'fork',   href: 'https://github.com/heterarchy-society/heterarchy.fyi', icon: 'fork', external: true },
 ];

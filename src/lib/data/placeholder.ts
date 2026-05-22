@@ -70,7 +70,7 @@ export const latestTexts: TextArticle[] = [
 ];
 
 export const githubOrg = 'https://github.com/heterarchy-society';
-export const githubWebRepo = 'https://github.com/heterarchy-society/heterarchy.cz';
+export const githubWebRepo = 'https://github.com/heterarchy-society/heterarchy.fyi';
 
 export const footerLinks: FooterLink[] = [
 	{ label: 'kde nás najdete?', href: '/find-us' },
