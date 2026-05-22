@@ -30,6 +30,8 @@
 
 	const html = $derived(renderMarkdown(processDescription(activeDescription, data.term.resolvedLinks ?? [])));
 	const seeAlso = $derived(data.term.resolvedLinks?.filter((l) => l.target) ?? []);
+	const lastEdit = $derived((data.term as any).history?.[0]?.date ?? null);
+	const historyCount = $derived((data.term as any).history?.length ?? 0);
 
 	function slugForId(id: string): string {
 		const t = data.allTerms?.find((x: any) => x.id === id);
@@ -71,20 +73,14 @@
 						{@html html}
 					</div>
 
-					{#if lang === 'cs' && cs}
+					{#if lang === 'cs' && hasCs}
 						<div class="mt-6 flex items-baseline justify-between gap-4 border-t border-line pt-4">
-							<p class="font-mono text-[11px] text-black/35">
-								Přeloženo modelem {cs.model} · {formatDate(cs.translated_at)}
-							</p>
-							<a href="?lang=en" class="font-mono text-[11px] text-black/40 hover:text-black no-underline hover:underline whitespace-nowrap">
-								zobrazit anglicky →
-							</a>
+							<p class="font-mono text-[11px] text-black/35">Přeloženo modelem {cs.model} · {formatDate(cs.translated_at)}</p>
+							<a href="?lang=en" class="font-mono text-[11px] text-black/40 hover:text-black no-underline hover:underline whitespace-nowrap">anglicky →</a>
 						</div>
 					{:else if lang === 'en' && hasCs}
 						<div class="mt-6 flex items-baseline justify-end border-t border-line pt-4">
-							<a href="?" class="font-mono text-[11px] text-black/40 hover:text-black no-underline hover:underline whitespace-nowrap">
-								← zobrazit česky
-							</a>
+							<a href="?" class="font-mono text-[11px] text-black/40 hover:text-black no-underline hover:underline whitespace-nowrap">← česky</a>
 						</div>
 					{:else if !hasCs}
 						<div class="mt-6 border-t border-line pt-4">
@@ -118,6 +114,22 @@
 
 				<!-- Right: sidebar -->
 				<aside class="flex flex-col gap-8 border-t border-line pt-8 font-mono text-[12px] lg:border-t-0 lg:border-l lg:border-line lg:pl-8 lg:pt-0">
+					<div class="flex flex-col gap-1">
+						<a
+							href="https://github.com/heterarchy-society/glossary/blob/main/glossary/{data.term.id}.md"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="text-[11px] text-black/40 no-underline hover:underline hover:text-black"
+						>→ upravit na GitHubu</a>
+						<a
+							href="/glosar/{$page.params.id}/historie"
+							class="text-[11px] text-black/40 no-underline hover:underline hover:text-black"
+						>→ historie editací{#if historyCount > 0}&nbsp;({historyCount}){/if}</a>
+						{#if lastEdit}
+							<p class="text-[10px] text-black/30">editováno {formatDate(lastEdit)}</p>
+						{/if}
+					</div>
+
 					{#if data.backlinks.length > 0}
 						<div>
 							<p class="label mb-3">Backlinks</p>
@@ -150,6 +162,7 @@
 							</ul>
 						</div>
 					{/if}
+
 				</aside>
 			</div>
 		</section>
