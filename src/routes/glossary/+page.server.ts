@@ -1,8 +1,5 @@
-import glossaryData from '$lib/data/glossary.json';
+import { getGlossaryIndex } from '$lib/server/glossary';
 
 export function load() {
-	return {
-		terms: glossaryData.terms,
-		meta: glossaryData.meta
-	};
+	return getGlossaryIndex();
 }

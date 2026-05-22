@@ -1,30 +1,25 @@
 import { error } from '@sveltejs/kit';
-import glossaryData from '$lib/data/glossary.json';
+import {
+	findGlossaryTerm,
+	getGlossaryBacklinks,
+	getGlossaryEntries,
+	getGlossaryIndexTerms
+} from '$lib/server/glossary';
 import type { PageServerLoad } from './$types';
 
-function csSlug(term: any): string | null {
-	return term.translations?.cs?.slug ?? null;
-}
-
 export const load: PageServerLoad = ({ params }) => {
-	const term = glossaryData.terms.find(
-		(t) => t.id === params.id || csSlug(t) === params.id
-	);
+	const term = findGlossaryTerm(params.id);
 
 	if (!term) {
 		error(404, 'Term not found');
 	}
 
-	const backlinks = glossaryData.terms.filter((t) =>
-		t.resolvedLinks?.some((l) => l.target === term.id)
-	);
-
-	const slug = csSlug(term);
+	const slug = (term.translations?.cs?.slug as string | undefined) ?? null;
 
 	return {
 		term,
-		backlinks,
-		allTerms: glossaryData.terms,
+		backlinks: getGlossaryBacklinks(term.id),
+		allTerms: getGlossaryIndexTerms(),
 		// Alternate URLs for the language switcher
 		altUrls: {
 			en: `/glossary/${term.id}`,
@@ -34,10 +29,5 @@ export const load: PageServerLoad = ({ params }) => {
 };
 
 export function entries() {
-	return glossaryData.terms.flatMap((t) => {
-		const slug = csSlug(t);
-		return slug && slug !== t.id
-			? [{ id: t.id }, { id: slug }]
-			: [{ id: t.id }];
-	});
+	return getGlossaryEntries();
 }

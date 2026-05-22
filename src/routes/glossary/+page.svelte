@@ -84,7 +84,7 @@
 									<a href={termHref(term)} class="group flex items-baseline gap-3 py-3 no-underline">
 										<span class="font-mono text-[14px] leading-snug">
 											<span class="group-hover:underline">{displayName(term)}</span>
-											{#if csTranslated && term.translations.cs.name !== term.name}
+											{#if csTranslated && term.translations?.cs?.name !== term.name}
 												<span class="text-black/35 no-underline"> ({term.name})</span>
 											{/if}
 										</span>
