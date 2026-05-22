@@ -43,7 +43,7 @@
 				{#if data.changelog[0]}
 					{@const latest = data.changelog[0]}
 					<div class="shrink-0 text-right font-mono text-[11px] text-black/35">
-						<span class="block text-black/25 uppercase tracking-widest text-[9px] mb-1">Latest revision</span>
+						<span class="block text-black/25 uppercase tracking-widest text-[9px] mb-1">{m.latest_revision()}</span>
 						<a
 							href="https://github.com/heterarchy-society/books/commit/{latest.hash}"
 							target="_blank"

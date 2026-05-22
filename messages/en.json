@@ -53,6 +53,7 @@
 	"glossary_changelog_op_added": "added",
 	"glossary_changelog_op_modified": "edited",
 	"glossary_label": "Glossary",
+	"latest_revision": "Latest revision",
 	"glossary_lead": "Terms, concepts and technologies",
 	"glossary_term_count": "{count} terms",
 	"glossary_no_history": "No history available.",
