@@ -2,6 +2,7 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { localizeUrl, getLocale } from '$lib/i18n';
+	import { timeAgo } from '$lib/time';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 	import type { ChangelogEntry } from './+page.server';
@@ -48,6 +49,7 @@
 		return new Date(iso).toLocaleString(getLocale(), { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 	}
 
+
 	const letters = $derived(() => {
 		const locale = getLocale() === 'cs' ? 'cs' : 'en';
 		const set = new Set<string>();
@@ -80,7 +82,22 @@
 
 	<main>
 		<section class="cell-roomy">
-			<p class="label">{m.glossary_label()}</p>
+			<div class="flex items-start justify-between gap-4">
+				<p class="label">{m.glossary_label()}</p>
+				{#if data.changelog[0]}
+					{@const latest = data.changelog[0]}
+					<div class="shrink-0 text-right font-mono text-[11px] text-black/35">
+						<span class="block text-black/25 uppercase tracking-widest text-[9px] mb-1">Latest revision</span>
+						<a
+							href="https://github.com/heterarchy-society/glossary/commit/{latest.hash}"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="no-underline hover:text-black tabular-nums"
+						>{latest.hash.slice(0, 7)} · {formatDate(latest.date)}</a>
+						<span class="block text-black/25 mt-0.5">{timeAgo(latest.date, getLocale())}</span>
+					</div>
+				{/if}
+			</div>
 			<p class="page-lead mb-10">{m.glossary_lead()}</p>
 
 			<div class="grid gap-16 lg:grid-cols-[1fr_480px]">
