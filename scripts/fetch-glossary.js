@@ -2,6 +2,9 @@ import { writeFileSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
+// Allow self-signed/new certs during development
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT = resolve(__dirname, '../src/lib/data/glossary.json');
 const URL = 'https://glossary.heterarchy.fyi/';

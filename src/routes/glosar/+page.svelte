@@ -5,18 +5,36 @@
 
 	let { data }: { data: PageData } = $props();
 
+	function csName(term: any): string | null {
+		const cs = term.translations?.cs;
+		return cs?.name ? cs.name : null;
+	}
+
+	function csType(term: any): string | null {
+		const cs = term.translations?.cs;
+		return cs?.type ? cs.type : null;
+	}
+
+	function displayName(term: any): string {
+		return csName(term) ?? term.name;
+	}
+
 	const letters = $derived(() => {
 		const set = new Set<string>();
-		for (const term of data.terms) set.add(term.name[0].toUpperCase());
+		for (const term of data.terms) set.add(displayName(term)[0].toUpperCase());
 		return [...set].sort();
 	});
 
 	const byLetter = $derived(() => {
 		const map = new Map<string, typeof data.terms>();
 		for (const term of data.terms) {
-			const l = term.name[0].toUpperCase();
+			const l = displayName(term)[0].toUpperCase();
 			if (!map.has(l)) map.set(l, []);
 			map.get(l)!.push(term);
+		}
+		// sort each bucket by display name
+		for (const [, bucket] of map) {
+			bucket.sort((a, b) => displayName(a).localeCompare(displayName(b), 'cs'));
 		}
 		return map;
 	});
@@ -49,14 +67,20 @@
 						<p class="mb-4 font-mono text-[11px] tracking-[0.2em] uppercase text-black/30">{letter}</p>
 						<ul class="flex flex-col divide-y divide-line">
 							{#each byLetter().get(letter) ?? [] as term}
+								{@const translated = csName(term)}
 								<li>
 									<a
-										href="/glosar/{term.id}"
-										class="group flex items-baseline gap-4 py-3 no-underline"
+										href="/glosar/{(term as any).translations?.cs?.slug ?? term.id}"
+										class="group flex items-baseline gap-3 py-3 no-underline"
 									>
-										<span class="font-mono text-[14px] leading-snug group-hover:underline">{term.name}</span>
+										<span class="font-mono text-[14px] leading-snug">
+											<span class="group-hover:underline">{displayName(term)}</span>
+											{#if translated}
+												<span class="text-black/35 no-underline"> ({term.name})</span>
+											{/if}
+										</span>
 										{#if term.type}
-											<span class="font-mono text-[10px] uppercase tracking-wider text-black/35 whitespace-nowrap">{term.type}</span>
+											<span class="font-mono text-[10px] uppercase tracking-wider text-black/35 whitespace-nowrap">{csType(term) ?? term.type}</span>
 										{/if}
 										<span class="ml-auto font-mono text-[12px] text-black/30 group-hover:text-black">→</span>
 									</a>

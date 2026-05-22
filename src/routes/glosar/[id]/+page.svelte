@@ -2,30 +2,47 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { renderMarkdown } from '$lib/markdown';
+	import { page } from '$app/stores';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
-	function processDescription(text: string): string {
-		return text.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, target, label) => {
-			const display = label || target;
-			const resolved = data.term.resolvedLinks?.find(
-				(l) => l.key.toLowerCase() === target.toLowerCase()
-			);
+	const cs = $derived((data.term as any).translations?.cs ?? null);
+	const hasCs = $derived(cs?.name && cs?.description);
+	const lang = $derived($page.url.searchParams.get('lang') === 'en' ? 'en' : (hasCs ? 'cs' : 'en'));
+
+	const activeName = $derived(lang === 'cs' && hasCs ? cs.name : data.term.name);
+	const activeType = $derived(lang === 'cs' && cs?.type ? cs.type : data.term.type);
+	const activeDescription = $derived(lang === 'cs' && hasCs ? cs.description : data.term.description);
+
+
+	function processDescription(text: string, resolvedLinks: any[]): string {
+		let i = 0;
+		return text.replace(/\[\[([^\|\]]+)\|?([^\]]*)\]\]/g, (_, key) => {
+			const resolved = resolvedLinks[i++];
 			if (resolved?.target) {
-				return `<a href="/glosar/${resolved.target}">${display}</a>`;
+				return `<a href="/glosar/${slugForId(resolved.target)}">${key}</a>`;
 			}
-			return `<a href="/glosar/chybi?term=${encodeURIComponent(target)}" class="missing-term">${display}</a>`;
+			return `<a href="/glosar/chybi?term=${encodeURIComponent(key)}" class="missing-term">${key}</a>`;
 		});
 	}
 
-	const html = $derived(renderMarkdown(processDescription(data.term.description)));
+	const html = $derived(renderMarkdown(processDescription(activeDescription, data.term.resolvedLinks ?? [])));
 	const seeAlso = $derived(data.term.resolvedLinks?.filter((l) => l.target) ?? []);
+
+	function slugForId(id: string): string {
+		const t = data.allTerms?.find((x: any) => x.id === id);
+		return (t as any)?.translations?.cs?.slug ?? id;
+	}
+
+	function formatDate(iso: string) {
+		return new Date(iso).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' });
+	}
 </script>
 
 <svelte:head>
-	<title>{data.term.name} — Glosář — The Heterarchy Society</title>
-	<meta name="description" content={data.term.description.slice(0, 160).replace(/\[\[.*?\]\]/g, '')} />
+	<title>{activeName} — Glosář — The Heterarchy Society</title>
+	<meta name="description" content={activeDescription.slice(0, 160).replace(/\[\[.*?\]\]/g, '')} />
 </svelte:head>
 
 <div class="min-h-screen w-full">
@@ -33,16 +50,17 @@
 
 	<main>
 		<section class="cell-roomy">
-			<a href="/glosar" class="link-arrow mb-8 inline-block text-[12px]">← glosář</a>
-
 			<div class="grid max-w-6xl gap-12 lg:grid-cols-[1fr_240px] lg:gap-40">
 
 				<!-- Left: main content -->
 				<div class="min-w-0">
-					<p class="label mb-4">Glosář</p>
-					<h1 class="page-lead mb-2">{data.term.name}</h1>
-					{#if data.term.type}
-						<p class="mb-8 font-mono text-[11px] uppercase tracking-widest text-black/40">{data.term.type}</p>
+					<a href="/glosar" class="label mb-4 inline-block hover:underline">Glosář</a>
+					<h1 class="page-lead mb-2">
+						{activeName}<!--
+					-->{#if lang === 'cs' && cs && cs.name !== data.term.name}&nbsp;<span class="text-black/35">({data.term.name})</span>{/if}
+					</h1>
+					{#if activeType}
+						<p class="mb-8 font-mono text-[11px] uppercase tracking-widest text-black/40">{activeType}</p>
 					{/if}
 
 					<div class="max-w-[80ch] text-[15px] leading-[1.7] text-black/80
@@ -51,6 +69,27 @@
 						[&_.missing-term]:decoration-red-600">
 						{@html html}
 					</div>
+
+					{#if lang === 'cs' && cs}
+						<div class="mt-6 flex items-baseline justify-between gap-4 border-t border-line pt-4">
+							<p class="font-mono text-[11px] text-black/35">
+								Přeloženo modelem {cs.model} · {formatDate(cs.translated_at)}
+							</p>
+							<a href="?lang=en" class="font-mono text-[11px] text-black/40 hover:text-black no-underline hover:underline whitespace-nowrap">
+								zobrazit anglicky →
+							</a>
+						</div>
+					{:else if lang === 'en' && hasCs}
+						<div class="mt-6 flex items-baseline justify-end border-t border-line pt-4">
+							<a href="?" class="font-mono text-[11px] text-black/40 hover:text-black no-underline hover:underline whitespace-nowrap">
+								← zobrazit česky
+							</a>
+						</div>
+					{:else if !hasCs}
+						<div class="mt-6 border-t border-line pt-4">
+							<p class="font-mono text-[11px] text-black/35">Tento termín zatím nebyl přeložen.</p>
+						</div>
+					{/if}
 
 					{#if data.term.resources && data.term.resources.length > 0}
 						<div class="mt-10 border-t border-line pt-8">
@@ -84,7 +123,7 @@
 							<ul class="flex flex-col gap-2">
 								{#each data.backlinks as bl}
 									<li>
-										<a href="/glosar/{bl.id}" class="no-underline hover:underline leading-snug">
+										<a href="/glosar/{slugForId(bl.id)}" class="no-underline hover:underline leading-snug">
 											{bl.name}
 										</a>
 										{#if bl.type}
@@ -102,7 +141,7 @@
 							<ul class="flex flex-col gap-2">
 								{#each seeAlso as link}
 									<li>
-										<a href="/glosar/{link.target}" class="no-underline hover:underline">
+										<a href="/glosar/{slugForId(link.target)}" class="no-underline hover:underline">
 											{link.key}
 										</a>
 									</li>
