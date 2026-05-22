@@ -74,7 +74,6 @@
 				</div>
 
 				{#if entry.diff}
-					<p class="label mb-4">Diff</p>
 					<DiffViewer diff={entry.diff} />
 				{/if}
 			{/if}

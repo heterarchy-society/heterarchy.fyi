@@ -32,7 +32,8 @@
 	}
 </script>
 
-<div class="mb-2 flex justify-end">
+<div class="mb-4 flex items-center justify-between">
+	<span class="font-mono text-[10px] tracking-[0.2em] uppercase">Diff</span>
 	<button
 		onclick={toggleLayout}
 		class="font-mono text-[11px] text-black/40 hover:text-black border border-line px-2 py-1"
