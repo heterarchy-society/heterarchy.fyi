@@ -10,7 +10,7 @@
 
 	const book = $derived(data.book);
 	let coverFailed = $state(false);
-	const coverSrc = $derived(coverFailed ? '/book-placeholder.svg' : book.coverUrl);
+	const coverSrc = $derived(coverFailed || !book.coverUrl ? '/book-placeholder.svg' : book.coverUrl);
 </script>
 
 <svelte:head>

@@ -13,7 +13,7 @@ export type LibraryBook = {
 	title: string;
 	author: string;
 	year?: string;
-	coverUrl: string;
+	coverUrl?: string;
 	description: string;
 	language: BookLanguage[];
 	formats: BookFormat[];

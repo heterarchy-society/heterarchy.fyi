@@ -6,7 +6,7 @@
 
 	let coverFailed = $state(false);
 
-	const coverSrc = $derived(coverFailed ? '/book-placeholder.svg' : book.coverUrl);
+	const coverSrc = $derived(coverFailed || !book.coverUrl ? '/book-placeholder.svg' : book.coverUrl);
 	const href = $derived(bookPath(book.id));
 </script>
 

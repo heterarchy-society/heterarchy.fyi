@@ -1,12 +1,6 @@
 import type { LibraryBook } from './library-types';
 
-const SOVENG = 'https://sovereignengineering.io';
 const PP = 'https://parallelpolis.info';
-
-function cover(path: string): string {
-	const normalized = path.startsWith('/') ? path : `/${path}`;
-	return `${SOVENG}${normalized}`;
-}
 
 export const libraryBooks: LibraryBook[] = [
 	{
@@ -14,7 +8,7 @@ export const libraryBooks: LibraryBook[] = [
 		title: 'The Sovereign Individual',
 		author: 'James Dale Davidson & William Rees-Mogg',
 		year: '1997',
-		coverUrl: cover('/images/books/the-sovereign-individual.jpg'),
+		coverUrl: '/books/sovereign-individual.jpg',
 		description:
 			'Mastering the Transition to the Information Age. Klasická teze o tom, jak digitální technologie mění vztah jednotlivce a státu.',
 		language: ['en'],
@@ -27,14 +21,14 @@ export const libraryBooks: LibraryBook[] = [
 				external: true
 			}
 		],
-		source: { name: 'Sovereign Engineering', href: `${SOVENG}/books` }
+		source: { name: 'Sovereign Engineering', href: 'https://sovereignengineering.io/books' }
 	},
 	{
 		id: 'cathedral-bazaar',
 		title: 'The Cathedral and the Bazaar',
 		author: 'Eric S. Raymond',
 		year: '1999',
-		coverUrl: cover('/images/books/the-cathedral-and-the-bazaar.jpg'),
+		coverUrl: '/books/cathedral-bazaar.jpg',
 		description:
 			'Musings on Linux and Open Source by an Accidental Revolutionary. Eseje o otevřeném vývoji a decentralizované spolupráci.',
 		language: ['en'],
@@ -47,14 +41,14 @@ export const libraryBooks: LibraryBook[] = [
 				external: true
 			}
 		],
-		source: { name: 'Sovereign Engineering', href: `${SOVENG}/books` }
+		source: { name: 'Sovereign Engineering', href: 'https://sovereignengineering.io/books' }
 	},
 	{
 		id: 'free-software-free-society',
 		title: 'Free Software, Free Society',
 		author: 'Richard Stallman',
 		year: '2002',
-		coverUrl: cover('/images/books/free-software-free-society.jpg'),
+		coverUrl: '/books/free-software-free-society.jpg',
 		description:
 			'Selected Essays of Richard M. Stallman. When we speak of free software, we are referring to freedom, not price.',
 		language: ['en'],
@@ -67,14 +61,14 @@ export const libraryBooks: LibraryBook[] = [
 				external: true
 			}
 		],
-		source: { name: 'Sovereign Engineering', href: `${SOVENG}/books` }
+		source: { name: 'Sovereign Engineering', href: 'https://sovereignengineering.io/books' }
 	},
 	{
 		id: 'property-freedom-society',
 		title: 'Property, Freedom, and Society',
 		author: 'Hans-Hermann Hoppe',
 		year: '2009',
-		coverUrl: cover('/images/books/property-freedom-and-society.jpg'),
+		coverUrl: '/books/property-freedom-society.jpg',
 		description: 'Essays in Honor of Hans-Hermann Hoppe.',
 		language: ['en'],
 		formats: ['pdf', 'ebook'],
@@ -86,14 +80,14 @@ export const libraryBooks: LibraryBook[] = [
 				external: true
 			}
 		],
-		source: { name: 'Sovereign Engineering', href: `${SOVENG}/books` }
+		source: { name: 'Sovereign Engineering', href: 'https://sovereignengineering.io/books' }
 	},
 	{
 		id: 'against-intellectual-property',
 		title: 'Against Intellectual Property',
 		author: 'Stephan Kinsella',
 		year: '2008',
-		coverUrl: cover('/images/books/Against_Intellectual_Propery-Kinsella.jpg'),
+		coverUrl: '/books/against-intellectual-property.jpg',
 		description:
 			'Would a libertarian society recognize patents as legitimate? What about copyright?',
 		language: ['en'],
@@ -106,14 +100,14 @@ export const libraryBooks: LibraryBook[] = [
 				external: true
 			}
 		],
-		source: { name: 'Sovereign Engineering', href: `${SOVENG}/books` }
+		source: { name: 'Sovereign Engineering', href: 'https://sovereignengineering.io/books' }
 	},
 	{
 		id: 'lodging-wayfaring-men',
 		title: 'A Lodging of Wayfaring Men',
 		author: 'Paul Rosenberg',
 		year: '2007',
-		coverUrl: cover('/images/books/a_lodging_of_wayfaring_men.jpg'),
+		coverUrl: '/books/lodging-wayfaring-men.jpg',
 		description:
 			'A novel that explores the concept of freedom-seekers creating an alternative society on the Internet.',
 		language: ['en'],
@@ -126,14 +120,14 @@ export const libraryBooks: LibraryBook[] = [
 				external: true
 			}
 		],
-		source: { name: 'Sovereign Engineering', href: `${SOVENG}/books` }
+		source: { name: 'Sovereign Engineering', href: 'https://sovereignengineering.io/books' }
 	},
 	{
 		id: 'endurance-shackleton',
 		title: "Endurance: Shackleton's Incredible Voyage",
 		author: 'Alfred Lansing',
 		year: '1959',
-		coverUrl: cover('/images/books/Endurance-Shackletons_incredible_voyage.jpg'),
+		coverUrl: '/books/endurance-shackleton.jpg',
 		description:
 			"A tale of survival by Shackleton and all 27 of his men for over a year on the ice-bound Antarctic seas — a story of leadership without hierarchy.",
 		language: ['en'],
@@ -146,14 +140,14 @@ export const libraryBooks: LibraryBook[] = [
 				external: true
 			}
 		],
-		source: { name: 'Sovereign Engineering', href: `${SOVENG}/books` }
+		source: { name: 'Sovereign Engineering', href: 'https://sovereignengineering.io/books' }
 	},
 	{
 		id: 'finite-infinite-games',
 		title: 'Finite and Infinite Games',
 		author: 'James P. Carse',
 		year: '1986',
-		coverUrl: cover('/images/books/finite_and_infinite_games-carse.jpg'),
+		coverUrl: '/books/finite-infinite-games.jpg',
 		description: 'A vision of life as play and possibility.',
 		language: ['en'],
 		formats: ['ebook'],
@@ -165,14 +159,14 @@ export const libraryBooks: LibraryBook[] = [
 				external: true
 			}
 		],
-		source: { name: 'Sovereign Engineering', href: `${SOVENG}/books` }
+		source: { name: 'Sovereign Engineering', href: 'https://sovereignengineering.io/books' }
 	},
 	{
 		id: 'network-state',
 		title: 'The Network State',
 		author: 'Balaji Srinivasan',
 		year: '2022',
-		coverUrl: cover('/images/books/the_network_state-balaji.jpg'),
+		coverUrl: '/books/network-state.jpg',
 		description: 'How to start a new country.',
 		language: ['en'],
 		formats: ['web', 'ebook'],
@@ -184,14 +178,14 @@ export const libraryBooks: LibraryBook[] = [
 				external: true
 			}
 		],
-		source: { name: 'Sovereign Engineering', href: `${SOVENG}/books` }
+		source: { name: 'Sovereign Engineering', href: 'https://sovereignengineering.io/books' }
 	},
 	{
 		id: 'singularity-is-near',
 		title: 'The Singularity Is Near',
 		author: 'Ray Kurzweil',
 		year: '2005',
-		coverUrl: cover('/images/books/the-singularity-is-near.jpg'),
+		coverUrl: '/books/singularity-is-near.jpg',
 		description:
 			'When Humans Transcend Biology. A deep dive into exponential technological growth and the coming merger of human and machine intelligence.',
 		language: ['en'],
@@ -204,14 +198,14 @@ export const libraryBooks: LibraryBook[] = [
 				external: true
 			}
 		],
-		source: { name: 'Sovereign Engineering', href: `${SOVENG}/books` }
+		source: { name: 'Sovereign Engineering', href: 'https://sovereignengineering.io/books' }
 	},
 	{
 		id: 'superintelligence',
 		title: 'Superintelligence',
 		author: 'Nick Bostrom',
 		year: '2014',
-		coverUrl: cover('/images/books/superintelligence.jpg'),
+		coverUrl: '/books/superintelligence.jpg',
 		description:
 			'Paths, Dangers, Strategies. What happens when machines surpass human intelligence, and how do we navigate the transition?',
 		language: ['en'],
@@ -224,14 +218,14 @@ export const libraryBooks: LibraryBook[] = [
 				external: true
 			}
 		],
-		source: { name: 'Sovereign Engineering', href: `${SOVENG}/books` }
+		source: { name: 'Sovereign Engineering', href: 'https://sovereignengineering.io/books' }
 	},
 	{
 		id: 'alignment-problem',
 		title: 'The Alignment Problem',
 		author: 'Brian Christian',
 		year: '2020',
-		coverUrl: cover('/images/books/the-alignment-problem.jpg'),
+		coverUrl: '/books/alignment-problem.jpg',
 		description:
 			'Machine Learning and Human Values. How do we ensure the systems we build actually do what we intend?',
 		language: ['en'],
@@ -244,15 +238,14 @@ export const libraryBooks: LibraryBook[] = [
 				external: true
 			}
 		],
-		source: { name: 'Sovereign Engineering', href: `${SOVENG}/books` }
+		source: { name: 'Sovereign Engineering', href: 'https://sovereignengineering.io/books' }
 	},
 	{
 		id: 'extreme-privacy',
 		title: 'Extreme Privacy: What It Takes to Disappear in America',
 		author: 'Michael Bazzell',
 		year: '2024',
-		coverUrl:
-			'https://atlas.pp0.co/img/books/m/7b39c48699f8d60054e7f3dd6e715b624ab86d6199218c8f538c7dd2fa2d104f.webp',
+		coverUrl: '/books/extreme-privacy.webp',
 		description:
 			'Michael Bazzell has helped hundreds of celebrities, billionaires, and everyday citizens disappear completely from public view. His latest work focuses on proactive privacy — not just cleaning up what is already online.',
 		language: ['en'],
@@ -278,8 +271,7 @@ export const libraryBooks: LibraryBook[] = [
 			'Means of Control: How the Hidden Alliance of Tech and Government Is Creating a New American Surveillance State',
 		author: 'Byron Tau',
 		year: '2024',
-		coverUrl:
-			'https://atlas.pp0.co/img/books/m/eadaa19a2561653d9c45bbfb8a50b6cffb283a5a73f4a9f40639d296cf84a53c.webp',
+		coverUrl: '/books/means-of-control.webp',
 		description:
 			'You are being surveilled right now. An exposé of how the U.S. government allied with data brokers, tech companies, and advertisers to monitor us through the phones we carry and the devices in our homes.',
 		language: ['en'],
@@ -304,8 +296,7 @@ export const libraryBooks: LibraryBook[] = [
 		title: 'Tracers in the Dark: The Global Hunt for the Crime Lords of Cryptocurrency',
 		author: 'Andy Greenberg',
 		year: '2022',
-		coverUrl:
-			'https://atlas.pp0.co/img/books/m/665538eabf5203587fd727ac9f847ad6df5bce02b8d1aa8fd00422d5f6d9b5ac.webp',
+		coverUrl: '/books/tracers-in-the-dark.webp',
 		description:
 			'From the author of Sandworm: investigators who cracked the Bitcoin blockchain, exposing once-anonymous realms of money, drugs, and violence.',
 		language: ['en'],
@@ -330,10 +321,9 @@ export const libraryBooks: LibraryBook[] = [
 		title: 'Stuck on the Platform: Reclaiming the Internet',
 		author: 'Geert Lovink',
 		year: '2022',
-		coverUrl:
-			'https://atlas.pp0.co/img/books/m/512419cfb075aa92727ab85e2d1985c83b50e278204a201c5033abbf86e5c7d7.webp',
+		coverUrl: '/books/stuck-on-the-platform.webp',
 		description:
-			'We’re all trapped. No matter how hard you try to delete apps from your phone, the power of seduction draws you back. What happens when your home office starts to feel like a call center?',
+			"We’re all trapped. No matter how hard you try to delete apps from your phone, the power of seduction draws you back. What happens when your home office starts to feel like a call center?",
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
@@ -356,8 +346,7 @@ export const libraryBooks: LibraryBook[] = [
 		title: 'Cypherpunk Ethics: Radical Ethics for the Digital Age',
 		author: 'Patrick D. Anderson',
 		year: '2022',
-		coverUrl:
-			'https://atlas.pp0.co/img/books/m/0c07e975616712b8f6e4f7d76c5d7578e7dd23e7b0d0957b7424a7dc40a52758.webp',
+		coverUrl: '/books/cypherpunk-ethics.webp',
 		description:
 			'Explores the moral worldview of the cypherpunks — a movement that advocates strong cryptography to defend privacy and promote institutional transparency.',
 		language: ['en'],
@@ -382,8 +371,7 @@ export const libraryBooks: LibraryBook[] = [
 		title: 'Psychopolitics: Neoliberalism and New Technologies of Power',
 		author: 'Byung-Chul Han',
 		year: '2017',
-		coverUrl:
-			'https://atlas.pp0.co/img/books/m/ce880103d6b2015d4f63adbb1cb7d6091dc2d7aa5a28d6259fc316fd0dce93d2.webp',
+		coverUrl: '/books/psychopolitics.webp',
 		description:
 			'Exploring how neoliberalism has discovered the productive force of the psyche.',
 		language: ['en'],
@@ -408,8 +396,7 @@ export const libraryBooks: LibraryBook[] = [
 		title: 'Dark Matters: On the Surveillance of Blackness',
 		author: 'Simone Browne',
 		year: '2015',
-		coverUrl:
-			'https://atlas.pp0.co/img/books/m/6bf98c0777c00862386c8bb75f95d110808b26c876ff51bea790a54698d3855a.webp',
+		coverUrl: '/books/dark-matters.webp',
 		description:
 			'Simone Browne locates the conditions of blackness as a key site through which surveillance is practiced, narrated, and resisted.',
 		language: ['en'],
@@ -434,8 +421,7 @@ export const libraryBooks: LibraryBook[] = [
 		title: 'The Forest Passage',
 		author: 'Ernst Jünger',
 		year: '2013',
-		coverUrl:
-			'https://atlas.pp0.co/img/books/m/3ece937597b88f9c04f30b6923b2ee65c77e8c52221417cb25d28a53bef4e2f5.webp',
+		coverUrl: '/books/forest-passage.webp',
 		description:
 			'Ernst Jünger explores the possibility of resistance: how the independent thinker can withstand and oppose the power of the omnipresent state.',
 		language: ['en', 'de'],
@@ -564,13 +550,33 @@ export const libraryBooks: LibraryBook[] = [
 		source: { name: 'Mises.cz', href: 'https://www.mises.cz/literatura/anarchokapitalismus-69.aspx' }
 	},
 	{
+		id: 'vanishing-culture',
+		title: 'Vanishing Culture: A Report on Our Fragile Cultural Record',
+		author: 'Luca Messarra, Chris Freeland & Juliya Ziskina',
+		year: '2026',
+		coverUrl: '/books/vanishing-culture.jpg',
+		description:
+			'Zpráva o ohrožení veřejného přístupu ke kulturnímu dědictví v digitální době — streamovací platformy, dočasné licence, mazání webů a kyberútoky na archivy a knihovny.',
+		language: ['en'],
+		formats: ['pdf', 'web'],
+		physical: false,
+		links: [
+			{
+				href: 'https://archive.org/details/vanishing-culture-2026',
+				label: '→ číst na archive.org',
+				external: true
+			}
+		],
+		source: { name: 'Internet Archive', href: 'https://archive.org/details/vanishing-culture-2026' }
+	},
+	{
 		id: 'tor-collier',
 		title: 'Tor: From the Dark Web to the Future of Privacy',
 		author: 'Ben Collier',
 		year: '2024',
 		coverUrl: '/books/tor-collier.jpg',
 		description:
-			'A cultural and technological history of Tor — from the US Navy’s Naval Research Lab and the Cypherpunks to activists on the frontlines of digital privacy today.',
+			"A cultural and technological history of Tor — from the US Navy's Naval Research Lab and the Cypherpunks to activists on the frontlines of digital privacy today.",
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,

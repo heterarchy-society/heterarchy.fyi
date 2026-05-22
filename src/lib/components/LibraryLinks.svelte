@@ -5,7 +5,7 @@
 
 	const previewItems = $derived(
 		books.length > 0
-			? books.map((b) => ({ href: bookPath(b.id), src: b.coverUrl, alt: b.title }))
+			? books.map((b) => ({ href: bookPath(b.id), src: b.coverUrl ?? '/book-placeholder.svg', alt: b.title }))
 			: Array.from({ length: 4 }, (_, i) => ({
 					href: '/knihovna',
 					src: '/book-placeholder.svg',
