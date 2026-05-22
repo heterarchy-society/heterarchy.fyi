@@ -570,6 +570,176 @@ export const libraryBooks: LibraryBook[] = [
 		source: { name: 'Internet Archive', href: 'https://archive.org/details/vanishing-culture-2026' }
 	},
 	{
+		id: 'reinventing-organizations',
+		title: 'Reinventing Organizations',
+		author: 'Frederic Laloux',
+		year: '2014',
+		coverUrl: '/books/reinventing-organizations.jpg',
+		description:
+			'Jak fungují organizace bez šéfů, popisů práce a rozpočtů. Laloux mapuje vznik nového paradigmatu řízení — samospráva, celistvost a evoluční účel jako základ živých organizací.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://www.reinventingorganizations.com/',
+				label: '→ web knihy',
+				external: true
+			}
+		],
+		source: { name: 'Reinventing Organizations', href: 'https://www.reinventingorganizations.com/' }
+	},
+	{
+		id: 'animal-farm',
+		title: 'Animal Farm',
+		author: 'George Orwell',
+		year: '1945',
+		coverUrl: '/books/animal-farm.jpg',
+		description:
+			'Alegorická novela o revoluci, která zradí sama sebe. Zvířata svrhnou farmáře a postaví vlastní společnost — dokud se nová elita nestane k nerozeznání od té staré.',
+		language: ['en'],
+		formats: ['ebook', 'print'],
+		physical: false,
+		links: [
+			{
+				href: 'https://archive.org/details/animal-farm-by-george-orwell',
+				label: '→ číst na archive.org',
+				external: true
+			}
+		],
+		source: { name: 'Internet Archive', href: 'https://archive.org/details/animal-farm-by-george-orwell' }
+	},
+	{
+		id: 'agorism-21st-century',
+		title: 'Agorism in the 21st Century #1',
+		author: 'DarkFi (ed.)',
+		year: '2022',
+		coverUrl: '/books/agorism-21st-century.png',
+		description:
+			'Filozofický žurnál zkoumající agorismus a kryptoekonomi. Eseje o meme coinech, NFT, DeFi, DAO a zero-knowledge kryptografii optikou agoristické filozofie — od autorů jako Jaya Klara Brekke, Harry Halpin nebo Nick Land.',
+		language: ['en'],
+		formats: ['pdf', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://agorist.xyz/files/Agorism_XXI_I_2022.pdf',
+				label: '→ stáhnout PDF',
+				external: true
+			},
+			{
+				href: 'https://agorist.xyz/files/Agorism_XXI_I_2022.epub',
+				label: '→ EPUB',
+				external: true
+			}
+		],
+		source: { name: 'DarkFi', href: 'https://confoederatio.noblogs.org/post/2022/02/19/agorism-in-the-21st-century-1/' }
+	},
+	{
+		id: 'blockchain-radicals',
+		title: 'Blockchain Radicals: How Capitalism Ruined Crypto and How to Fix It',
+		author: 'Joshua Dávila',
+		year: '2023',
+		coverUrl: '/books/blockchain-radicals.jpg',
+		description:
+			'Jak kapitalismus ovládl krypto — a jak ho vzít zpět. Dávila zkoumá cestu od WikiLeaks přes DeFi a dělnické kooperativy až po krypto-commons a argumentuje, že blockchain je příležitost, ne hrozba.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://repeaterbooks.com/product/blockchain-radicals-how-capitalism-ruined-crypto-and-how-to-fix-it/',
+				label: '→ Repeater Books',
+				external: true
+			}
+		],
+		source: { name: 'Repeater Books', href: 'https://repeaterbooks.com/product/blockchain-radicals-how-capitalism-ruined-crypto-and-how-to-fix-it/' }
+	},
+	{
+		id: 'word-for-world-is-forest',
+		title: 'The Word for World is Forest',
+		author: 'Ursula K. Le Guin',
+		year: '1976',
+		coverUrl: '/books/word-for-world-is-forest.jpg',
+		description:
+			'Novela o kolonializmu a násilí na cizí planetě — když mírový národ Athšanů povstane proti lidským dobyvatelům, zkoumá Le Guin cenu, kterou platí za opuštění vlastních hodnot. Hugo Award 1973.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://www.ursulakleguin.com/the-word-for-world-is-forest',
+				label: '→ web autorky',
+				external: true
+			}
+		],
+		source: { name: 'Ursula K. Le Guin', href: 'https://www.ursulakleguin.com/the-word-for-world-is-forest' }
+	},
+	{
+		id: 'understanding-institutional-diversity',
+		title: 'Understanding Institutional Diversity',
+		author: 'Elinor Ostrom',
+		year: '2005',
+		coverUrl: '/books/understanding-institutional-diversity.jpg',
+		description:
+			'Ostrom presents the IAD framework for analyzing how institutions form and govern collective action — from common-pool resources to self-organized communities. Klíčová práce o polycentriickém vládnutí a správě bez centrální autority.',
+		language: ['en'],
+		formats: ['pdf'],
+		physical: false,
+		links: [
+			{
+				href: 'https://wtf.tw/ref/ostrom_2005.pdf',
+				label: '→ stáhnout PDF',
+				external: true
+			},
+			{
+				href: 'https://press.princeton.edu/books/paperback/9780691122380/understanding-institutional-diversity',
+				label: '→ Princeton UP',
+				external: true
+			}
+		],
+		source: { name: 'Princeton University Press', href: 'https://press.princeton.edu/books/paperback/9780691122380/understanding-institutional-diversity' }
+	},
+	{
+		id: 'platform-brutality',
+		title: 'Platform Brutality: Closing Down Internet Toxicity',
+		author: 'Geert Lovink',
+		year: '2025',
+		coverUrl: '/books/platform-brutality.png',
+		description:
+			'Social media no longer just distracts — it wounds. Lovink zkoumá, jak se digitální prostory staly místy toxicity a násilí, a volá po demontáži samotného principu platforem.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://valiz.nl/en/publications/platform-brutality',
+				label: '→ Valiz',
+				external: true
+			}
+		],
+		source: { name: 'Valiz', href: 'https://valiz.nl/en/publications/platform-brutality' }
+	},
+	{
+		id: 'chasing-shadows',
+		title: 'Chasing Shadows',
+		author: 'Ronald J. Deibert',
+		year: '2025',
+		coverUrl: '/books/chasing-shadows.jpg',
+		description:
+			'A real-life spy thriller documenting the Citizen Lab\'s investigations into cyber espionage — how authoritarian regimes exploit digital infrastructure to monitor and suppress activists, journalists, and dissidents worldwide.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://chasingshadowsbook.ca/',
+				label: '→ web knihy',
+				external: true
+			}
+		],
+		source: { name: 'Simon & Schuster', href: 'https://chasingshadowsbook.ca/' }
+	},
+	{
 		id: 'tor-collier',
 		title: 'Tor: From the Dark Web to the Future of Privacy',
 		author: 'Ben Collier',
