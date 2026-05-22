@@ -570,6 +570,366 @@ export const libraryBooks: LibraryBook[] = [
 		source: { name: 'Internet Archive', href: 'https://archive.org/details/vanishing-culture-2026' }
 	},
 	{
+		id: 'for-a-new-liberty',
+		title: 'For a New Liberty: The Libertarian Manifesto',
+		author: 'Murray Rothbard',
+		year: '1973',
+		coverUrl: '/books/for-a-new-liberty.jpg',
+		description:
+			'Anarcho-kapitalistický manifest — systematická obhajoba absolutní individuální svobody a dobrovolné společnosti bez státu. Nejčitelnější a nejúplnější Rothbardův vstupní bod.',
+		language: ['en'],
+		formats: ['pdf', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://mises.org/library/book/new-liberty-libertarian-manifesto',
+				label: '→ číst na mises.org',
+				external: true
+			}
+		],
+		source: { name: 'Mises Institute', href: 'https://mises.org/library/book/new-liberty-libertarian-manifesto' }
+	},
+	{
+		id: 'ethics-of-liberty',
+		title: 'The Ethics of Liberty',
+		author: 'Murray Rothbard',
+		year: '1982',
+		coverUrl: '/books/ethics-of-liberty.jpg',
+		description:
+			'Filozofický základ anarcho-kapitalismu — přirozené právo, vlastnictví a legitimita násilí. Rothbard buduje etický systém od prvních principů k aplikaci na stát a trh.',
+		language: ['en'],
+		formats: ['pdf', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://mises.org/library/book/ethics-liberty',
+				label: '→ číst na mises.org',
+				external: true
+			}
+		],
+		source: { name: 'Mises Institute', href: 'https://mises.org/library/book/ethics-liberty' }
+	},
+	{
+		id: 'man-economy-state',
+		title: 'Man, Economy, and State',
+		author: 'Murray Rothbard',
+		year: '1962',
+		coverUrl: '/books/man-economy-state.jpg',
+		description:
+			'Rothbardova systematická rekonstrukce ekonomické teorie z praxeologických základů — od individuálního jednání přes trhy až po kritiku státních intervencí. Kanonická reference rakouské školy.',
+		language: ['en'],
+		formats: ['pdf', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://mises.org/library/book/man-economy-and-state-power-and-market',
+				label: '→ číst na mises.org',
+				external: true
+			}
+		],
+		source: { name: 'Mises Institute', href: 'https://mises.org/library/book/man-economy-and-state-power-and-market' }
+	},
+	{
+		id: 'democracy-god-that-failed',
+		title: 'Democracy: The God That Failed',
+		author: 'Hans-Hermann Hoppe',
+		year: '2001',
+		coverUrl: '/books/democracy-god-that-failed.jpg',
+		description:
+			'Proč je demokracie horší než monarchie — a proč je anarcho-kapitalismus lepší než oboje. Hoppe srovnává časové preference, vlastnictví a institucionální logiku různých politických systémů.',
+		language: ['en'],
+		formats: ['pdf', 'ebook', 'print'],
+		physical: false,
+		links: [
+			{
+				href: 'https://mises.org/library/book/democracy-god-failed',
+				label: '→ číst na mises.org',
+				external: true
+			}
+		],
+		source: { name: 'Mises Institute', href: 'https://mises.org/library/book/democracy-god-failed' }
+	},
+	{
+		id: 'problem-of-political-authority',
+		title: 'The Problem of Political Authority',
+		author: 'Michael Huemer',
+		year: '2013',
+		coverUrl: '/books/problem-of-political-authority.jpg',
+		description:
+			'Moderní filozofická demolice státní autority — proč žádná vláda nemá legitimní právo vládnout a proč ji posloucháme stejně. Přístupnější než Rothbard, analyticky precizní.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://www.amazon.com/Problem-Political-Authority-Examination-Coerce/dp/1137281650',
+				label: '→ koupit (Amazon)',
+				external: true
+			}
+		],
+		source: { name: 'Palgrave Macmillan', href: 'https://www.amazon.com/Problem-Political-Authority-Examination-Coerce/dp/1137281650' }
+	},
+	{
+		id: 'crypto-levy',
+		title: 'Crypto: How the Code Rebels Beat the Government — Saving Privacy in the Digital Age',
+		author: 'Steven Levy',
+		year: '2001',
+		coverUrl: '/books/crypto-levy.jpg',
+		description:
+			'Definitivní historie kryptowars — jak hrstka matematiků, hackerů a libertariánů porazila NSA a vládní monopol na šifrování. Levy byl u toho a znal všechny klíčové postavy.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://archive.org/details/cryptohowcodereb00levy',
+				label: '→ číst na archive.org',
+				external: true
+			}
+		],
+		source: { name: 'Internet Archive', href: 'https://archive.org/details/cryptohowcodereb00levy' }
+	},
+	{
+		id: 'this-machine-kills-secrets',
+		title: 'This Machine Kills Secrets',
+		author: 'Andy Greenberg',
+		year: '2012',
+		coverUrl: '/books/this-machine-kills-secrets.jpg',
+		description:
+			'WikiLeaks, cypherpunks a genealogie radikální transparentnosti — jak se nápad z manifestů z roku 1988 proměnil v globální infrastrukturu pro whistleblowery. Greenbergova starší kniha před Tracers.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://www.penguinrandomhouse.com/books/311549/this-machine-kills-secrets-by-andy-greenberg/',
+				label: '→ web knihy',
+				external: true
+			}
+		],
+		source: { name: 'Dutton', href: 'https://www.penguinrandomhouse.com/books/311549/this-machine-kills-secrets-by-andy-greenberg/' }
+	},
+	{
+		id: 'applied-cryptography',
+		title: 'Applied Cryptography',
+		author: 'Bruce Schneier',
+		year: '1996',
+		coverUrl: '/books/applied-cryptography.jpg',
+		description:
+			'Technická bible kryptografie — protokoly, algoritmy a zdrojový kód v C. Druhé vydání, které se stalo standardní referencí pro každého, kdo chce pochopit, jak šifrování skutečně funguje.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://www.schneier.com/books/applied-cryptography/',
+				label: '→ web knihy',
+				external: true
+			}
+		],
+		source: { name: 'Bruce Schneier', href: 'https://www.schneier.com/books/applied-cryptography/' }
+	},
+	{
+		id: 'dawn-of-everything',
+		title: 'The Dawn of Everything: A New History of Humanity',
+		author: 'David Graeber & David Wengrow',
+		year: '2021',
+		coverUrl: '/books/dawn-of-everything.jpg',
+		description:
+			'Antropologická demolice mýtu, že hierarchie je nevyhnutelná. Graeber a Wengrow ukazují, že lidé po tisíce let vědomě experimentovali s různými formami společenského uspořádání — a záměrně odmítali centralizaci.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://us.macmillan.com/books/9780374157357/thedawnofeverything',
+				label: '→ web knihy',
+				external: true
+			}
+		],
+		source: { name: 'Macmillan', href: 'https://us.macmillan.com/books/9780374157357/thedawnofeverything' }
+	},
+	{
+		id: 'surveillance-capitalism',
+		title: 'The Age of Surveillance Capitalism',
+		author: 'Shoshana Zuboff',
+		year: '2019',
+		coverUrl: '/books/surveillance-capitalism.jpg',
+		description:
+			'Behaviorální data jako surovina pro předpověď a modifikaci lidského jednání. Zuboff popisuje vznik nové ekonomické logiky, kde jsme my sami produktem — a jak s tím bojovat.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://www.publicaffairsbooks.com/titles/shoshana-zuboff/the-age-of-surveillance-capitalism/9781610395694/',
+				label: '→ web knihy',
+				external: true
+			}
+		],
+		source: { name: 'PublicAffairs', href: 'https://www.publicaffairsbooks.com/titles/shoshana-zuboff/the-age-of-surveillance-capitalism/9781610395694/' }
+	},
+	{
+		id: 'weapons-of-math-destruction',
+		title: 'Weapons of Math Destruction',
+		author: "Cathy O'Neil",
+		year: '2016',
+		coverUrl: '/books/weapons-of-math-destruction.jpg',
+		description:
+			'Jak algoritmy fungují jako nástroje moci — neprůhledné, samonaplňující a systematicky poškozující ty nejzranitelnější. O\'Neil demaskuje matematiku jako politiku.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://www.penguinrandomhouse.com/books/241363/weapons-of-math-destruction-by-cathy-oneil/',
+				label: '→ web knihy',
+				external: true
+			}
+		],
+		source: { name: 'Crown', href: 'https://www.penguinrandomhouse.com/books/241363/weapons-of-math-destruction-by-cathy-oneil/' }
+	},
+	{
+		id: 'small-is-beautiful',
+		title: 'Small is Beautiful: Economics as if People Mattered',
+		author: 'E.F. Schumacher',
+		year: '1973',
+		coverUrl: '/books/small-is-beautiful.jpg',
+		description:
+			'Ekonomika v lidském měřítku — proti gigantismu průmyslu a státu. Schumacher argumentuje, že malé, decentralizované struktury jsou nejen etičtější, ale i efektivnější.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://archive.org/details/smallisbeautiful00schu',
+				label: '→ číst na archive.org',
+				external: true
+			}
+		],
+		source: { name: 'Internet Archive', href: 'https://archive.org/details/smallisbeautiful00schu' }
+	},
+	{
+		id: 'governing-the-commons',
+		title: 'Governing the Commons',
+		author: 'Elinor Ostrom',
+		year: '1990',
+		coverUrl: '/books/governing-the-commons.jpg',
+		description:
+			'Jak komunity spravují sdílené zdroje bez státu ani trhu. Ostrom bourá Hardinovu "tragédii obecní půdy" empirickými důkazy — a ukazuje, že samospráva funguje.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://www.cambridge.org/core/books/governing-the-commons/A8BB63BC4A1433A50A3FB92EDBBB97D5',
+				label: '→ Cambridge UP',
+				external: true
+			}
+		],
+		source: { name: 'Cambridge University Press', href: 'https://www.cambridge.org/core/books/governing-the-commons/A8BB63BC4A1433A50A3FB92EDBBB97D5' }
+	},
+	{
+		id: 'dispossessed',
+		title: 'The Dispossessed',
+		author: 'Ursula K. Le Guin',
+		year: '1974',
+		coverUrl: '/books/dispossessed.jpg',
+		description:
+			'Anarchistická utopie versus kapitalismus — nejpolitičtější SF román všech dob. Fyzik Shevek pendluje mezi dvěma světy a odhaluje, že žádný není svobodný tak docela, jak tvrdí.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://www.ursulakleguin.com/the-dispossessed',
+				label: '→ web autorky',
+				external: true
+			}
+		],
+		source: { name: 'Ursula K. Le Guin', href: 'https://www.ursulakleguin.com/the-dispossessed' }
+	},
+	{
+		id: '1984',
+		title: 'Nineteen Eighty-Four',
+		author: 'George Orwell',
+		year: '1949',
+		coverUrl: '/books/1984.jpg',
+		description:
+			'Totalitní stát jako dokonalý stroj na výrobu souhlasu. Big Brother, doublethink, newspeak — Orwellův slovník se stal jazykem, kterým popisujeme skutečný svět.',
+		language: ['en'],
+		formats: ['ebook', 'print'],
+		physical: false,
+		links: [
+			{
+				href: 'https://archive.org/details/nineteen-eighty-four-1984',
+				label: '→ číst na archive.org',
+				external: true
+			}
+		],
+		source: { name: 'Internet Archive', href: 'https://archive.org/details/nineteen-eighty-four-1984' }
+	},
+	{
+		id: 'tools-for-conviviality',
+		title: 'Tools for Conviviality',
+		author: 'Ivan Illich',
+		year: '1973',
+		coverUrl: '/books/tools-for-conviviality.jpg',
+		description:
+			'Nástroje, které přesáhnou určitý práh složitosti, ničí autonomii a vytvářejí závislost na institucích. Illich definuje "konviviální nástroje" — takové, které zůstávají pod kontrolou uživatele.',
+		language: ['en'],
+		formats: ['pdf', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://archive.org/details/illich-tools-for-conviviality',
+				label: '→ číst na archive.org',
+				external: true
+			}
+		],
+		source: { name: 'Internet Archive', href: 'https://archive.org/details/illich-tools-for-conviviality' }
+	},
+	{
+		id: 'deschooling-society',
+		title: 'Deschooling Society',
+		author: 'Ivan Illich',
+		year: '1971',
+		coverUrl: '/books/deschooling-society.jpg',
+		description:
+			'Povinná školní docházka jako institucionální kolonizace učení. Illich navrhuje "vzdělávací sítě" — decentralizované vrstevnické struktury místo hierarchických institucí. Prorocká předzvěst internetu.',
+		language: ['en'],
+		formats: ['pdf', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://archive.org/details/deschoolingsoci000illi',
+				label: '→ číst na archive.org',
+				external: true
+			}
+		],
+		source: { name: 'Internet Archive', href: 'https://archive.org/details/deschoolingsoci000illi' }
+	},
+	{
+		id: 'medical-nemesis',
+		title: 'Medical Nemesis',
+		author: 'Ivan Illich',
+		year: '1975',
+		coverUrl: '/books/medical-nemesis.jpg',
+		description:
+			'Profesionalizace medicíny ničí schopnost lidí pečovat o sebe navzájem. Stejná logika jako v Tools for Conviviality — aplikovaná na zdravotnictví a institucionální závislost.',
+		language: ['en'],
+		formats: ['pdf', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://archive.org/details/medicalnemesisso00illi',
+				label: '→ číst na archive.org',
+				external: true
+			}
+		],
+		source: { name: 'Internet Archive', href: 'https://archive.org/details/medicalnemesisso00illi' }
+	},
+	{
 		id: 'reinventing-organizations',
 		title: 'Reinventing Organizations',
 		author: 'Frederic Laloux',
@@ -768,5 +1128,96 @@ export const libraryBooks: LibraryBook[] = [
 			}
 		],
 		source: { name: 'MIT Press', href: 'https://mitpress.mit.edu/9780262548182/tor/' }
+	},
+	{
+		id: 'algorithms-of-resistance',
+		title: 'Algorithms of Resistance: The Everyday Fight against Platform Power',
+		author: 'Tiziano Bonini & Emiliano Treré',
+		year: '2024',
+		coverUrl: '/books/algorithms-of-resistance.jpg',
+		description:
+			'Jak pracovníci platforem, tvůrci a aktivisté obracejí algoritmy proti moci, která je řídí. Bonini a Treré ukazují každodenní taktiky algoritmické agency napříč gig workem, kulturními průmysly a politikou.',
+		language: ['en'],
+		formats: ['ebook', 'web', 'print'],
+		physical: false,
+		links: [
+			{
+				href: 'https://direct.mit.edu/books/oa-monograph/5721/Algorithms-of-ResistanceThe-Everyday-Fight-against',
+				label: '→ číst na MIT Press Direct',
+				external: true
+			},
+			{
+				href: 'https://mitpress.mit.edu/9780262547420/algorithms-of-resistance/',
+				label: '→ MIT Press',
+				external: true
+			}
+		],
+		source: {
+			name: 'MIT Press Direct',
+			href: 'https://direct.mit.edu/books/oa-monograph/5721/Algorithms-of-ResistanceThe-Everyday-Fight-against'
+		}
+	},
+	{
+		id: 'enshittification',
+		title: 'Enshittification: Why Everything Suddenly Got Worse and What to Do About It',
+		author: 'Cory Doctorow',
+		year: '2025',
+		coverUrl: '/books/enshittification.jpg',
+		description:
+			'Proč internet zhoršuje služby, jakmile nás platformy zamknou — a jak je zase rozebrat. Doctorow mapuje enshittifikaci od Google a Amazonu po antitrust, regulaci a svobodu softwaru.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://craphound.com/enshittification/',
+				label: '→ Cory Doctorow',
+				external: true
+			},
+			{
+				href: 'https://shop.craphound.com/product/enshittification/',
+				label: '→ koupit (Craphound Shop)',
+				external: true
+			},
+			{
+				href: 'https://www.goodreads.com/book/show/222376640-enshittification',
+				label: '→ Goodreads',
+				external: true
+			}
+		],
+		source: { name: 'Cory Doctorow', href: 'https://craphound.com/enshittification/' }
+	},
+	{
+		id: 'the-genesis-book',
+		title: 'The Genesis Book: The Story of the People and Projects That Inspired Bitcoin',
+		author: 'Aaron van Wirdum',
+		year: '2024',
+		coverUrl: '/books/the-genesis-book.jpg',
+		description:
+			'Bitcoin se neobjevil z ničeho nic. Van Wirdum mapuje dekády počítačových vědců, privacy aktivistů a heterodoxních ekonomů, jejichž projekty a myšlenky vedly k prvnímu úspěšnému peer-to-peer elektronickému cash systému.',
+		language: ['en'],
+		formats: ['print', 'ebook'],
+		physical: false,
+		links: [
+			{
+				href: 'https://store.bitcoinmagazine.com/collections/books/products/the-genesis-book',
+				label: '→ Bitcoin Magazine Store',
+				external: true
+			},
+			{
+				href: 'https://thegenesisbook.com/',
+				label: '→ web knihy',
+				external: true
+			},
+			{
+				href: 'https://www.goodreads.com/book/show/204250558-the-genesis-book',
+				label: '→ Goodreads',
+				external: true
+			}
+		],
+		source: {
+			name: 'Bitcoin Magazine Books',
+			href: 'https://store.bitcoinmagazine.com/collections/books/products/the-genesis-book'
+		}
 	}
 ];
