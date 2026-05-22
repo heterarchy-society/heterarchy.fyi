@@ -41,14 +41,7 @@ function makeUrlPatterns(): UrlPattern[] {
 			['en', ':protocol://:domain(.*)::port?/glossary/missing'],
 		],
 	});
-	patterns.push({
-		pattern: ':protocol://:domain(.*)::port?/glossary/:id/history/:hash',
-		localized: [
-			['cs', ':protocol://:domain(.*)::port?/cs/glosar/:id/historie/:hash'],
-			['en', ':protocol://:domain(.*)::port?/glossary/:id/history/:hash'],
-		],
-	});
-	patterns.push({
+patterns.push({
 		pattern: ':protocol://:domain(.*)::port?/glossary/:id/history',
 		localized: [
 			['cs', ':protocol://:domain(.*)::port?/cs/glosar/:id/historie'],

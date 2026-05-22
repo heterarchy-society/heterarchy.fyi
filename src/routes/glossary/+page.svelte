@@ -161,7 +161,7 @@
 												<a href={termHrefById(change.id)} class="no-underline hover:underline leading-snug text-black/70">
 													{termNameById(change.id)}
 												</a>
-												<a href={localizeUrl(`/glossary/${change.id}/history/${entry.hash}`)} class="text-black/30 no-underline hover:underline hover:text-black shrink-0">(diff)</a>
+												<a href={localizeUrl(`/glossary/${change.id}/history`) + `?commit=${entry.hash}`} class="text-black/30 no-underline hover:underline hover:text-black shrink-0">(diff)</a>
 											</li>
 										{/each}
 									</ul>

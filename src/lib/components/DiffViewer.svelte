@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { FileDiff, parsePatchFiles } from '@pierre/diffs';
 
 	let { diff }: { diff: string } = $props();
@@ -24,7 +23,10 @@
 		}
 	}
 
-	onMount(() => render());
+	$effect(() => {
+		diff; // track prop changes
+		render();
+	});
 
 	function toggleLayout() {
 		layout = layout === 'unified' ? 'split' : 'unified';
