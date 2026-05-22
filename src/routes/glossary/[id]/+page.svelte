@@ -45,6 +45,9 @@
 	);
 	const lastEdit = $derived((data.term as any).history?.[0]?.date ?? null);
 	const historyCount = $derived((data.term as any).history?.length ?? 0);
+	const contributors = $derived(
+		((data.term as any).authors ?? []) as { name: string; email: string; avatar: string }[]
+	);
 
 	const glossaryHref = $derived(localizeUrl('/glossary'));
 	const historyHref = $derived(localizeUrl(`/glossary/${$page.params.id}/history`));
@@ -130,6 +133,26 @@
 							<p class="text-[10px] text-black/30">{m.glossary_last_edited({ date: formatDate(lastEdit) })}</p>
 						{/if}
 					</div>
+
+					{#if contributors.length > 0}
+						<div>
+							<p class="label mb-3">{m.glossary_contributors_label()}</p>
+							<ul class="flex flex-col gap-2">
+								{#each contributors as contributor}
+									{@const gh = (contributor as any).gh_username}
+									<li class="flex items-center gap-2">
+										{#if gh}
+											<img src="https://github.com/{gh}.png?size=40" alt={gh} width={20} height={20} class="rounded-full border border-line shrink-0" />
+											<a href="https://github.com/{gh}" target="_blank" rel="noopener noreferrer" class="font-mono text-[11px] text-black/70 no-underline hover:underline">{gh}</a>
+										{:else}
+											<span class="w-5 h-5 rounded-full border border-line bg-bg-muted shrink-0"></span>
+											<span class="font-mono text-[11px] text-black/70">{(contributor as any).name}</span>
+										{/if}
+									</li>
+								{/each}
+							</ul>
+						</div>
+					{/if}
 
 					{#if data.backlinks.length > 0}
 						<div>

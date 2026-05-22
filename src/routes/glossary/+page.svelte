@@ -156,6 +156,27 @@
 								</li>
 							{/each}
 						</ul>
+						{#if data.contributors.length > 0}
+							<div class="mt-10 border-t border-line pt-8">
+								<p class="label mb-4">{m.glossary_contributors_label()}</p>
+								<ul class="flex flex-col gap-2 font-mono text-[11px]">
+									{#each data.contributors as contributor}
+										<li class="flex items-center justify-between gap-3">
+											<div class="flex items-center gap-2">
+												{#if contributor.gh_username}
+													<img src="https://github.com/{contributor.gh_username}.png?size=40" alt={contributor.gh_username} width={20} height={20} class="rounded-full border border-line shrink-0" />
+													<a href="https://github.com/{contributor.gh_username}" target="_blank" rel="noopener noreferrer" class="text-black/70 no-underline hover:underline">{contributor.gh_username}</a>
+												{:else}
+													<span class="w-5 h-5 rounded-full border border-line bg-bg-muted shrink-0"></span>
+													<span class="text-black/70">{contributor.name}</span>
+												{/if}
+											</div>
+											<span class="text-black/30">{contributor.commits}</span>
+										</li>
+									{/each}
+								</ul>
+							</div>
+						{/if}
 					</aside>
 				{/if}
 			</div>
