@@ -53,7 +53,7 @@
 	const historyHref = $derived(localizeUrl(`/glossary/${$page.params.id}/history`));
 
 	function formatDate(iso: string) {
-		return new Date(iso).toLocaleDateString('cs-CZ', { day: 'numeric', month: 'long', year: 'numeric' });
+		return new Date(iso).toLocaleDateString(getLocale(), { day: 'numeric', month: 'long', year: 'numeric' });
 	}
 </script>
 
