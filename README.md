@@ -1,49 +1,53 @@
 # heterarchy.fyi
 
-Website for The Heterarchy Society, built with SvelteKit and Tailwind CSS.
+Website for [The Heterarchy Society](https://heterarchy.fyi), built with SvelteKit and Tailwind CSS.
 
 The site is a static Svelte app with pages for the homepage, events, library, platforms, joining the community, and about content. Most editable content lives in TypeScript data files under `src/lib/data`, with visual components in `src/lib/components`.
 
 ## Tech Stack
 
-- SvelteKit
-- Svelte 5 runes
-- TypeScript
-- Tailwind CSS
-- Vite
-- Static adapter output to `build/`
+- [SvelteKit](https://kit.svelte.dev) — app framework with file-based routing and static adapter
+- [Svelte 5](https://svelte.dev) — UI with runes (`$state`, `$derived`, `$effect`)
+- [TypeScript](https://www.typescriptlang.org)
+- [Tailwind CSS v4](https://tailwindcss.com)
+- [Vite](https://vite.dev)
+- [Paraglide JS](https://inlang.com/m/gerre34r/library-inlang-paraglideJs) — i18n with URL-prefix routing (`/` EN, `/cs/` CS)
+- [Bun](https://bun.sh) — package manager and script runner
+- [`@pierre/diffs`](https://www.npmjs.com/package/@pierre/diffs) — git diff rendering in glossary history
 
 ## Getting Started
 
 Install dependencies:
 
 ```sh
-npm install
+bun install
 ```
 
 Start the local development server:
 
 ```sh
-npm run dev
+make dev
 ```
 
 Run type and Svelte checks:
 
 ```sh
-npm run check
+make check
 ```
 
 Create a production build:
 
 ```sh
-npm run build
+make build
 ```
 
 Preview the production build locally:
 
 ```sh
-npm run preview
+make preview
 ```
+
+Run `make help` to see all available targets.
 
 ## Project Structure
 
@@ -67,6 +71,6 @@ build/                   Generated static site output
 
 ## Deployment
 
-The project uses `@sveltejs/adapter-static`. Running `npm run build` writes the static site to `build/`, which can be deployed to any static hosting provider.
+The project uses `@sveltejs/adapter-static`. Running `make build` (or `bun run build`) writes the static site to `build/`, which can be deployed to any static hosting provider. CI/CD uses GitHub Actions with [`oven-sh/setup-bun`](https://github.com/oven-sh/setup-bun) and deploys to GitHub Pages automatically on push to `main`.
 
 If the site is deployed under a subpath, set `BASE_PATH` before building.
