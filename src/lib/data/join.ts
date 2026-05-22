@@ -47,11 +47,11 @@ export const joinOptions: JoinOption[] = [
 		icon: 'write'
 	},
 	{
-		label: 'Knihovna',
+		label: 'Knihy',
 		description:
 			'Vypůjč si knihu z naší knihovny nebo přines vlastní. Katalog je online.',
-		href: '/knihovna',
-		linkLabel: '→ knihovna',
+		href: '/knihy',
+		linkLabel: '→ knihy',
 		icon: 'book'
 	},
 	{

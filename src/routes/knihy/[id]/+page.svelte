@@ -14,7 +14,7 @@
 </script>
 
 <svelte:head>
-	<title>{book.title} — Knihovna</title>
+	<title>{book.title} — Knihy</title>
 	<meta name="description" content={book.description} />
 </svelte:head>
 
@@ -23,17 +23,17 @@
 
 	<main>
 		<section class="cell-roomy border-b border-line">
-			<a href="/knihovna" class="link-arrow mb-8 inline-block text-[12px]">← knihovna</a>
+			<a href="/knihy" class="link-arrow mb-8 inline-block text-[12px]">← knihovna</a>
 
 			<div class="grid gap-10 lg:grid-cols-[minmax(200px,280px)_1fr] lg:gap-14">
-				<div class="mx-auto w-full max-w-[280px] lg:mx-0">
+				<div class="mx-auto w-full max-w-70 lg:mx-0">
 					<div class="overflow-hidden border border-line bg-bg-muted">
 						<img
 							src={coverSrc}
 							alt="Obálka: {book.title}"
 							width={280}
 							height={420}
-							class="aspect-[2/3] w-full object-cover"
+							class="aspect-2/3 w-full object-cover"
 							onerror={() => (coverFailed = true)}
 						/>
 					</div>
@@ -99,6 +99,14 @@
 									</li>
 								{/each}
 							</ul>
+						</div>
+					{/if}
+
+					{#if book.tags && book.tags.length > 0}
+						<div class="mt-8 flex flex-wrap gap-2">
+							{#each book.tags as tag}
+								<span class="font-mono text-[10px] tracking-widest uppercase text-black/50 border border-line px-2 py-1">{tag}</span>
+							{/each}
 						</div>
 					{/if}
 

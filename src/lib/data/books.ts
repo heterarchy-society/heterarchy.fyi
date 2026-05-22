@@ -14,6 +14,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['ebook'],
 		physical: false,
+		tags: ['anarcho-capitalism', 'sovereignty', 'technology', 'economics'],
 		links: [
 			{
 				href: 'https://archive.org/details/the-sovereign-individual',
@@ -34,6 +35,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['web'],
 		physical: false,
+		tags: ['open-source', 'decentralization', 'software', 'community'],
 		links: [
 			{
 				href: 'http://www.catb.org/~esr/writings/cathedral-bazaar/',
@@ -54,6 +56,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'ebook'],
 		physical: false,
+		tags: ['open-source', 'software', 'freedom', 'copyright'],
 		links: [
 			{
 				href: 'https://www.gnu.org/philosophy/fsfs/rms-essays.pdf',
@@ -73,6 +76,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'ebook'],
 		physical: false,
+		tags: ['anarcho-capitalism', 'libertarianism', 'property', 'economics'],
 		links: [
 			{
 				href: 'https://cdn.mises.org/Property,%20Freedom,%20and%20Society%20Essays%20in%20Honor%20of%20Hans-Hermann%20Hoppe_2.pdf',
@@ -93,6 +97,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['ebook', 'web'],
 		physical: false,
+		tags: ['copyright', 'anarcho-capitalism', 'libertarianism', 'law'],
 		links: [
 			{
 				href: 'https://mises.org/library/book/against-intellectual-property',
@@ -113,6 +118,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'ebook'],
 		physical: false,
+		tags: ['fiction', 'cypherpunk', 'sovereignty', 'parallel-structures'],
 		links: [
 			{
 				href: 'https://anarplex.sirion.io/hosted/files/A_Lodging_of_Wayfaring_Men.pdf',
@@ -133,6 +139,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['ebook'],
 		physical: false,
+		tags: ['leadership', 'coordination', 'fiction', 'resilience'],
 		links: [
 			{
 				href: 'https://archive.org/details/enduranceshackle0000lans_n0v5',
@@ -152,6 +159,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['ebook'],
 		physical: false,
+		tags: ['philosophy', 'coordination', 'game-theory'],
 		links: [
 			{
 				href: 'https://archive.org/details/finiteinfinitega00carsrich',
@@ -171,6 +179,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['web', 'ebook'],
 		physical: false,
+		tags: ['governance', 'sovereignty', 'decentralization', 'crypto'],
 		links: [
 			{
 				href: 'https://thenetworkstate.com/',
@@ -191,6 +200,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['ebook'],
 		physical: false,
+		tags: ['ai', 'technology', 'futurism', 'transhumanism'],
 		links: [
 			{
 				href: 'https://archive.org/details/singularityisnea00kurz',
@@ -211,6 +221,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['ebook'],
 		physical: false,
+		tags: ['ai', 'existential-risk', 'technology', 'futurism'],
 		links: [
 			{
 				href: 'https://archive.org/details/superintelligenc0000bost',
@@ -231,6 +242,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['web', 'ebook'],
 		physical: false,
+		tags: ['ai', 'ethics', 'technology'],
 		links: [
 			{
 				href: 'https://brianchristian.org/the-alignment-problem/',
@@ -251,6 +263,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['privacy', 'opsec', 'security', 'practical'],
 		links: [
 			{
 				href: 'https://www.amazon.com/Extreme-Privacy-What-Takes-Disappear-dp-B0DCJN61GF/dp/B0DCJN61GF',
@@ -277,6 +290,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['surveillance', 'privacy', 'state', 'technology'],
 		links: [
 			{
 				href: 'https://www.amazon.com/Means-Control-Alliance-Government-Surveillance/dp/0593443225',
@@ -302,6 +316,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['crypto', 'privacy', 'surveillance', 'journalism'],
 		links: [
 			{
 				href: 'https://www.amazon.com/Tracers-Dark-Global-Crime-Cryptocurrency/dp/0385548095',
@@ -323,10 +338,11 @@ export const libraryBooks: LibraryBook[] = [
 		year: '2022',
 		coverUrl: '/books/stuck-on-the-platform.webp',
 		description:
-			"We’re all trapped. No matter how hard you try to delete apps from your phone, the power of seduction draws you back. What happens when your home office starts to feel like a call center?",
+			"We're all trapped. No matter how hard you try to delete apps from your phone, the power of seduction draws you back. What happens when your home office starts to feel like a call center?",
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['platforms', 'internet', 'media-criticism', 'decentralization'],
 		links: [
 			{
 				href: 'https://www.amazon.com/Stuck-Platform-Reclaiming-Geert-Lovink/dp/9493246086',
@@ -352,6 +368,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['cypherpunk', 'ethics', 'privacy', 'cryptography'],
 		links: [
 			{
 				href: 'https://www.amazon.com/Cypherpunk-Ethics-Radical-Digital-Routledge/dp/1032113596',
@@ -377,6 +394,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['philosophy', 'power', 'surveillance', 'neoliberalism'],
 		links: [
 			{
 				href: 'https://www.amazon.com/Psychopolitics-Neoliberalism-New-Technologies-Power/dp/1784785776',
@@ -402,6 +420,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['surveillance', 'race', 'power', 'resistance'],
 		links: [
 			{
 				href: 'https://www.amazon.com/Dark-Matters-Surveillance-Simone-Browne/dp/0822359383',
@@ -427,6 +446,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en', 'de'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['resistance', 'philosophy', 'sovereignty', 'state'],
 		links: [
 			{
 				href: 'https://www.amazon.com/Forest-Passage-Ernst-J%C3%BCnger/dp/0914386492',
@@ -452,6 +472,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'ebook', 'print'],
 		physical: false,
+		tags: ['privacy', 'cypherpunk', 'economics', 'cryptography'],
 		links: [
 			{
 				href: 'https://pay.towardsliberty.com/Storage/c38551e1-9fc8-44f8-b295-8de7773546f4',
@@ -490,6 +511,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'ebook', 'print', 'web'],
 		physical: false,
+		tags: ['governance', 'sovereignty', 'crypto', 'decentralization'],
 		links: [
 			{
 				href: 'https://logos.co/assets/Farewell%20to%20Westphalia%20(Jarrad%20Hope%20and%20Peter%20Ludlow)%20-%20FOSS%20edition.pdf',
@@ -525,6 +547,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['cs'],
 		formats: ['pdf', 'ebook'],
 		physical: false,
+		tags: ['anarcho-capitalism', 'economics', 'libertarianism', 'czech'],
 		links: [
 			{
 				href: 'https://www.mises.cz/database/literatura/69.pdf',
@@ -560,6 +583,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'web'],
 		physical: false,
+		tags: ['knowledge-commons', 'censorship', 'archives', 'internet'],
 		links: [
 			{
 				href: 'https://archive.org/details/vanishing-culture-2026',
@@ -580,6 +604,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'web'],
 		physical: false,
+		tags: ['copyright', 'culture', 'internet', 'freedom'],
 		links: [
 			{
 				href: 'https://lessig.org/product/free-culture/',
@@ -600,6 +625,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'web'],
 		physical: false,
+		tags: ['copyright', 'knowledge-commons', 'law', 'culture'],
 		links: [
 			{
 				href: 'https://www.thepublicdomain.org/download/',
@@ -620,6 +646,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['copyright', 'culture', 'law', 'media-criticism'],
 		links: [
 			{
 				href: 'https://nyupress.org/9780814788073/copyrights-and-copywrongs/',
@@ -640,6 +667,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['decentralization', 'organization', 'coordination', 'resilience'],
 		links: [
 			{
 				href: 'https://www.penguinrandomhouse.com/books/298985/the-starfish-and-the-spider-by-ori-brafman-and-rod-a-beckstrom/',
@@ -660,6 +688,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['open-source', 'community', 'coordination', 'software'],
 		links: [
 			{
 				href: 'https://press.stripe.com/working-in-public',
@@ -680,6 +709,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'web'],
 		physical: false,
+		tags: ['anarchism', 'autonomy', 'parallel-structures', 'resistance'],
 		links: [
 			{
 				href: 'https://archive.org/details/T.A.Z.TheTemporaryAutonomousZoneOntologicalAnarchyPoeticTerrorism',
@@ -700,6 +730,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['surveillance', 'privacy', 'whistleblowing', 'state'],
 		links: [
 			{
 				href: 'https://www.macmillanpublishers.com/ww/b/permanent-record',
@@ -720,6 +751,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'ebook'],
 		physical: false,
+		tags: ['anarcho-capitalism', 'libertarianism', 'state', 'freedom'],
 		links: [
 			{
 				href: 'https://mises.org/library/book/new-liberty-libertarian-manifesto',
@@ -740,6 +772,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'ebook'],
 		physical: false,
+		tags: ['anarcho-capitalism', 'ethics', 'philosophy', 'natural-law'],
 		links: [
 			{
 				href: 'https://mises.org/library/book/ethics-liberty',
@@ -760,6 +793,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'ebook'],
 		physical: false,
+		tags: ['economics', 'austrian-economics', 'anarcho-capitalism', 'praxeology'],
 		links: [
 			{
 				href: 'https://mises.org/library/book/man-economy-and-state-power-and-market',
@@ -780,6 +814,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'ebook', 'print'],
 		physical: false,
+		tags: ['anarcho-capitalism', 'democracy', 'state', 'political-theory'],
 		links: [
 			{
 				href: 'https://mises.org/library/book/democracy-god-failed',
@@ -800,6 +835,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['anarcho-capitalism', 'philosophy', 'state', 'political-theory'],
 		links: [
 			{
 				href: 'https://www.amazon.com/Problem-Political-Authority-Examination-Coerce/dp/1137281650',
@@ -820,6 +856,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['cypherpunk', 'cryptography', 'history', 'privacy'],
 		links: [
 			{
 				href: 'https://archive.org/details/cryptohowcodereb00levy',
@@ -840,6 +877,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['cypherpunk', 'whistleblowing', 'privacy', 'journalism'],
 		links: [
 			{
 				href: 'https://www.penguinrandomhouse.com/books/311549/this-machine-kills-secrets-by-andy-greenberg/',
@@ -860,6 +898,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['cryptography', 'security', 'technical', 'cypherpunk'],
 		links: [
 			{
 				href: 'https://www.schneier.com/books/applied-cryptography/',
@@ -880,6 +919,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['anarchism', 'anthropology', 'history', 'decentralization'],
 		links: [
 			{
 				href: 'https://us.macmillan.com/books/9780374157357/thedawnofeverything',
@@ -900,6 +940,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['surveillance', 'capitalism', 'platforms', 'power'],
 		links: [
 			{
 				href: 'https://www.publicaffairsbooks.com/titles/shoshana-zuboff/the-age-of-surveillance-capitalism/9781610395694/',
@@ -916,10 +957,11 @@ export const libraryBooks: LibraryBook[] = [
 		year: '2016',
 		coverUrl: '/books/weapons-of-math-destruction.jpg',
 		description:
-			'Jak algoritmy fungují jako nástroje moci — neprůhledné, samonaplňující a systematicky poškozující ty nejzranitelnější. O\'Neil demaskuje matematiku jako politiku.',
+			"Jak algoritmy fungují jako nástroje moci — neprůhledné, samonaplňující a systematicky poškozující ty nejzranitelnější. O'Neil demaskuje matematiku jako politiku.",
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['algorithms', 'power', 'surveillance', 'ai'],
 		links: [
 			{
 				href: 'https://www.penguinrandomhouse.com/books/241363/weapons-of-math-destruction-by-cathy-oneil/',
@@ -940,6 +982,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['economics', 'decentralization', 'ecology', 'autonomy'],
 		links: [
 			{
 				href: 'https://archive.org/details/smallisbeautiful00schu',
@@ -960,6 +1003,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['governance', 'commons', 'coordination', 'self-organization'],
 		links: [
 			{
 				href: 'https://www.cambridge.org/core/books/governing-the-commons/A8BB63BC4A1433A50A3FB92EDBBB97D5',
@@ -980,6 +1024,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['fiction', 'anarchism', 'utopia', 'sci-fi'],
 		links: [
 			{
 				href: 'https://www.ursulakleguin.com/the-dispossessed',
@@ -1000,6 +1045,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['ebook', 'print'],
 		physical: false,
+		tags: ['fiction', 'dystopia', 'surveillance', 'totalitarianism'],
 		links: [
 			{
 				href: 'https://archive.org/details/nineteen-eighty-four-1984',
@@ -1020,6 +1066,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'ebook'],
 		physical: false,
+		tags: ['technology', 'autonomy', 'institutions', 'decentralization'],
 		links: [
 			{
 				href: 'https://archive.org/details/illich-tools-for-conviviality',
@@ -1040,6 +1087,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'ebook'],
 		physical: false,
+		tags: ['education', 'institutions', 'decentralization', 'autonomy'],
 		links: [
 			{
 				href: 'https://archive.org/details/deschoolingsoci000illi',
@@ -1060,6 +1108,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'ebook'],
 		physical: false,
+		tags: ['institutions', 'autonomy', 'health', 'critique'],
 		links: [
 			{
 				href: 'https://archive.org/details/medicalnemesisso00illi',
@@ -1080,6 +1129,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['organization', 'self-management', 'coordination', 'governance'],
 		links: [
 			{
 				href: 'https://www.reinventingorganizations.com/',
@@ -1100,6 +1150,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['ebook', 'print'],
 		physical: false,
+		tags: ['fiction', 'dystopia', 'power', 'totalitarianism'],
 		links: [
 			{
 				href: 'https://archive.org/details/animal-farm-by-george-orwell',
@@ -1120,6 +1171,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf', 'ebook'],
 		physical: false,
+		tags: ['agorism', 'crypto', 'cypherpunk', 'philosophy'],
 		links: [
 			{
 				href: 'https://agorist.xyz/files/Agorism_XXI_I_2022.pdf',
@@ -1145,6 +1197,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['crypto', 'blockchain', 'economics', 'left-libertarianism'],
 		links: [
 			{
 				href: 'https://repeaterbooks.com/product/blockchain-radicals-how-capitalism-ruined-crypto-and-how-to-fix-it/',
@@ -1165,6 +1218,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['fiction', 'colonialism', 'resistance', 'sci-fi'],
 		links: [
 			{
 				href: 'https://www.ursulakleguin.com/the-word-for-world-is-forest',
@@ -1185,6 +1239,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['pdf'],
 		physical: false,
+		tags: ['governance', 'institutions', 'commons', 'polycentric'],
 		links: [
 			{
 				href: 'https://wtf.tw/ref/ostrom_2005.pdf',
@@ -1210,6 +1265,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['platforms', 'internet', 'media-criticism', 'social-media'],
 		links: [
 			{
 				href: 'https://valiz.nl/en/publications/platform-brutality',
@@ -1226,10 +1282,11 @@ export const libraryBooks: LibraryBook[] = [
 		year: '2025',
 		coverUrl: '/books/chasing-shadows.jpg',
 		description:
-			'A real-life spy thriller documenting the Citizen Lab\'s investigations into cyber espionage — how authoritarian regimes exploit digital infrastructure to monitor and suppress activists, journalists, and dissidents worldwide.',
+			"A real-life spy thriller documenting the Citizen Lab's investigations into cyber espionage — how authoritarian regimes exploit digital infrastructure to monitor and suppress activists, journalists, and dissidents worldwide.",
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['surveillance', 'security', 'cyber-espionage', 'journalism'],
 		links: [
 			{
 				href: 'https://chasingshadowsbook.ca/',
@@ -1250,6 +1307,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['privacy', 'cypherpunk', 'infrastructure', 'history'],
 		links: [
 			{
 				href: 'https://mitpress.mit.edu/9780262548182/tor/',
@@ -1280,6 +1338,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['ebook', 'web', 'print'],
 		physical: false,
+		tags: ['algorithms', 'platforms', 'resistance', 'media-criticism'],
 		links: [
 			{
 				href: 'https://direct.mit.edu/books/oa-monograph/5721/Algorithms-of-ResistanceThe-Everyday-Fight-against',
@@ -1308,6 +1367,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['platforms', 'internet', 'capitalism', 'decentralization'],
 		links: [
 			{
 				href: 'https://craphound.com/enshittification/',
@@ -1338,6 +1398,7 @@ export const libraryBooks: LibraryBook[] = [
 		language: ['en'],
 		formats: ['print', 'ebook'],
 		physical: false,
+		tags: ['bitcoin', 'crypto', 'cypherpunk', 'history'],
 		links: [
 			{
 				href: 'https://store.bitcoinmagazine.com/collections/books/products/the-genesis-book',

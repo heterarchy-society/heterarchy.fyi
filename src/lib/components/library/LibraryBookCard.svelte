@@ -20,7 +20,7 @@
 			alt="Obálka: {book.title}"
 			width={large ? 320 : 240}
 			height={large ? 480 : 360}
-			class="aspect-[2/3] w-full object-cover"
+			class="aspect-2/3 w-full object-cover"
 			onerror={() => (coverFailed = true)}
 		/>
 	</div>
@@ -31,7 +31,7 @@
 		</p>
 
 		<h2
-			class="mb-1 font-mono leading-snug tracking-[-0.01em] break-words group-hover:underline"
+			class="mb-1 font-mono leading-snug tracking-[-0.01em] wrap-break-word group-hover:underline"
 			class:text-[1.05rem]={large}
 			class:text-[13px]={!large}
 		>

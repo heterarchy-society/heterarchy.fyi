@@ -21,4 +21,5 @@ export type LibraryBook = {
 	physical: boolean;
 	links: LibraryLink[];
 	source?: { name: string; href: string };
+	tags?: string[];
 };

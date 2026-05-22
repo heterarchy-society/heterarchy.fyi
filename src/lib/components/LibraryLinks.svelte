@@ -7,7 +7,7 @@
 		books.length > 0
 			? books.map((b) => ({ href: bookPath(b.id), src: b.coverUrl ?? '/book-placeholder.svg', alt: b.title }))
 			: Array.from({ length: 4 }, (_, i) => ({
-					href: '/knihovna',
+					href: '/knihy',
 					src: '/book-placeholder.svg',
 					alt: '',
 					key: `placeholder-${i}`
@@ -16,7 +16,7 @@
 </script>
 
 <section>
-	<p class="label">Knihovna</p>
+	<p class="label">Knihy</p>
 
 	<div class="mb-5 grid grid-cols-4 gap-2">
 		{#each previewItems as item (item.href + item.src)}
@@ -26,11 +26,11 @@
 					alt={item.alt}
 					width={80}
 					height={120}
-					class="aspect-[2/3] w-full border border-line object-cover transition-opacity hover:opacity-80"
+					class="aspect-2/3 w-full border border-line object-cover transition-opacity hover:opacity-80"
 				/>
 			</a>
 		{/each}
 	</div>
 
-	<a href="/knihovna" class="link-arrow text-[13px]">→ knihovna</a>
+	<a href="/knihy" class="link-arrow text-[13px]">→ knihovna</a>
 </section>

@@ -20,7 +20,7 @@ export type FooterLink = {
 export const navItems: NavItem[] = [
 	{ label: 'domů', href: '/' },
 	{ label: 'události', href: '/udalosti' },
-	{ label: 'knihovna', href: '/knihovna' },
+	{ label: 'knihy', href: '/knihy' },
 	{ label: 'zapojit se', href: '/zapojit-se' }
 ];
 

@@ -1,5 +1,5 @@
 import { libraryBooks as booksByAdded } from './books';
-import type { BookFormat, BookLanguage, LibraryBook, LibraryLink } from './library-types';
+import type { BookFormat, BookLanguage, LibraryBook } from './library-types';
 
 /** Seřazeno podle roku vydání, nejnovější první */
 export const libraryBooks: LibraryBook[] = [...booksByAdded].sort(
@@ -22,7 +22,7 @@ export const languageLabels: Record<BookLanguage, string> = {
 };
 
 export function bookPath(id: string): string {
-	return `/knihovna/${id}`;
+	return `/knihy/${id}`;
 }
 
 export function getBookById(id: string): LibraryBook | undefined {
@@ -38,7 +38,7 @@ export const libraryLocation = {
 };
 
 export const libraryIntro = {
-	label: 'Knihovna',
+	label: 'Knihy',
 	lead: 'E-booky i fyzické kopie — u každého titulu jazyk, formáty a odkazy.'
 };
 
@@ -51,7 +51,7 @@ export const libraryContribute = {
 };
 
 export const libraryMeta = {
-	title: 'Knihovna — The Heterarchy Society',
+	title: 'Knihy — The Heterarchy Society',
 	description: `${libraryName} — katalog knih The Heterarchy Society.`
 };
 
