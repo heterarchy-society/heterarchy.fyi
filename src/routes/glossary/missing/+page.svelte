@@ -39,10 +39,10 @@
 			</div>
 
 			<div class="mt-10 flex flex-col gap-4 sm:flex-row">
-				<a href={newFileUrl} target="_blank" rel="noopener noreferrer" class="link-arrow text-[13px]">
+				<a href={newFileUrl} target="_blank" rel="noopener noreferrer" class="link-external font-mono text-[13px]">
 					{m.glossary_missing_add()}
 				</a>
-				<a href="https://github.com/heterarchy-society/glossary" target="_blank" rel="noopener noreferrer" class="link-arrow text-[13px]">
+				<a href="https://github.com/heterarchy-society/glossary" target="_blank" rel="noopener noreferrer" class="link-external font-mono text-[13px]">
 					{m.glossary_missing_explore()}
 				</a>
 			</div>

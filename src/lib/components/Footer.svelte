@@ -13,11 +13,11 @@
 		<nav class="flex flex-wrap items-center justify-center gap-x-1.5 lg:justify-self-center">
 			<a href={localizeUrl('/find-us')} class="no-underline hover:underline">{m.footer_where_to_find()}</a>
 			<span aria-hidden="true">·</span>
-			<a href={siteMeta.sourceHref} class="no-underline hover:underline" target="_blank" rel="noopener noreferrer">{m.footer_git()}</a>
+			<a href={siteMeta.sourceHref} class="link-external" target="_blank" rel="noopener noreferrer">{m.footer_git()}</a>
 		</nav>
 		<a
 			href={siteMeta.sourceHref}
-			class="no-underline hover:underline lg:justify-self-end"
+			class="link-external lg:justify-self-end"
 			target="_blank"
 			rel="noopener noreferrer"
 		>

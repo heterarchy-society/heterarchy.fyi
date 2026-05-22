@@ -32,7 +32,7 @@
 									rel={channel.external ? 'noopener noreferrer' : undefined}
 								>
 									<span class="font-mono text-[11px] tracking-wide uppercase">{channel.label}</span>
-									<span class="text-[15px]">{channel.value}</span>
+									<span class={channel.external ? 'link-external text-[15px]' : 'text-[15px]'}>{channel.value}</span>
 								</a>
 							</li>
 						{/each}
@@ -54,7 +54,7 @@
 									<span class="font-mono text-[11px] tracking-wide uppercase">{venue.label}</span>
 									<span class="flex min-w-0 items-center gap-4">
 										<span class="min-w-0">
-											<span class="block text-[15px]">{venue.value}</span>
+											<span class={venue.external ? 'link-external block text-[15px]' : 'block text-[15px]'}>{venue.value}</span>
 											<span class="mt-1 block font-mono text-[11px] text-black/60">
 												{venue.city}, {venue.country}
 											</span>

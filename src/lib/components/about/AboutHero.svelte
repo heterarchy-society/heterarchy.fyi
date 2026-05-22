@@ -15,10 +15,11 @@
 
 	<a
 		href={aboutHero.cta.href}
-		class="link-arrow w-fit text-[13px]"
+		class={isExternal ? 'link-external w-fit font-mono text-[13px]' : 'link-arrow w-fit text-[13px]'}
 		target={isExternal ? '_blank' : undefined}
 		rel={isExternal ? 'noopener noreferrer' : undefined}
 	>
-		→ {aboutHero.cta.label}
+		{#if !isExternal}→ {/if}
+		{aboutHero.cta.label}
 	</a>
 </div>

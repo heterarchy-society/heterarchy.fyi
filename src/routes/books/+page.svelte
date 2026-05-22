@@ -100,7 +100,7 @@
 			<p class="max-w-xl text-[15px] leading-[1.65] text-black/75">{m.books_contribute_text()}</p>
 			<div class="mt-6 flex flex-wrap gap-x-8 gap-y-3">
 				<a href={localizeUrl('/find-us')} class="link-arrow text-[13px]">{m.books_contribute_where()}</a>
-				<a href={localizeUrl('/join').pathname} class="link-arrow text-[13px]">{m.books_contribute_join()}</a>
+				<a href={localizeUrl('/join')} class="link-arrow text-[13px]">{m.books_contribute_join()}</a>
 			</div>
 		</section>
 	</main>

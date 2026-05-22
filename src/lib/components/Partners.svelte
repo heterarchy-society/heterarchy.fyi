@@ -8,8 +8,8 @@
 	<ul class="mt-4 flex flex-col gap-2">
 		{#each partners as partner}
 			<li>
-				<a href={partner.href} target="_blank" rel="noopener noreferrer" class="link-arrow text-[13px]">
-					→ {partner.name}
+				<a href={partner.href} target="_blank" rel="noopener noreferrer" class="link-external font-mono text-[13px]">
+					{partner.name}
 				</a>
 			</li>
 		{/each}

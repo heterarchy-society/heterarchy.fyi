@@ -38,9 +38,9 @@
 	const content = $derived(labels[option.key]());
 	const href = $derived(option.external ? option.href : localizeUrl(option.href));
 
-	const spansFull = index === total - 1 && total % 2 !== 0;
-	const row = Math.floor(index / 2);
-	const totalRows = Math.ceil(total / 2);
+	const spansFull = $derived(index === total - 1 && total % 2 !== 0);
+	const row = $derived(Math.floor(index / 2));
+	const totalRows = $derived(Math.ceil(total / 2));
 </script>
 
 <article
@@ -58,7 +58,7 @@
 
 	<a
 		{href}
-		class="link-arrow mt-auto text-[13px]"
+		class={option.external ? 'link-external mt-auto font-mono text-[13px]' : 'link-arrow mt-auto text-[13px]'}
 		target={option.external ? '_blank' : undefined}
 		rel={option.external ? 'noopener noreferrer' : undefined}
 	>

@@ -73,7 +73,7 @@
 						href="https://github.com/heterarchy-society/glossary/commit/{entry.hash}"
 						target="_blank"
 						rel="noopener noreferrer"
-						class="no-underline hover:underline hover:text-black"
+						class="link-external hover:text-black"
 					>{entry.hash.slice(0, 7)}</a>
 				</div>
 

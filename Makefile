@@ -27,6 +27,11 @@ build:
 preview:
 	$(BUN) run preview
 
+## check-translations: check if long-form content translations are up to date
+.PHONY: check-translations
+check-translations:
+	$(BUN) scripts/check-translations.js
+
 ## fetch-data: fetch glossary data from remote
 .PHONY: fetch-data
 fetch-data:

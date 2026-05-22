@@ -40,7 +40,9 @@
 	}
 
 	const html = $derived(renderMarkdown(processDescription(activeDescription, data.term.resolvedLinks ?? [])));
-	const seeAlso = $derived(data.term.resolvedLinks?.filter((l) => l.target) ?? []);
+	const seeAlso = $derived(
+		(data.term.resolvedLinks ?? []).filter((link: any): link is { target: string; key: string } => Boolean(link.target))
+	);
 	const lastEdit = $derived((data.term as any).history?.[0]?.date ?? null);
 	const historyCount = $derived((data.term as any).history?.length ?? 0);
 
@@ -97,12 +99,13 @@
 							<p class="label mb-4">{m.glossary_sources()}</p>
 							<ul class="flex flex-col gap-3">
 								{#each data.term.resources as resource}
+									{@const resourceLang = 'lang' in resource ? resource.lang : null}
 									<li class="flex items-baseline gap-3">
-										<a href={resource.url} target="_blank" rel="noopener noreferrer" class="link-arrow text-[13px]">
-											→ {resource.title}
+										<a href={resource.url} target="_blank" rel="noopener noreferrer" class="link-external font-mono text-[13px]">
+											{resource.title}
 										</a>
-										{#if resource.lang}
-											<span class="font-mono text-[10px] uppercase tracking-wider text-black/35">{resource.lang}</span>
+										{#if resourceLang}
+											<span class="font-mono text-[10px] uppercase tracking-wider text-black/35">{resourceLang}</span>
 										{/if}
 									</li>
 								{/each}
@@ -118,7 +121,7 @@
 							href="https://github.com/heterarchy-society/glossary/blob/main/glossary/{data.term.id}.md"
 							target="_blank"
 							rel="noopener noreferrer"
-							class="text-[11px] text-black/40 no-underline hover:underline hover:text-black"
+							class="link-external text-[11px] text-black/40 hover:text-black"
 						>{m.glossary_edit_on_github()}</a>
 						<a href={historyHref} class="text-[11px] text-black/40 no-underline hover:underline hover:text-black">
 							{#if historyCount > 0}{m.glossary_edit_history_count({ count: String(historyCount) })}{:else}{m.glossary_edit_history()}{/if}
@@ -152,16 +155,17 @@
 					{#if seeAlso.length > 0}
 						<div>
 							<p class="label mb-3">{m.glossary_see_also()}</p>
-							<ul class="flex flex-col gap-2">
-								{#each seeAlso as link}
-									{@const linkTerm = data.allTerms?.find((t: any) => t.id === link.target)}
-									{@const linkCsName = (linkTerm as any)?.translations?.cs?.name}
-									{@const linkName = getLocale() === 'cs' && linkCsName ? linkCsName : link.key}
-									<li>
-										<a href={termHref(link.target)} class="no-underline hover:underline">
-											{linkName}
-										</a>
-									</li>
+								<ul class="flex flex-col gap-2">
+									{#each seeAlso as link}
+										{@const linkTarget = String(link.target)}
+										{@const linkTerm = data.allTerms?.find((t: any) => t.id === linkTarget)}
+										{@const linkCsName = (linkTerm as any)?.translations?.cs?.name}
+										{@const linkName = getLocale() === 'cs' && linkCsName ? linkCsName : link.key}
+										<li>
+											<a href={termHref(linkTarget)} class="no-underline hover:underline">
+												{linkName}
+											</a>
+										</li>
 								{/each}
 							</ul>
 						</div>

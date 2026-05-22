@@ -6,6 +6,7 @@
 	"type": "module",
 	"scripts": {
 		"fetch-data": "bun scripts/fetch-glossary.js",
+		"check-translations": "bun scripts/check-translations.js",
 		"dev": "vite dev",
 		"build": "bun scripts/fetch-glossary.js && vite build",
 		"preview": "vite preview",

@@ -5,10 +5,12 @@
 	let { events }: { events: EventItem[] } = $props();
 </script>
 
-{#snippet eventRow(event: EventItem, linked: boolean)}
+{#snippet eventRow(event: EventItem, linked: boolean, external = false)}
 	<span class="pt-px leading-snug">{event.date}</span>
 	<div class="min-w-0">
-		<p class="font-mono leading-snug" class:group-hover:underline={linked}>{event.title}</p>
+		<p class="font-mono leading-snug" class:group-hover:underline={linked && !external}>
+			<span class:link-external={external}>{event.title}</span>
+		</p>
 		{#if event.location && event.location !== 'TBD'}
 			<p class="mt-1 text-[11px] leading-snug text-black/60">{event.location}</p>
 		{/if}
@@ -16,7 +18,7 @@
 			<span class="mt-1 inline-block font-mono text-[10px] uppercase tracking-wider text-black/40">{m.upcoming_events_in_preparation()}</span>
 		{/if}
 	</div>
-	{#if linked}
+	{#if linked && !external}
 		<span class="justify-self-end pt-px group-hover:underline">→</span>
 	{/if}
 {/snippet}
@@ -39,7 +41,7 @@
 							target={external ? '_blank' : undefined}
 							rel={external ? 'noopener noreferrer' : undefined}
 						>
-							{@render eventRow(event, true)}
+							{@render eventRow(event, true, external)}
 						</a>
 					{:else}
 						<div class="grid grid-cols-[7rem_1fr] items-start gap-4 py-4">

@@ -1,23 +1,23 @@
-## Koncept
+## Concept
 
-**The Heterarchy Society** je komunita kolem suverénních technologií, decentralizovaných systémů a nehierarchických forem organizace.
+**The Heterarchy Society** is a community around sovereign technologies, decentralised systems and non-hierarchical forms of organisation.
 
-Většina z nás se naučila myslet v pyramidách. Někdo nahoře, někdo dole, jedni rozhodují, druzí poslouchají. Tak fungují školy, firmy, státy, většina komunit. Funguje to tak důsledně, že si často ani nevšimneme — existuje něco jiného.
+Most of us have learned to think in pyramids. Someone at the top, someone at the bottom, some decide, others obey. That's how schools work, companies, states, most communities. It works so thoroughly that we often don't even notice — there is something else.
 
-A i když si všimneme, zvyk se vrací. Hnutí za svobodu se mění v instituce. Nástroje osvobození se stávají platformami. Pirát se stává policistou. To není selhání jednotlivců — je to gravitace. A je to ten skutečný protivník: ne systém venku, ale reflex uvnitř.
+And even when we do notice, the habit returns. Freedom movements become institutions. Tools of liberation become platforms. The pirate becomes the policeman. This isn't the failure of individuals — it's gravity. And that's the real adversary: not the system out there, but the reflex within.
 
-Scházíme se kolem prosté otázky: co když to jde bez vládců? Bez prostředníků, bez šéfů, bez někoho kdo má poslední slovo proto že je tam déle nebo má větší hlas.
+We gather around a simple question: what if it works without rulers? Without intermediaries, without bosses, without someone who has the final word because they've been there longer or have a louder voice.
 
-Něco z toho už existuje. Něco se teprve hledá. Část je technologie, část je způsob myšlení. Nejsme ideologie ani škola. Spojuje nás jen podezření — že hierarchie není přirozený stav, jen zvyk. A zvyk se dá změnit.
+Some of this already exists. Some is still being figured out. Part is technology, part is a way of thinking. We are not an ideology or a school. What connects us is just a suspicion — that hierarchy is not a natural state, just a habit. And habits can be changed.
 
-Neučíme. Zkoumáme společně. Kdo umí, ukáže. Kdo neumí, ptá se. Nikdo nevede, protože není kam vést.
+We don't teach. We explore together. Those who know, show. Those who don't, ask. Nobody leads, because there is nowhere to lead.
 
-Nemáme sídlo. Hostujeme se v různých prostorech, ale žádný z nich nás nedefinuje. Jsme tam kde jsou naši lidé — všude a nikde zároveň. Pokud se z nás stane instituce, selhali jsme.
+We have no headquarters. We are hosted in various spaces, but none of them define us. We are where our people are — everywhere and nowhere at the same time. If we become an institution, we have failed.
 
-> *„Změny můžeme jedině žít: k lidskosti se nemůžeme zkrátka promyslet. Každý z nás, každá skupina, se musí stát vzorem toho, co toužíme stvořit.“*
+> *”We can only change by living it: we cannot simply think our way to humanity. Each of us, each group, must become the model of what we wish to create.”*
 >
-> — Ivan Illich, *Limity medicíny* (1976)
+> — Ivan Illich, *Limits to Medicine* (1976)
 
 ---
 
-*Verze 0.1 — koncept*
+*Version 0.1 — concept*

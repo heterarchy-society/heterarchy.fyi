@@ -21,7 +21,7 @@
 				{#if hasLink}
 					<a
 						href={event.href}
-						class="no-underline hover:underline"
+						class={isExternal ? 'link-external' : 'no-underline hover:underline'}
 						target={isExternal ? '_blank' : undefined}
 						rel={isExternal ? 'noopener noreferrer' : undefined}
 					>
@@ -52,7 +52,7 @@
 			{#if hasLink}
 				<a
 					href={event.href}
-					class="link-arrow mt-auto w-fit text-[13px]"
+					class={isExternal ? 'link-external mt-auto w-fit font-mono text-[13px]' : 'link-arrow mt-auto w-fit text-[13px]'}
 					target={isExternal ? '_blank' : undefined}
 					rel={isExternal ? 'noopener noreferrer' : undefined}
 				>

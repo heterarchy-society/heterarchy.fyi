@@ -43,7 +43,7 @@
 						<li class="border-line font-mono py-6" class:border-t={i > 0}>
 							<p class="text-[1rem] leading-snug tracking-[-0.01em]">
 								{#if event.href}
-									<a href={event.href} target="_blank" rel="noopener noreferrer" class="no-underline hover:underline">{event.title}</a>
+									<a href={event.href} target="_blank" rel="noopener noreferrer" class="link-external">{event.title}</a>
 								{:else}
 									{event.title}
 								{/if}

@@ -12,7 +12,7 @@
 	const book = $derived(data.book);
 	let coverFailed = $state(false);
 	const coverSrc = $derived(coverFailed || !book.coverUrl ? '/book-placeholder.svg' : book.coverUrl);
-	const booksHref = $derived(localizeUrl('/books').pathname);
+	const booksHref = $derived(localizeUrl('/books'));
 </script>
 
 <svelte:head>
@@ -73,7 +73,7 @@
 									<li>
 										<a
 											href={link.href}
-											class="link-arrow text-[13px]"
+											class={link.external ? 'link-external font-mono text-[13px]' : 'link-arrow text-[13px]'}
 											target={link.external ? '_blank' : undefined}
 											rel={link.external ? 'noopener noreferrer' : undefined}
 										>
@@ -96,7 +96,7 @@
 					{#if book.source}
 						<p class="mt-10 font-mono text-[11px] text-black/45">
 							{m.books_detail_recommended_in()}
-							<a href={book.source.href} class="underline" target="_blank" rel="noopener noreferrer">
+							<a href={book.source.href} class="link-external" target="_blank" rel="noopener noreferrer">
 								{book.source.name}
 							</a>
 						</p>
