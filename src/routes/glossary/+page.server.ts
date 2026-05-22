@@ -23,8 +23,12 @@ async function fetchChangelog(): Promise<ChangelogEntry[]> {
 
 export async function load() {
 	const [index, changelog] = await Promise.all([
-		getGlossaryIndex(),
+		Promise.resolve(getGlossaryIndex()),
 		fetchChangelog(),
 	]);
-	return { ...index, changelog: changelog.slice(0, 20) };
+	return {
+		terms: index.terms,
+		meta: index.meta,
+		changelog: changelog.slice(0, 20),
+	};
 }
