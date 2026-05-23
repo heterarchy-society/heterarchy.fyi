@@ -1,7 +1,14 @@
 <script lang="ts">
+	import { dev } from '$app/environment';
+	import { buildInfo } from '$lib/data/build-info';
 	import { siteMeta } from '$lib/data/placeholder';
-	import { localizeUrl } from '$lib/i18n';
+	import { getLocale, localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
+	import { timeAgo } from '$lib/time';
+
+	const versionHref =
+		buildInfo.commit === 'unknown' ? siteMeta.sourceHref : `${siteMeta.sourceHref}/commit/${buildInfo.commit}`;
+	const deployAge = buildInfo.deployedAt === 'unknown' ? 'unknown' : timeAgo(buildInfo.deployedAt, getLocale());
 </script>
 
 <footer class="border-t border-line">
@@ -15,13 +22,19 @@
 			<span aria-hidden="true">·</span>
 			<a href={siteMeta.sourceHref} class="link-external" target="_blank" rel="noopener noreferrer">{m.footer_git()}</a>
 		</nav>
-		<a
-			href={siteMeta.sourceHref}
-			class="link-external lg:justify-self-end"
-			target="_blank"
-			rel="noopener noreferrer"
-		>
-			{m.footer_version({ version: siteMeta.version })}
-		</a>
+		<div class="lg:justify-self-end">
+			{#if dev}
+				{siteMeta.version}-dev
+			{:else}
+				<span>v{siteMeta.version} · </span>
+				<a
+					href={versionHref}
+					class="link-external"
+					target="_blank"
+					rel="noopener noreferrer"
+				>{buildInfo.shortCommit}</a>
+				<span class="text-black/25">({deployAge})</span>
+			{/if}
+		</div>
 	</div>
 </footer>
