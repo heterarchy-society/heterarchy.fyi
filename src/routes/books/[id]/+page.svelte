@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { MapPin } from 'lucide-svelte';
-	import { localizeUrl } from '$lib/i18n';
+	import { getLocale, localizeUrl } from '$lib/i18n';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import LibraryBookMeta from '$lib/components/library/LibraryBookMeta.svelte';
@@ -13,6 +13,16 @@
 	let coverFailed = $state(false);
 	const coverSrc = $derived(coverFailed || !book.coverUrl ? '/book-placeholder.svg' : book.coverUrl);
 	const booksHref = $derived(localizeUrl('/books'));
+
+	function glossaryTermName(term: PageData['glossary'][number]): string {
+		const cs = term.translations?.cs;
+		return getLocale() === 'cs' && cs?.name ? cs.name : term.name;
+	}
+
+	function glossaryTermHref(term: PageData['glossary'][number]): string {
+		const slug = term.translations?.cs?.slug ?? term.id;
+		return localizeUrl(`/glossary/${slug}`);
+	}
 </script>
 
 <svelte:head>
@@ -85,10 +95,15 @@
 						</div>
 					{/if}
 
-					{#if book.tags && book.tags.length > 0}
+					{#if data.glossary.length > 0}
 						<div class="mt-8 flex flex-wrap gap-2">
-							{#each book.tags as tag}
-								<span class="font-mono text-[10px] tracking-widest uppercase text-black/50 border border-line px-2 py-1">{tag}</span>
+							{#each data.glossary as term}
+								<a
+									href={glossaryTermHref(term)}
+									class="border border-line px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-black/55 no-underline hover:border-black/40 hover:text-black"
+								>
+									{glossaryTermName(term)}
+								</a>
 							{/each}
 						</div>
 					{/if}

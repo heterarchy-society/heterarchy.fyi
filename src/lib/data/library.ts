@@ -29,6 +29,10 @@ export function getBookById(id: string): LibraryBook | undefined {
 	return libraryBooks.find((b) => b.id === id);
 }
 
+export function getBooksByGlossaryTerm(termId: string): LibraryBook[] {
+	return libraryBooks.filter((book) => book.glossary?.includes(termId));
+}
+
 export const libraryName = 'Komunitní svobodomyslná knihovna';
 
 export const libraryLocation = {

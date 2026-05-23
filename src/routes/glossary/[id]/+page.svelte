@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import LibraryBookCard from '$lib/components/library/LibraryBookCard.svelte';
 	import { renderMarkdown } from '$lib/markdown';
 	import { page } from '$app/stores';
 	import { localizeUrl, getLocale } from '$lib/i18n';
@@ -113,6 +114,17 @@
 									</li>
 								{/each}
 							</ul>
+						</div>
+					{/if}
+
+					{#if data.books.length > 0}
+						<div class="mt-10 border-t border-line pt-8">
+							<p class="label mb-4">{m.glossary_books()}</p>
+							<div class="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+								{#each data.books as book}
+									<LibraryBookCard {book} />
+								{/each}
+							</div>
 						</div>
 					{/if}
 				</div>

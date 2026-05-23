@@ -68,6 +68,7 @@
 	"glossary_edit_history_count": "→ view history ({count})",
 	"glossary_last_edited": "last edited {date}",
 	"glossary_backlinks": "Backlinks",
+	"glossary_books": "Books",
 	"glossary_see_also": "See also",
 	"glossary_sources": "Sources",
 	"glossary_translated_by": "Translated by {model} · {date}",

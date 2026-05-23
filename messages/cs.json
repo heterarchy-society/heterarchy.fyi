@@ -68,6 +68,7 @@
 	"glossary_edit_history_count": "→ zobrazit historii ({count})",
 	"glossary_last_edited": "editováno {date}",
 	"glossary_backlinks": "Backlinks",
+	"glossary_books": "Knihy",
 	"glossary_see_also": "Viz také",
 	"glossary_sources": "Zdroje",
 	"glossary_translated_by": "Přeloženo modelem {model} · {date}",
