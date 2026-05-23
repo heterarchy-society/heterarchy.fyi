@@ -15,8 +15,10 @@
 	let spotlight = $state<(typeof data.terms)[0] | null>(null);
 
 	function pickSpotlight() {
-		const next = data.terms[Math.floor(Math.random() * data.terms.length)];
-		spotlight = next.id !== spotlight?.id ? next : data.terms[(data.terms.indexOf(next) + 1) % data.terms.length];
+		const pool = data.terms.filter(t => t.excerpt);
+		if (!pool.length) return;
+		const next = pool[Math.floor(Math.random() * pool.length)];
+		spotlight = next.id !== spotlight?.id ? next : pool[(pool.indexOf(next) + 1) % pool.length];
 	}
 
 	onMount(pickSpotlight);
@@ -65,7 +67,9 @@
 		return Boolean(stats && (stats.added > 0 || stats.removed > 0));
 	}
 
-	function renderExcerpt(term: any, text: string): string {
+	function renderExcerpt(term: any, text: string | undefined): string {
+		if (!text) return '';
+
 		const resolved = new Map<string, string>();
 		for (const rl of (term.resolvedLinks ?? []) as { key: string; link: string | null; target: string | null }[]) {
 			if (rl.target) {
