@@ -4,20 +4,129 @@
 	import Header from '$lib/components/Header.svelte';
 	import LatestRevision from '$lib/components/LatestRevision.svelte';
 	import Footer from '$lib/components/Footer.svelte';
-	import { localizeUrl } from '$lib/i18n';
+	import { getLocale, localizeUrl } from '$lib/i18n';
+	import { renderMarkdownInline } from '$lib/markdown';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
-	let spotlight = $state<(typeof data.spotlightTerms)[0] | null>(null);
+	type GlossaryTermSummary = {
+		id: string;
+		name: string;
+		type?: string | null;
+		translations?: Record<string, { slug?: string; name?: string; type?: string | null }>;
+	};
+
+	type Spotlight = {
+		id: string;
+		name: string;
+		type: string | null;
+		href: string;
+		excerptHtml: string;
+	};
+
+	const GLOSSARY_DATA_BASE = 'https://glossary.data.heterarchy.fyi';
+	const localTerms: GlossaryTermSummary[] = $derived(data.sections.flatMap((section) => section.terms));
+
+	let spotlight = $state<Spotlight | null>(null);
+	let spotlightLoading = $state(false);
+	let spotlightPhase = $state<'idle' | 'entering'>('idle');
 	let expandedChanges = $state(new Set<string>());
 
-	function pickSpotlight() {
-		const pool = data.spotlightTerms.filter((t) => t.excerptHtml);
+	function termName(term: GlossaryTermSummary) {
+		const cs = term.translations?.cs;
+		return getLocale() === 'cs' && cs?.name ? cs.name : term.name;
+	}
+
+	function termType(term: GlossaryTermSummary) {
+		const cs = term.translations?.cs;
+		return getLocale() === 'cs' && cs?.type ? cs.type : (term.type ?? null);
+	}
+
+	function termHref(term: GlossaryTermSummary) {
+		const slug = getLocale() === 'cs' ? (term.translations?.cs?.slug ?? term.id) : term.id;
+		return localizeUrl(`/glossary/${slug}`);
+	}
+
+	function pickRandomTerm(terms: GlossaryTermSummary[]) {
+		const pool = terms.filter((term) => term.id);
 		if (!pool.length) return;
 		const next = pool[Math.floor(Math.random() * pool.length)];
-		spotlight = next.id !== spotlight?.id ? next : pool[(pool.indexOf(next) + 1) % pool.length];
+		return next.id !== spotlight?.id ? next : pool[(pool.indexOf(next) + 1) % pool.length];
+	}
+
+	async function fetchJson<T>(url: string): Promise<T> {
+		const res = await fetch(`${url}?t=${Date.now()}`, { cache: 'no-store' });
+		if (!res.ok) throw new Error(`${res.status} ${url}`);
+		return res.json();
+	}
+
+	function renderSpotlightExcerpt(term: any, terms: GlossaryTermSummary[]) {
+		const locale = getLocale();
+		const translated = locale === 'cs' ? term.translations?.cs : null;
+		const excerpt =
+			locale === 'cs'
+				? (translated?.excerpt ?? translated?.description?.split('\n\n')[0] ?? term.excerpt ?? term.description?.split('\n\n')[0])
+				: (term.excerpt ?? term.description?.split('\n\n')[0]);
+		if (!excerpt) return '';
+
+		const termsById = new Map(terms.map((item) => [item.id, item]));
+		const resolved = new Map<string, string>();
+		for (const rl of (term.resolvedLinks ?? []) as { key: string; link: string | null; target: string | null }[]) {
+			if (rl.target) {
+				resolved.set((rl.link ?? rl.key).toLowerCase(), rl.target);
+				resolved.set(rl.key.toLowerCase(), rl.target);
+			}
+		}
+
+		const md = excerpt.replace(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/g, (_: string, display: string, explicit?: string) => {
+			const target = resolved.get((explicit ?? display).toLowerCase());
+			const targetTerm = target ? termsById.get(target) : null;
+			return targetTerm ? `[${display}](${termHref(targetTerm)})` : display;
+		});
+
+		return renderMarkdownInline(md);
+	}
+
+	function setSpotlight(next: Spotlight) {
+		spotlight = next;
+		spotlightPhase = 'entering';
+		window.setTimeout(() => {
+			spotlightPhase = 'idle';
+		}, 260);
+	}
+
+	async function pickSpotlight() {
+		spotlightLoading = !spotlight;
+		try {
+			const picked = pickRandomTerm(localTerms);
+			if (!picked) return;
+			const term = await fetchJson<any>(`${GLOSSARY_DATA_BASE}/terms/${picked.id}.json`);
+			const excerptHtml = renderSpotlightExcerpt(term, localTerms);
+			if (!excerptHtml) return;
+
+			setSpotlight({
+				id: term.id,
+				name: termName(term),
+				type: termType(term),
+				href: termHref(term),
+				excerptHtml
+			});
+		} catch {
+			const picked = pickRandomTerm(localTerms);
+			if (picked && !spotlight) {
+				setSpotlight({
+					id: picked.id,
+					name: data.spotlightFallback?.name ?? picked.name,
+					type: data.spotlightFallback?.type ?? picked.type ?? null,
+					href: data.spotlightFallback?.href ?? termHref(picked),
+					excerptHtml: data.spotlightFallback?.excerptHtml ?? ''
+				});
+			}
+		} finally {
+			spotlightLoading = false;
+		}
 	}
 
 	onMount(pickSpotlight);
@@ -91,11 +200,12 @@
 
 				<!-- Right: spotlight + changelog -->
 				<aside class="border-t border-line pt-8 lg:border-t-0 lg:border-l lg:border-line lg:pl-8 lg:pt-0">
-					{#if spotlight}
-						<div class="relative mb-10">
+					{#if spotlight && !spotlightLoading}
+						<div class="spotlight relative mb-10" class:spotlight-entering={spotlightPhase === 'entering'} class:spotlight-loading={spotlightLoading}>
 							<button
 								onclick={pickSpotlight}
-								class="absolute top-0 right-0 cursor-pointer text-black/20 hover:text-black transition-colors"
+								class="absolute top-0 right-0 cursor-pointer text-black/20 transition-colors hover:text-black disabled:cursor-wait disabled:text-black/10"
+								disabled={spotlightLoading}
 								aria-label="Next random term"
 							>
 								<RotateCcw size={16} strokeWidth={1.5} />
@@ -220,3 +330,30 @@
 
 	<Footer />
 </div>
+
+<style>
+	.spotlight {
+		transition:
+			opacity 180ms ease,
+			transform 220ms ease;
+	}
+
+	.spotlight-entering {
+		animation: spotlight-enter 260ms ease both;
+	}
+
+	.spotlight-loading {
+		opacity: 0.65;
+	}
+
+	@keyframes spotlight-enter {
+		from {
+			opacity: 0;
+			transform: translateY(6px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+</style>

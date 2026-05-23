@@ -46,7 +46,11 @@ function termPath(term: any, locale: string): string {
 }
 
 function renderSpotlightExcerpt(term: any, termsById: Map<string, any>, locale: string): string {
-	const excerpt = locale === 'cs' ? (term.translations?.cs?.excerpt ?? term.excerpt) : term.excerpt;
+	const translated = locale === 'cs' ? term.translations?.cs : null;
+	const excerpt =
+		locale === 'cs'
+			? (translated?.excerpt ?? translated?.description?.split('\n\n')[0] ?? term.excerpt ?? term.description?.split('\n\n')[0])
+			: (term.excerpt ?? term.description?.split('\n\n')[0]);
 	if (!excerpt) return '';
 
 	const resolved = new Map<string, string>();
@@ -64,6 +68,20 @@ function renderSpotlightExcerpt(term: any, termsById: Map<string, any>, locale: 
 	});
 
 	return renderMarkdownInline(md);
+}
+
+function randomFallbackSpotlight(terms: any[], termsById: Map<string, any>, locale: string) {
+	const pool = terms.filter((term) => term.description || term.translations?.cs?.description);
+	if (!pool.length) return null;
+	const term = pool[Math.floor(Math.random() * pool.length)];
+
+	return {
+		id: term.id,
+		name: displayName(term, locale),
+		type: displayType(term, locale),
+		href: termPath(term, locale),
+		excerptHtml: renderSpotlightExcerpt(term, termsById, locale)
+	};
 }
 
 function formatDate(iso: string, locale: string): string {
@@ -113,16 +131,11 @@ export async function load() {
 	const contributors = getContributors();
 	const ghByName = new Map(contributors.filter((c) => c.gh_username).map((c) => [c.name, c.gh_username]));
 	const termsById = new Map(index.terms.map((term) => [term.id, term]));
+	const glossaryTerms = (glossaryData as any).terms;
 
 	return {
 		sections: buildSections(index.terms, locale),
-		spotlightTerms: index.spotlightTerms.map((term) => ({
-			id: term.id,
-			name: displayName(term, locale),
-			type: displayType(term, locale),
-			href: termPath(term, locale),
-			excerptHtml: renderSpotlightExcerpt(term, termsById, locale)
-		})),
+		spotlightFallback: randomFallbackSpotlight(glossaryTerms, termsById, locale),
 		meta: index.meta,
 		changelog: changelog.slice(0, 5).map((entry) => ({
 			hash: entry.hash,
