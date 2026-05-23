@@ -13,11 +13,12 @@
 	const sidebarEvents = upcomingEvents.filter((e) => e.date !== 'TBD');
 	import { libraryPreview } from '$lib/data/library';
 	import { siteMeta } from '$lib/data/placeholder';
+	import * as m from '$lib/paraglide/messages';
 </script>
 
 <svelte:head>
 	<title>{siteMeta.title}</title>
-	<meta name="description" content={siteMeta.description} />
+	<meta name="description" content={m.site_description()} />
 </svelte:head>
 
 <div class="min-h-screen w-full">
