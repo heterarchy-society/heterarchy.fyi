@@ -51,6 +51,8 @@
 	"books_language_de": "němčina",
 	"glossary_contributors_label": "Přispěvatelé",
 	"glossary_changelog_label": "Poslední úpravy",
+	"glossary_recent_show_all": "Zobrazit všechny změny",
+	"glossary_recent_more_changes": "+ {count} dalších změn",
 	"collection_changelog_all": "všechny úpravy →",
 	"collection_changelog_title": "Changelog",
 	"collection_changelog_back_to": "← {collection}",

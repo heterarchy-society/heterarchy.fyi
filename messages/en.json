@@ -51,6 +51,8 @@
 	"books_language_de": "German",
 	"glossary_contributors_label": "Contributors",
 	"glossary_changelog_label": "Recent edits",
+	"glossary_recent_show_all": "Show all changes",
+	"glossary_recent_more_changes": "+ {count} other changes",
 	"collection_changelog_all": "all edits →",
 	"collection_changelog_title": "Changelog",
 	"collection_changelog_back_to": "← {collection}",
