@@ -11,32 +11,43 @@
 	const deployAge = buildInfo.deployedAt === 'unknown' ? 'unknown' : timeAgo(buildInfo.deployedAt, getLocale());
 </script>
 
-<footer class="border-t border-line">
-	<div class="grid items-center gap-4 px-8 py-5 font-mono text-[13px] lg:grid-cols-[1fr_auto_1fr]">
-		<a href={localizeUrl('/')} class="flex items-center gap-2 no-underline hover:opacity-75 lg:justify-self-start">
-			<img src="/logo.svg" alt="Heterarchy" class="h-5 w-auto" />
-			<span class="font-mono text-[13px]">{siteMeta.footerNotice}</span>
-		</a>
-		<nav class="flex flex-wrap items-center justify-center gap-x-1.5 lg:justify-self-center">
+<footer class="border-t border-line font-mono text-[13px]">
+	<div class="flex flex-col gap-3 px-6 py-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-4 lg:px-8 lg:py-5">
+
+		<!-- logo + version (mobile: one row; desktop: logo only) -->
+		<div class="flex items-center justify-between">
+			<a href={localizeUrl('/')} class="flex items-center gap-2 no-underline hover:opacity-75">
+				<img src="/logo.svg" alt="Heterarchy" class="h-5 w-auto" />
+				<span>{siteMeta.footerNotice}</span>
+			</a>
+			<div class="text-[11px] text-black/40 lg:hidden">
+				{#if dev}
+					{siteMeta.version}-dev
+				{:else}
+					v{siteMeta.version} · <a href={versionHref} class="link-external" target="_blank" rel="noopener noreferrer">{buildInfo.shortCommit}</a>
+				{/if}
+			</div>
+		</div>
+
+		<!-- nav -->
+		<nav class="flex flex-wrap items-center gap-x-1.5 lg:justify-self-center">
 			<a href={localizeUrl('/find-us')} class="no-underline hover:underline">{m.footer_where_to_find()}</a>
 			<span aria-hidden="true">·</span>
 			<a href={localizeUrl('/open-data')} class="no-underline hover:underline">{m.footer_data()}</a>
 			<span aria-hidden="true">·</span>
 			<a href={siteMeta.sourceHref} class="link-external" target="_blank" rel="noopener noreferrer">{m.footer_git()}</a>
 		</nav>
-		<div class="lg:justify-self-end">
+
+		<!-- version (desktop only) -->
+		<div class="hidden lg:block lg:justify-self-end">
 			{#if dev}
 				{siteMeta.version}-dev
 			{:else}
 				<span>v{siteMeta.version} · </span>
-				<a
-					href={versionHref}
-					class="link-external"
-					target="_blank"
-					rel="noopener noreferrer"
-				>{buildInfo.shortCommit}</a>
+				<a href={versionHref} class="link-external" target="_blank" rel="noopener noreferrer">{buildInfo.shortCommit}</a>
 				<span class="text-black/25">({deployAge})</span>
 			{/if}
 		</div>
+
 	</div>
 </footer>
