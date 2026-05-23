@@ -98,6 +98,17 @@
 						</div>
 					{/if}
 
+					{#if data.books.length > 0}
+						<div class="mt-10 border-t border-line pt-8">
+							<p class="label mb-4">{m.glossary_books()}</p>
+							<div class="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+								{#each data.books as book}
+									<LibraryBookCard {book} />
+								{/each}
+							</div>
+						</div>
+					{/if}
+
 					{#if data.term.resources && data.term.resources.length > 0}
 						<div class="mt-10 border-t border-line pt-8">
 							<p class="label mb-4">{m.glossary_sources()}</p>
@@ -114,17 +125,6 @@
 									</li>
 								{/each}
 							</ul>
-						</div>
-					{/if}
-
-					{#if data.books.length > 0}
-						<div class="mt-10 border-t border-line pt-8">
-							<p class="label mb-4">{m.glossary_books()}</p>
-							<div class="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
-								{#each data.books as book}
-									<LibraryBookCard {book} />
-								{/each}
-							</div>
 						</div>
 					{/if}
 				</div>
