@@ -20,6 +20,8 @@
 		<nav class="flex flex-wrap items-center justify-center gap-x-1.5 lg:justify-self-center">
 			<a href={localizeUrl('/find-us')} class="no-underline hover:underline">{m.footer_where_to_find()}</a>
 			<span aria-hidden="true">·</span>
+			<a href={localizeUrl('/data')} class="no-underline hover:underline">{m.footer_data()}</a>
+			<span aria-hidden="true">·</span>
 			<a href={siteMeta.sourceHref} class="link-external" target="_blank" rel="noopener noreferrer">{m.footer_git()}</a>
 		</nav>
 		<div class="lg:justify-self-end">
