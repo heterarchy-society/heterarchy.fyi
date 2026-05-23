@@ -31,6 +31,7 @@ const config = {
 				'/events',
 				'/join',
 				'/find-us',
+				'/open-data',
 				'/data',
 				'/about',
 				// Czech routes
@@ -40,6 +41,7 @@ const config = {
 				'/cs/udalosti',
 				'/cs/zapojit-se',
 				'/cs/najdete-nas',
+				'/cs/otevrena-data',
 				'/cs/data',
 				'/cs/o-nas',
 				// Crawl all linked pages from these entry points

@@ -9,7 +9,7 @@ const csPathMap: Record<string, string> = {
 	'/join': '/zapojit-se',
 	'/find-us': '/najdete-nas',
 	'/about': '/o-nas',
-	'/data': '/data',
+	'/open-data': '/otevrena-data',
 };
 
 type UrlPattern = { pattern: string; localized: ['en' | 'cs', string][] };
