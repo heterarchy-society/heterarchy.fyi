@@ -13,10 +13,10 @@
 
 	let { data }: { data: PageData } = $props();
 
-	let spotlight = $state<(typeof data.terms)[0] | null>(null);
+	let spotlight = $state<(typeof data.spotlightTerms)[0] | null>(null);
 
 	function pickSpotlight() {
-		const pool = data.terms.filter(t => t.excerpt);
+		const pool = data.spotlightTerms.filter(t => t.excerpt);
 		if (!pool.length) return;
 		const next = pool[Math.floor(Math.random() * pool.length)];
 		spotlight = next.id !== spotlight?.id ? next : pool[(pool.indexOf(next) + 1) % pool.length];
@@ -27,6 +27,7 @@
 	const ghByName = $derived(
 		new Map(data.contributors.filter(c => c.gh_username).map(c => [c.name, c.gh_username!]))
 	);
+	const termsById = $derived(new Map(data.terms.map((term) => [term.id, term])));
 
 	function displayName(term: any): string {
 		if (getLocale() === 'cs') {
@@ -50,12 +51,12 @@
 	}
 
 	function termHrefById(id: string): string {
-		const term = data.terms.find((t: any) => t.id === id);
+		const term = termsById.get(id);
 		return termHref(term ?? { id, translations: {} });
 	}
 
 	function termNameById(id: string): string {
-		const term = data.terms.find((t: any) => t.id === id);
+		const term = termsById.get(id);
 		if (!term) return id;
 		return displayName(term);
 	}

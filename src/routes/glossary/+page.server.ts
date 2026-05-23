@@ -42,8 +42,12 @@ export async function load() {
 	]);
 	return {
 		terms: index.terms,
+		spotlightTerms: index.spotlightTerms,
 		meta: index.meta,
-		changelog: changelog.slice(0, 20),
+		changelog: changelog.slice(0, 12).map((entry) => ({
+			...entry,
+			changes: entry.changes.slice(0, 8)
+		})),
 		contributors: getContributors(),
 	};
 }

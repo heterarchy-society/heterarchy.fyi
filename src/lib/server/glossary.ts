@@ -22,6 +22,11 @@ type GlossaryIndexTerm = Omit<GlossaryTerm, 'description' | 'resources' | 'histo
 
 type GlossarySummaryTerm = Pick<GlossaryTerm, 'id' | 'name' | 'type' | 'translations'>;
 
+type GlossarySpotlightTerm = GlossarySummaryTerm & {
+	excerpt: string;
+	resolvedLinks?: GlossaryTerm['resolvedLinks'];
+};
+
 const glossaryData = glossaryDataSource as { meta: unknown; terms: GlossaryTerm[] };
 
 function csSlug(term: GlossaryTerm): string | null {
@@ -50,6 +55,36 @@ function stripTranslationContent(translations: GlossaryTerm['translations']) {
 	);
 }
 
+function stripTranslationLabels(translations: GlossaryTerm['translations']) {
+	if (!translations) return undefined;
+
+	return Object.fromEntries(
+		Object.entries(translations).map(([locale, translation]) => {
+			const { slug, name, type } = translation as Record<string, unknown>;
+			return [locale, { slug, name, type }];
+		})
+	);
+}
+
+function stripTranslationExcerpts(translations: GlossaryTerm['translations']) {
+	if (!translations) return undefined;
+
+	return Object.fromEntries(
+		Object.entries(translations).map(([locale, translation]) => {
+			const { slug, name, type, description } = translation as Record<string, unknown>;
+			return [
+				locale,
+				{
+					slug,
+					name,
+					type,
+					excerpt: typeof description === 'string' ? description.split('\n\n')[0] : undefined
+				}
+			];
+		})
+	);
+}
+
 function toIndexTerm(term: GlossaryTerm): GlossaryIndexTerm {
 	const { description, resources, history, translations, ...summary } = term;
 	const latestHistory = Array.isArray(history) ? (history[0] as { date?: string } | undefined) : undefined;
@@ -63,14 +98,42 @@ function toIndexTerm(term: GlossaryTerm): GlossaryIndexTerm {
 	};
 }
 
+function toListTerm({ id, name, type, translations }: GlossaryTerm): GlossarySummaryTerm {
+	return {
+		id,
+		name,
+		type,
+		translations: stripTranslationLabels(translations)
+	};
+}
+
+function toSpotlightTerm({ id, name, type, description, translations, resolvedLinks }: GlossaryTerm): GlossarySpotlightTerm {
+	return {
+		id,
+		name,
+		type,
+		translations: stripTranslationExcerpts(translations),
+		excerpt: description ? description.split('\n\n')[0] : '',
+		resolvedLinks
+	};
+}
+
+function getSpotlightTerms(): GlossarySpotlightTerm[] {
+	const terms = glossaryData.terms.map(toSpotlightTerm).filter((term) => term.excerpt);
+	const targetCount = 16;
+	const step = Math.max(1, Math.floor(terms.length / targetCount));
+	return terms.filter((_, index) => index % step === 0).slice(0, targetCount);
+}
+
 export function findGlossaryTerm(idOrSlug: string): GlossaryTerm | undefined {
 	return glossaryData.terms.find((term) => term.id === idOrSlug || csSlug(term) === idOrSlug);
 }
 
-export function getGlossaryIndex(): { meta: unknown; terms: GlossaryIndexTerm[] } {
+export function getGlossaryIndex(): { meta: unknown; terms: GlossarySummaryTerm[]; spotlightTerms: GlossarySpotlightTerm[] } {
 	return {
 		meta: glossaryData.meta,
-		terms: glossaryData.terms.map(toIndexTerm)
+		terms: glossaryData.terms.map(toListTerm),
+		spotlightTerms: getSpotlightTerms()
 	};
 }
 
