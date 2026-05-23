@@ -1,5 +1,8 @@
 import { getGlossaryIndex } from '$lib/server/glossary';
-import { fetchCollectionChangelog, type CollectionChangelogEntry } from '$lib/server/changelog';
+import {
+	fetchCollectionChangelog,
+	type CollectionChangelogEntry
+} from '$lib/server/changelog';
 import glossaryData from '$lib/data/glossary.json';
 
 export type ChangelogEntry = CollectionChangelogEntry;

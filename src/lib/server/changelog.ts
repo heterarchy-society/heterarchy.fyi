@@ -1,6 +1,10 @@
 export type CollectionChange = {
 	id: string;
 	op: 'added' | 'modified' | string;
+	stats?: {
+		added: number;
+		removed: number;
+	};
 };
 
 export type CollectionChangelogEntry = {

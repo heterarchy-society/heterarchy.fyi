@@ -30,6 +30,10 @@
 	function opLabel(op: string): string {
 		return op === 'added' ? m.glossary_changelog_op_added() : m.glossary_changelog_op_modified();
 	}
+
+	function hasStats(stats: { added: number; removed: number } | undefined): stats is { added: number; removed: number } {
+		return Boolean(stats && (stats.added > 0 || stats.removed > 0));
+	}
 </script>
 
 {#if entries.length > 0}
@@ -64,6 +68,12 @@
 								<a href={itemHref(change.id)} class="leading-snug text-black/75 no-underline hover:underline">
 									{itemName(change.id)}
 								</a>
+								{#if hasStats(change.stats)}
+									<span class="shrink-0 text-[10px] tabular-nums">
+										<span class="text-green-700">+{change.stats.added}</span>
+										<span class="ml-1 text-red-700">-{change.stats.removed}</span>
+									</span>
+								{/if}
 								{#if diff}
 									<a href={diff} class="shrink-0 text-black/30 no-underline hover:text-black hover:underline">(diff)</a>
 								{/if}

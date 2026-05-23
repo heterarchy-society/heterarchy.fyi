@@ -1,4 +1,7 @@
-import { fetchCollectionChangelog, type CollectionChangelogEntry } from '$lib/server/changelog';
+import {
+	fetchCollectionChangelog,
+	type CollectionChangelogEntry
+} from '$lib/server/changelog';
 
 export type ChangelogEntry = CollectionChangelogEntry;
 
