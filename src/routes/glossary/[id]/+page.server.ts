@@ -3,7 +3,7 @@ import {
 	findGlossaryTerm,
 	getGlossaryBacklinks,
 	getGlossaryEntries,
-	getGlossaryIndexTerms
+	getGlossarySummaryTerms
 } from '$lib/server/glossary';
 import { getBooksByGlossaryTerm } from '$lib/data/library';
 import type { PageServerLoad } from './$types';
@@ -16,12 +16,21 @@ export const load: PageServerLoad = ({ params }) => {
 	}
 
 	const slug = (term.translations?.cs?.slug as string | undefined) ?? null;
+	const backlinks = getGlossaryBacklinks(term.id);
+	const relatedTermIds = new Set<string>();
+
+	for (const link of term.resolvedLinks ?? []) {
+		if (link.target) relatedTermIds.add(link.target);
+	}
+	for (const backlink of backlinks) {
+		relatedTermIds.add(backlink.id);
+	}
 
 	return {
 		term,
-		backlinks: getGlossaryBacklinks(term.id),
+		backlinks,
 		books: getBooksByGlossaryTerm(term.id),
-		allTerms: getGlossaryIndexTerms(),
+		relatedTerms: getGlossarySummaryTerms(relatedTermIds),
 		// Alternate URLs for the language switcher
 		altUrls: {
 			en: `/glossary/${term.id}`,

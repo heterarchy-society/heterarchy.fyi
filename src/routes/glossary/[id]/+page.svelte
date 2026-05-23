@@ -18,9 +18,10 @@
 	const activeName = $derived(showCs ? cs.name : data.term.name);
 	const activeType = $derived(showCs && cs?.type ? cs.type : data.term.type);
 	const activeDescription = $derived(showCs ? cs.description : data.term.description);
+	const relatedTermsById = $derived(new Map(data.relatedTerms.map((term) => [term.id, term])));
 
 	function slugForId(id: string): string {
-		const t = data.allTerms?.find((x: any) => x.id === id);
+		const t = relatedTermsById.get(id);
 		return (t as any)?.translations?.cs?.slug ?? id;
 	}
 
@@ -193,7 +194,7 @@
 								<ul class="flex flex-col gap-2">
 									{#each seeAlso as link}
 										{@const linkTarget = String(link.target)}
-										{@const linkTerm = data.allTerms?.find((t: any) => t.id === linkTarget)}
+										{@const linkTerm = relatedTermsById.get(linkTarget)}
 										{@const linkCsName = (linkTerm as any)?.translations?.cs?.name}
 										{@const linkName = getLocale() === 'cs' && linkCsName ? linkCsName : link.key}
 										<li>

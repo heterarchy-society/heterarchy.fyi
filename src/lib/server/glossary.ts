@@ -20,6 +20,8 @@ type GlossaryIndexTerm = Omit<GlossaryTerm, 'description' | 'resources' | 'histo
 	excerpt: string;
 };
 
+type GlossarySummaryTerm = Pick<GlossaryTerm, 'id' | 'name' | 'type' | 'translations'>;
+
 const glossaryData = glossaryDataSource as { meta: unknown; terms: GlossaryTerm[] };
 
 function csSlug(term: GlossaryTerm): string | null {
@@ -33,6 +35,17 @@ function stripTranslationDetails(translations: GlossaryTerm['translations']) {
 		Object.entries(translations).map(([locale, translation]) => {
 			const { description, ...summary } = translation as Record<string, unknown>;
 			return [locale, { ...summary, excerpt: typeof description === 'string' ? description.split('\n\n')[0] : undefined }];
+		})
+	);
+}
+
+function stripTranslationContent(translations: GlossaryTerm['translations']) {
+	if (!translations) return undefined;
+
+	return Object.fromEntries(
+		Object.entries(translations).map(([locale, translation]) => {
+			const { description, excerpt, ...summary } = translation as Record<string, unknown>;
+			return [locale, summary];
 		})
 	);
 }
@@ -65,10 +78,26 @@ export function getGlossaryIndexTerms(): GlossaryIndexTerm[] {
 	return glossaryData.terms.map(toIndexTerm);
 }
 
-export function getGlossaryBacklinks(termId: string): GlossaryIndexTerm[] {
+export function getGlossarySummaryTerms(ids: Iterable<string>): GlossarySummaryTerm[] {
+	const wanted = new Set(ids);
+	return glossaryData.terms
+		.filter((term) => wanted.has(term.id))
+		.map(toSummaryTerm);
+}
+
+function toSummaryTerm({ id, name, type, translations }: GlossaryTerm): GlossarySummaryTerm {
+	return {
+		id,
+		name,
+		type,
+		translations: stripTranslationContent(translations)
+	};
+}
+
+export function getGlossaryBacklinks(termId: string): GlossarySummaryTerm[] {
 	return glossaryData.terms
 		.filter((term) => term.resolvedLinks?.some((link) => link.target === termId))
-		.map(toIndexTerm);
+		.map(toSummaryTerm);
 }
 
 export function getGlossaryEntries(): { id: string }[] {
