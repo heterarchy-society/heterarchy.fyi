@@ -44,10 +44,11 @@
 	}
 
 	const examples = [
-		{ label: 'glossary index', url: 'https://glossary.data.heterarchy.fyi/' },
+		{ label: 'glossary bundle', url: 'https://glossary.data.heterarchy.fyi/' },
+		{ label: 'terms index', url: 'https://glossary.data.heterarchy.fyi/terms-index.json' },
 		{ label: 'term: bittorrent', url: 'https://glossary.data.heterarchy.fyi/terms/bittorrent.json' },
 		{ label: 'term: heterarchy', url: 'https://glossary.data.heterarchy.fyi/terms/heterarchy.json' },
-		{ label: 'books index', url: 'https://books.data.heterarchy.fyi/index.json' },
+		{ label: 'books bundle', url: 'https://books.data.heterarchy.fyi/index.json' },
 		{ label: 'book: 1984', url: 'https://books.data.heterarchy.fyi/books/1984.json' },
 		{ label: 'history: 1984', url: 'https://books.data.heterarchy.fyi/history/1984.json' }
 	];
