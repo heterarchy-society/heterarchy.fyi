@@ -146,6 +146,9 @@
 	"data_books_desc": "Library catalogue with covers, links and related glossary terms.",
 	"data_usage_label": "How to use it",
 	"data_playground_label": "Playground",
+	"data_playground_fetch": "fetch",
+	"data_playground_fetching": "…",
+	"data_playground_truncated": "truncated to {lines} lines — open the URL directly to see the full response",
 	"data_usage_body": "Each dataset has an index endpoint. Some collections also expose individual item files, such as /terms/:id.json for glossary terms. Treat the files as static JSON: fetch them from the data domain, cache them normally, and link back to the source repository when building on them.",
 	"data_example_label": "Example",
 	"site_description": "A community around sovereign technologies, decentralized systems and non-hierarchical forms of organization."

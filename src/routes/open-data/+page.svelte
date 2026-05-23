@@ -185,7 +185,7 @@
 						onclick={runFetch}
 						disabled={loading}
 						class="border border-line px-4 py-2 font-mono text-[12px] text-black/60 transition-colors hover:border-black/30 hover:text-black disabled:opacity-40"
-					>{loading ? '…' : 'fetch'}</button>
+					>{loading ? m.data_playground_fetching() : m.data_playground_fetch()}</button>
 				</div>
 
 				{#if response !== null || error !== null}
@@ -205,7 +205,7 @@
 						{:else}
 							<pre class="json-output p-4 font-mono text-[12px] leading-[1.6]">{@html highlightJson(response ?? '')}</pre>
 							{#if truncated}
-								<p class="border-t border-line px-4 py-2 font-mono text-[11px] text-black/35">truncated to {MAX_LINES} lines — open the URL directly to see the full response</p>
+								<p class="border-t border-line px-4 py-2 font-mono text-[11px] text-black/35">{m.data_playground_truncated({ lines: MAX_LINES })}</p>
 							{/if}
 						{/if}
 					</div>
