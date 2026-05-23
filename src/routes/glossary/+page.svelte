@@ -189,8 +189,12 @@
 												</a>
 												{#if hasStats(change.stats)}
 													<span class="shrink-0 text-[10px] tabular-nums">
-														<span class="text-green-700">+{change.stats.added}</span>
-														<span class="ml-1 text-red-700">-{change.stats.removed}</span>
+														{#if change.stats.added > 0}
+															<span class="text-green-700">+{change.stats.added}</span>
+														{/if}
+														{#if change.stats.removed > 0}
+															<span class:ml-1={change.stats.added > 0} class="text-red-700">-{change.stats.removed}</span>
+														{/if}
 													</span>
 												{/if}
 												<a href={localizeUrl(`/glossary/${change.id}/history`) + `?commit=${entry.hash}`} class="text-black/30 no-underline hover:underline hover:text-black shrink-0">(diff)</a>
