@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { RotateCcw } from 'lucide-svelte';
+	import { renderMarkdownInline } from '$lib/markdown';
 	import Header from '$lib/components/Header.svelte';
 	import LatestRevision from '$lib/components/LatestRevision.svelte';
 	import Footer from '$lib/components/Footer.svelte';
@@ -77,13 +78,14 @@
 				resolved.set(rl.key.toLowerCase(), rl.target);
 			}
 		}
-		return text
-			.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-			.replace(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/g, (_, display, explicit) => {
-				const target = resolved.get((explicit ?? display).toLowerCase());
-				if (!target) return display;
-				return `<a href="${termHrefById(target)}" class="underline decoration-black/20 hover:decoration-black/60">${display}</a>`;
-			});
+
+		// Convert [[wiki links]] to standard markdown links, then delegate to marked
+		const md = text.replace(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/g, (_, display, explicit) => {
+			const target = resolved.get((explicit ?? display).toLowerCase());
+			return target ? `[${display}](${termHrefById(target)})` : display;
+		});
+
+		return renderMarkdownInline(md);
 	}
 
 

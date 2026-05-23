@@ -46,3 +46,7 @@ renderer.link = function ({ href, title, tokens }: Tokens.Link): string {
 export function renderMarkdown(source: string): string {
 	return marked.parse(source, { async: false, renderer }) as string;
 }
+
+export function renderMarkdownInline(source: string): string {
+	return marked.parseInline(source, { async: false, renderer }) as string;
+}
