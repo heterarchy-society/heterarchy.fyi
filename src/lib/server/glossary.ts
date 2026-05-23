@@ -17,6 +17,7 @@ type GlossaryIndexTerm = Omit<GlossaryTerm, 'description' | 'resources' | 'histo
 	translations?: Record<string, Record<string, unknown>>;
 	historyCount: number;
 	lastEditDate: string | null;
+	excerpt: string;
 };
 
 const glossaryData = glossaryDataSource as { meta: unknown; terms: GlossaryTerm[] };
@@ -30,8 +31,8 @@ function stripTranslationDetails(translations: GlossaryTerm['translations']) {
 
 	return Object.fromEntries(
 		Object.entries(translations).map(([locale, translation]) => {
-			const { description, ...summary } = translation;
-			return [locale, summary];
+			const { description, ...summary } = translation as Record<string, unknown>;
+			return [locale, { ...summary, excerpt: typeof description === 'string' ? description.split('\n\n')[0] : undefined }];
 		})
 	);
 }
@@ -44,7 +45,8 @@ function toIndexTerm(term: GlossaryTerm): GlossaryIndexTerm {
 		...summary,
 		translations: stripTranslationDetails(translations),
 		historyCount: Array.isArray(history) ? history.length : 0,
-		lastEditDate: latestHistory?.date ?? null
+		lastEditDate: latestHistory?.date ?? null,
+		excerpt: description ? description.split('\n\n')[0] : '',
 	};
 }
 

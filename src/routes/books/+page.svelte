@@ -1,19 +1,15 @@
 <script lang="ts">
 	import { MapPin, Search } from 'lucide-svelte';
-	import { localizeUrl, getLocale } from '$lib/i18n';
+	import { localizeUrl } from '$lib/i18n';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import LibraryBookCard from '$lib/components/library/LibraryBookCard.svelte';
 	import { libraryBooks, type LibraryBook } from '$lib/data/library';
-	import { timeAgo } from '$lib/time';
+	import LatestRevision from '$lib/components/LatestRevision.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
-
-	function formatDate(iso: string): string {
-		return new Date(iso).toLocaleString(getLocale(), { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-	}
 
 	let query = $state('');
 
@@ -38,21 +34,10 @@
 
 	<main>
 		<section class="cell-roomy">
-			<div class="flex items-start justify-between gap-4">
+			<div class="mb-4 flex items-start justify-between gap-4 lg:mb-0">
 				<p class="label">{m.books_page_label()}</p>
 				{#if data.changelog[0]}
-					{@const latest = data.changelog[0]}
-					<div class="shrink-0 text-right font-mono text-[11px] text-black/35">
-						<span class="block text-black/25 uppercase tracking-widest text-[9px] mb-1">{m.latest_revision()}</span>
-						<a
-							href="https://github.com/heterarchy-society/books/commit/{latest.hash}"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="no-underline hover:text-black tabular-nums"
-						>{latest.hash.slice(0, 7)} · {formatDate(latest.date)}</a>
-						<span class="block text-black/25 mt-0.5">{timeAgo(latest.date, getLocale())}</span>
-						<a href={localizeUrl('/books/changelog')} class="mt-1 block no-underline hover:text-black hover:underline">{m.collection_changelog_all()}</a>
-					</div>
+					<LatestRevision latest={data.changelog[0]} changelogHref={localizeUrl('/books/changelog')} />
 				{/if}
 			</div>
 

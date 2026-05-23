@@ -1,5 +1,8 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { RotateCcw } from 'lucide-svelte';
 	import Header from '$lib/components/Header.svelte';
+	import LatestRevision from '$lib/components/LatestRevision.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { localizeUrl, getLocale } from '$lib/i18n';
 	import { timeAgo } from '$lib/time';
@@ -8,6 +11,15 @@
 	import type { ChangelogEntry } from './+page.server';
 
 	let { data }: { data: PageData } = $props();
+
+	let spotlight = $state<(typeof data.terms)[0] | null>(null);
+
+	function pickSpotlight() {
+		const next = data.terms[Math.floor(Math.random() * data.terms.length)];
+		spotlight = next.id !== spotlight?.id ? next : data.terms[(data.terms.indexOf(next) + 1) % data.terms.length];
+	}
+
+	onMount(pickSpotlight);
 
 	const ghByName = $derived(
 		new Map(data.contributors.filter(c => c.gh_username).map(c => [c.name, c.gh_username!]))
@@ -53,6 +65,23 @@
 		return Boolean(stats && (stats.added > 0 || stats.removed > 0));
 	}
 
+	function renderExcerpt(term: any, text: string): string {
+		const resolved = new Map<string, string>();
+		for (const rl of (term.resolvedLinks ?? []) as { key: string; link: string | null; target: string | null }[]) {
+			if (rl.target) {
+				resolved.set((rl.link ?? rl.key).toLowerCase(), rl.target);
+				resolved.set(rl.key.toLowerCase(), rl.target);
+			}
+		}
+		return text
+			.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+			.replace(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/g, (_, display, explicit) => {
+				const target = resolved.get((explicit ?? display).toLowerCase());
+				if (!target) return display;
+				return `<a href="${termHrefById(target)}" class="underline decoration-black/20 hover:decoration-black/60">${display}</a>`;
+			});
+	}
+
 
 	const letters = $derived(() => {
 		const locale = getLocale() === 'cs' ? 'cs' : 'en';
@@ -86,20 +115,10 @@
 
 	<main>
 		<section class="cell-roomy">
-			<div class="flex items-start justify-between gap-4">
+			<div class="mb-4 flex items-start justify-between gap-4 lg:mb-0">
 				<p class="label">{m.glossary_label()}</p>
 				{#if data.changelog[0]}
-					{@const latest = data.changelog[0]}
-					<div class="shrink-0 text-right font-mono text-[11px] text-black/35">
-						<span class="block text-black/25 uppercase tracking-widest text-[9px] mb-1">{m.latest_revision()}</span>
-						<a
-							href="https://github.com/heterarchy-society/glossary/commit/{latest.hash}"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="no-underline hover:text-black tabular-nums"
-						>{latest.hash.slice(0, 7)} · {formatDate(latest.date)}</a>
-						<span class="block text-black/25 mt-0.5">{timeAgo(latest.date, getLocale())}</span>
-					</div>
+					<LatestRevision latest={data.changelog[0]} changelogHref={localizeUrl('/glossary/changelog')} />
 				{/if}
 			</div>
 			<p class="page-lead mb-10">{m.glossary_lead()}</p>
@@ -146,10 +165,43 @@
 					<p class="mt-8 font-mono text-[11px] text-black/35">{m.glossary_term_count({ count: String(data.terms.length) })}</p>
 				</div>
 
-				<!-- Right: changelog -->
-				{#if data.changelog.length > 0}
-					<aside class="border-t border-line pt-8 lg:border-t-0 lg:border-l lg:border-line lg:pl-8 lg:pt-0">
-						<div class="mb-6 flex items-baseline justify-between gap-4">
+				<!-- Right: spotlight + changelog -->
+				<aside class="border-t border-line pt-8 lg:border-t-0 lg:border-l lg:border-line lg:pl-8 lg:pt-0">
+					{#if spotlight}
+						{@const spotlightExcerpt = getLocale() === 'cs'
+							? ((spotlight.translations?.cs as any)?.excerpt ?? spotlight.excerpt)
+							: spotlight.excerpt}
+						<div class="relative mb-10">
+							<button
+								onclick={pickSpotlight}
+								class="absolute top-0 right-0 cursor-pointer text-black/20 hover:text-black transition-colors"
+								aria-label="Next random term"
+							>
+								<RotateCcw size={16} strokeWidth={1.5} />
+							</button>
+							{#if spotlight.type}
+								<p class="mb-2 font-mono text-[10px] uppercase tracking-widest text-black/30">{displayType(spotlight)}</p>
+							{/if}
+							<h2 class="mb-3 font-mono text-[1.1rem] leading-snug">
+								<a href={termHref(spotlight)} class="hover:underline">{displayName(spotlight)}</a>
+							</h2>
+							<p class="text-[13px] leading-[1.7] text-black/60">{@html renderExcerpt(spotlight, spotlightExcerpt)}</p>
+							<a href={termHref(spotlight)} class="mt-3 block font-mono text-[11px] text-black/35 no-underline hover:text-black hover:underline">{m.spotlight_read_more()}</a>
+						</div>
+					{:else}
+						<div class="mb-10 animate-pulse">
+							<div class="mb-2 h-2 w-20 rounded bg-black/8"></div>
+							<div class="mb-3 h-5 w-48 rounded bg-black/8"></div>
+							<div class="space-y-2">
+								<div class="h-3 w-full rounded bg-black/6"></div>
+								<div class="h-3 w-full rounded bg-black/6"></div>
+								<div class="h-3 w-4/5 rounded bg-black/6"></div>
+							</div>
+						</div>
+					{/if}
+
+					{#if data.changelog.length > 0}
+						<div class="border-t border-line pt-6 mb-2 flex items-baseline justify-between gap-4">
 							<p class="label">{m.glossary_changelog_label()}</p>
 							<a href={localizeUrl('/glossary/changelog')} class="font-mono text-[11px] text-black/35 no-underline hover:text-black hover:underline">
 								{m.collection_changelog_all()}
@@ -158,7 +210,7 @@
 						<ul class="flex flex-col font-mono text-[11px] divide-y divide-line">
 							{#each data.changelog as entry (entry.hash)}
 								{@const gh = ghByName.get(entry.author)}
-								<li class="py-4">
+								<li class="py-4 first:pt-2">
 									<div class="mb-2 flex items-center gap-2 text-black/35">
 										<span>{formatDate(entry.date)}</span>
 										<span class="text-black/20">·</span>
@@ -225,8 +277,8 @@
 								</ul>
 							</div>
 						{/if}
-					</aside>
-				{/if}
+					{/if}
+				</aside>
 			</div>
 		</section>
 	</main>
