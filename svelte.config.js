@@ -14,6 +14,9 @@ const config = {
 		paths: {
 			base: process.env.BASE_PATH ?? ''
 		},
+		version: {
+			pollInterval: 60_000
+		},
 		prerender: {
 			handleHttpError: ({ message }) => {
 				// Ignore 404s for paths not part of this site (e.g. external wiki links in glossary)
