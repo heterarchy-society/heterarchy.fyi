@@ -31,7 +31,8 @@ function getContributors(): Contributor[] {
 }
 
 async function fetchChangelog(): Promise<ChangelogEntry[]> {
-	return fetchCollectionChangelog('https://glossary.data.heterarchy.fyi/changelog.json');
+	const changelog = await fetchCollectionChangelog('https://glossary.data.heterarchy.fyi/changelog.json');
+	return changelog.filter((entry) => entry.changes.length > 0);
 }
 
 export async function load() {
