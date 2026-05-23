@@ -145,7 +145,12 @@
 				<!-- Right: changelog -->
 				{#if data.changelog.length > 0}
 					<aside class="border-t border-line pt-8 lg:border-t-0 lg:border-l lg:border-line lg:pl-8 lg:pt-0">
-						<p class="label mb-6">{m.glossary_changelog_label()}</p>
+						<div class="mb-6 flex items-baseline justify-between gap-4">
+							<p class="label">{m.glossary_changelog_label()}</p>
+							<a href={localizeUrl('/glossary/changelog')} class="font-mono text-[11px] text-black/35 no-underline hover:text-black hover:underline">
+								{m.collection_changelog_all()}
+							</a>
+						</div>
 						<ul class="flex flex-col font-mono text-[11px] divide-y divide-line">
 							{#each data.changelog as entry (entry.hash)}
 								{@const gh = ghByName.get(entry.author)}

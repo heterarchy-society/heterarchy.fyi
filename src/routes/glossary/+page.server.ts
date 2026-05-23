@@ -1,13 +1,8 @@
 import { getGlossaryIndex } from '$lib/server/glossary';
+import { fetchCollectionChangelog, type CollectionChangelogEntry } from '$lib/server/changelog';
 import glossaryData from '$lib/data/glossary.json';
 
-export type ChangelogEntry = {
-	hash: string;
-	date: string;
-	author: string;
-	message: string;
-	changes: { id: string; op: 'added' | 'modified' }[];
-};
+export type ChangelogEntry = CollectionChangelogEntry;
 
 export type Contributor = {
 	name: string;
@@ -33,13 +28,7 @@ function getContributors(): Contributor[] {
 }
 
 async function fetchChangelog(): Promise<ChangelogEntry[]> {
-	try {
-		const res = await fetch('https://glossary.data.heterarchy.fyi/changelog.json');
-		if (!res.ok) return [];
-		return await res.json();
-	} catch {
-		return [];
-	}
+	return fetchCollectionChangelog('https://glossary.data.heterarchy.fyi/changelog.json');
 }
 
 export async function load() {

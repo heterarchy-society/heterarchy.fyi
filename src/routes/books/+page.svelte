@@ -51,6 +51,7 @@
 							class="no-underline hover:text-black tabular-nums"
 						>{latest.hash.slice(0, 7)} · {formatDate(latest.date)}</a>
 						<span class="block text-black/25 mt-0.5">{timeAgo(latest.date, getLocale())}</span>
+						<a href={localizeUrl('/books/changelog')} class="mt-1 block no-underline hover:text-black hover:underline">{m.collection_changelog_all()}</a>
 					</div>
 				{/if}
 			</div>
