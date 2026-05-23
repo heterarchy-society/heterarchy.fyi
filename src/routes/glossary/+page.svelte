@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { RotateCcw } from 'lucide-svelte';
+	import { Shuffle } from 'lucide-svelte';
 	import Header from '$lib/components/Header.svelte';
 	import LatestRevision from '$lib/components/LatestRevision.svelte';
 	import Footer from '$lib/components/Footer.svelte';
@@ -98,7 +98,7 @@
 	}
 
 	async function pickSpotlight() {
-		spotlightLoading = !spotlight;
+		spotlightLoading = true;
 		try {
 			const picked = pickRandomTerm(localTerms);
 			if (!picked) return;
@@ -200,24 +200,26 @@
 
 				<!-- Right: spotlight + changelog -->
 				<aside class="border-t border-line pt-8 lg:border-t-0 lg:border-l lg:border-line lg:pl-8 lg:pt-0">
-					{#if spotlight && !spotlightLoading}
-						<div class="spotlight relative mb-10" class:spotlight-entering={spotlightPhase === 'entering'} class:spotlight-loading={spotlightLoading}>
+					{#if spotlight}
+						<div class="relative mb-10">
 							<button
 								onclick={pickSpotlight}
-								class="absolute top-0 right-0 cursor-pointer text-black/20 transition-colors hover:text-black disabled:cursor-wait disabled:text-black/10"
+								class="absolute top-0 right-0 cursor-pointer text-black/20 transition-colors hover:text-black disabled:cursor-pointer disabled:text-black/10"
 								disabled={spotlightLoading}
 								aria-label="Next random term"
 							>
-								<RotateCcw size={16} strokeWidth={1.5} />
+								<Shuffle size={16} strokeWidth={1.5} />
 							</button>
-							{#if spotlight.type}
-								<p class="mb-2 font-mono text-[10px] uppercase tracking-widest text-black/30">{spotlight.type}</p>
-							{/if}
-							<h2 class="mb-3 font-mono text-[1.1rem] leading-snug">
-								<a href={spotlight.href} class="hover:underline">{spotlight.name}</a>
-							</h2>
-							<p class="text-[13px] leading-[1.7] text-black/60">{@html spotlight.excerptHtml}</p>
-							<a href={spotlight.href} class="mt-3 block font-mono text-[11px] text-black/35 no-underline hover:text-black hover:underline">{m.spotlight_read_more()}</a>
+							<div class="spotlight-content" class:spotlight-entering={spotlightPhase === 'entering'}>
+								{#if spotlight.type}
+									<p class="mb-2 font-mono text-[10px] uppercase tracking-widest text-black/30">{spotlight.type}</p>
+								{/if}
+								<h2 class="mb-3 font-mono text-[1.1rem] leading-snug">
+									<a href={spotlight.href} class="hover:underline">{spotlight.name}</a>
+								</h2>
+								<p class="text-[13px] leading-[1.7] text-black/60">{@html spotlight.excerptHtml}</p>
+								<a href={spotlight.href} class="mt-3 block font-mono text-[11px] text-black/35 no-underline hover:text-black hover:underline">{m.spotlight_read_more()}</a>
+							</div>
 						</div>
 					{:else}
 						<div class="mb-10 animate-pulse">
@@ -332,7 +334,7 @@
 </div>
 
 <style>
-	.spotlight {
+	.spotlight-content {
 		transition:
 			opacity 180ms ease,
 			transform 220ms ease;
@@ -340,10 +342,6 @@
 
 	.spotlight-entering {
 		animation: spotlight-enter 260ms ease both;
-	}
-
-	.spotlight-loading {
-		opacity: 0.65;
 	}
 
 	@keyframes spotlight-enter {
