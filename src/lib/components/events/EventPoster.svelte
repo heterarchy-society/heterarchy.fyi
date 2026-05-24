@@ -40,7 +40,7 @@
 		{@render poster()}
 	</a>
 {:else}
-	<div class="block shrink-0 border border-line bg-bg-muted">
+	<div class="block shrink-0 border border-line">
 		{@render poster()}
 	</div>
 {/if}

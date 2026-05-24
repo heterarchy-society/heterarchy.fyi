@@ -1012,6 +1012,8 @@
 		padding: 0.1em 0.3em;
 		font-family: var(--font-mono);
 		font-size: 0.82em;
+		word-break: break-all;
+		overflow-wrap: break-word;
 	}
 
 	.prose :global(hr) {

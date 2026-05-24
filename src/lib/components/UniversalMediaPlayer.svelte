@@ -153,7 +153,7 @@
 {#if mediaPlayer.track}
 	<div
 		transition:fly={{ y: 80, duration: 220 }}
-		class="mini-shell fixed inset-x-0 bottom-0 z-50 overflow-hidden sm:inset-x-auto sm:bottom-5 sm:right-5 {!mediaPlayer.minimized ? 'sm:hidden' : ''}"
+		class="mini-shell fixed inset-x-0 bottom-0 z-50 flex flex-col-reverse overflow-hidden sm:inset-x-auto sm:bottom-5 sm:right-5 sm:flex-col {!mediaPlayer.minimized ? 'sm:hidden' : ''}"
 	>
 		<div class="flex items-center gap-2 px-4 py-3 sm:px-3 sm:py-2.5">
 			<button
