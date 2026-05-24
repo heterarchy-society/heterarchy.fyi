@@ -6,7 +6,8 @@ export type Writing = {
 	language: string;
 	type: string;
 	glossary: string[];
-	sources: { path: string; format: string }[];
+	sources: { path: string; format: string; variant?: string; generated_from?: string }[];
+	_assets?: Record<string, { size: number; hash: string; mime: string }>;
 	references: { url: string; role: string }[];
 	license: string | null;
 	description: string;
@@ -26,10 +27,12 @@ export async function load({ fetch }: { fetch: typeof globalThis.fetch }) {
 		fetch('https://writings.data.heterarchy.fyi/changelog.json'),
 	]);
 
-	const writings: Writing[] =
+	const raw: Writing[] =
 		indexRes.status === 'fulfilled' && indexRes.value.ok
 			? ((await indexRes.value.json()).writings ?? [])
 			: [];
+
+	const writings = [...raw].sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
 
 	const changelog: ChangelogEntry[] =
 		changelogRes.status === 'fulfilled' && changelogRes.value.ok
