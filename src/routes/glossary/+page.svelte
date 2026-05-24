@@ -138,6 +138,32 @@
 	function expandChanges(hash: string) {
 		expandedChanges = new Set(expandedChanges).add(hash);
 	}
+
+	function scrollToLetter(event: MouseEvent, letter: string) {
+		event.preventDefault();
+		const section = document.getElementById(letter);
+		if (!section) return;
+		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const target = section.getBoundingClientRect().top + window.scrollY - 32;
+		if (prefersReducedMotion) {
+			window.scrollTo(0, target);
+		} else {
+			const start = window.scrollY;
+			const distance = target - start;
+			const duration = 220;
+			const startedAt = performance.now();
+			const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+			function tick(now: number) {
+				const progress = Math.min(1, (now - startedAt) / duration);
+				window.scrollTo(0, start + distance * easeOut(progress));
+				if (progress < 1) requestAnimationFrame(tick);
+			}
+
+			requestAnimationFrame(tick);
+		}
+		history.pushState(null, '', `#${letter}`);
+	}
 </script>
 
 <svelte:head>
@@ -160,18 +186,22 @@
 
 			<div class="grid gap-16 lg:grid-cols-[1fr_480px]">
 				<!-- Left: term index -->
-				<div class="min-w-0">
-					<nav class="mb-10 flex flex-wrap gap-2 font-mono text-[12px]">
-						{#each data.sections as section}
-							<a href="#{section.letter}" class="border border-line px-2 py-1 no-underline text-black/60 hover:border-black/40 hover:text-black">
-								{section.letter}
-							</a>
-						{/each}
-					</nav>
+					<div class="min-w-0">
+						<nav class="mb-10 flex flex-wrap gap-2 font-mono text-[12px]">
+							{#each data.sections as section}
+								<a
+									href="#{section.letter}"
+									onclick={(event) => scrollToLetter(event, section.letter)}
+									class="border border-line px-2 py-1 no-underline text-black/60 hover:border-black/40 hover:text-black"
+								>
+									{section.letter}
+								</a>
+							{/each}
+						</nav>
 
 					<div>
 						{#each data.sections as section}
-							<div id={section.letter} class="border-t border-line pt-8 pb-6">
+							<div id={section.letter} class="scroll-mt-8 border-t border-line pt-8 pb-6">
 								<p class="mb-4 font-mono text-[11px] tracking-[0.2em] uppercase text-black/30">{section.letter}</p>
 								<ul class="flex flex-col divide-y divide-line">
 									{#each section.terms as term}
