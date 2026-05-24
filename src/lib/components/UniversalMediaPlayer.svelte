@@ -179,25 +179,26 @@
 			{#if mediaPlayer.track.href}
 				<a
 					href={mediaPlayer.track.href}
-					class="min-w-0 flex-1 text-left no-underline sm:hidden"
+					class="min-w-0 flex-1 text-left no-underline"
 				>
-					<span class="block truncate font-mono text-[12px] text-black/70 hover:text-black">{mediaPlayer.track.title}</span>
+					<span class="block truncate font-mono text-[12px] text-black/70 hover:text-black sm:text-[11px] sm:text-black/65">{mediaPlayer.track.title}</span>
 					{#if mediaPlayer.track.subtitle}
 						<span class="block font-mono text-[10px] text-black/35">{mediaPlayer.track.subtitle}</span>
 					{/if}
 				</a>
+			{:else}
+				<button
+					type="button"
+					onclick={() => { mediaPlayer.minimized = false; }}
+					class="min-w-0 flex-1 cursor-pointer text-left"
+					aria-label={m.audio_expand_player()}
+				>
+					<span class="block truncate font-mono text-[12px] text-black/70 hover:text-black sm:text-[11px] sm:text-black/65">{mediaPlayer.track.title}</span>
+					{#if mediaPlayer.track.subtitle}
+						<span class="block font-mono text-[10px] text-black/35 sm:hidden">{mediaPlayer.track.subtitle}</span>
+					{/if}
+				</button>
 			{/if}
-			<button
-				type="button"
-				onclick={() => { mediaPlayer.minimized = false; }}
-				class="min-w-0 flex-1 cursor-pointer text-left {mediaPlayer.track.href ? 'hidden sm:block' : ''}"
-				aria-label={m.audio_expand_player()}
-			>
-				<span class="block truncate font-mono text-[12px] text-black/70 hover:text-black sm:text-[11px] sm:text-black/65">{mediaPlayer.track.title}</span>
-				{#if mediaPlayer.track.subtitle}
-					<span class="block font-mono text-[10px] text-black/35 sm:hidden">{mediaPlayer.track.subtitle}</span>
-				{/if}
-			</button>
 
 			<button
 				type="button"
