@@ -110,6 +110,24 @@
 						</div>
 					{/if}
 
+					{#if data.writings.length > 0}
+						<div class="mt-10 border-t border-line pt-8">
+							<p class="label mb-4">{m.nav_writings()}</p>
+							<ul class="flex flex-col gap-3">
+								{#each data.writings as writing}
+									<li>
+										<a href={localizeUrl(`/writings/${writing.id}`)} class="group no-underline">
+											<span class="block font-mono text-[14px] text-black group-hover:underline">{writing.title}</span>
+											<span class="font-mono text-[11px] text-black/40">
+												{writing.authors.join(', ')}{#if writing.year} · {writing.year}{/if}
+											</span>
+										</a>
+									</li>
+								{/each}
+							</ul>
+						</div>
+					{/if}
+
 					{#if data.term.resources && data.term.resources.length > 0}
 						<div class="mt-10 border-t border-line pt-8">
 							<p class="label mb-4">{m.glossary_sources()}</p>

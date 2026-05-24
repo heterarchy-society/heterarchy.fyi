@@ -6,6 +6,7 @@ import {
 	getGlossarySummaryTerms
 } from '$lib/server/glossary';
 import { getBooksByGlossaryTerm } from '$lib/data/library';
+import { getWritingsByGlossaryTerm } from '$lib/data/writings';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = ({ params }) => {
@@ -30,6 +31,7 @@ export const load: PageServerLoad = ({ params }) => {
 		term,
 		backlinks,
 		books: getBooksByGlossaryTerm(term.id),
+		writings: getWritingsByGlossaryTerm(term.id),
 		relatedTerms: getGlossarySummaryTerms(relatedTermIds),
 		// Alternate URLs for the language switcher
 		altUrls: {
