@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import { browser } from '$app/environment';
+	import { page } from '$app/state';
 	import { getLocale, localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
@@ -89,6 +91,7 @@
 	let proseEl: HTMLElement | undefined = $state();
 	let handledTextFollowRequest = 0;
 	let pendingTextFollowRequest = $state(0);
+	let handledTimestampParam: string | null = null;
 	const mediaTrack = $derived<MediaTrack | null>(data.audio ? {
 		id: `writing:${writing.id}`,
 		title: writing.title,
@@ -109,6 +112,62 @@
 			if (res.ok) transcript = await res.json();
 		} catch {}
 	}
+
+	function parseTimestampParam(raw: string): number | null {
+		const value = raw.trim().toLowerCase();
+		if (!value) return null;
+		if (/^\d+(?:\.\d+)?$/.test(value)) return Number(value);
+		if (/^\d{1,2}(?::\d{1,2}){1,2}$/.test(value)) {
+			const parts = value.split(':').map(Number);
+			return parts.reduce((total, part) => (total * 60) + part, 0);
+		}
+
+		const re = /(\d+(?:\.\d+)?)(h|m|s)/g;
+		let total = 0;
+		let matched = false;
+		let lastIndex = 0;
+		let match: RegExpExecArray | null;
+		while ((match = re.exec(value)) !== null) {
+			if (value.slice(lastIndex, match.index).trim()) return null;
+			const amount = Number(match[1]);
+			if (match[2] === 'h') total += amount * 3600;
+			if (match[2] === 'm') total += amount * 60;
+			if (match[2] === 's') total += amount;
+			matched = true;
+			lastIndex = re.lastIndex;
+		}
+		if (!matched || value.slice(lastIndex).trim()) return null;
+		return total;
+	}
+
+	async function playFromTimestamp(seconds: number) {
+		if (!mediaTrack) return;
+		mediaPlayer.load(mediaTrack);
+		mediaPlayer.seek(seconds);
+		if (data.audio?.transcriptUrl) void loadTranscript();
+		await tick();
+		mediaPlayer.seek(seconds);
+		try {
+			await mediaPlayer.play();
+		} catch {
+			mediaPlayer.seek(seconds);
+		}
+	}
+
+	$effect(() => {
+		if (!browser || !mediaTrack) return;
+		const raw = page.url.searchParams.get('t');
+		if (!raw) {
+			handledTimestampParam = null;
+			return;
+		}
+		const handledKey = `${mediaTrack.id}:${raw}`;
+		if (handledTimestampParam === handledKey) return;
+		const seconds = parseTimestampParam(raw);
+		handledTimestampParam = handledKey;
+		if (seconds === null) return;
+		void playFromTimestamp(seconds);
+	});
 
 	const currentWordIdx = $derived.by(() => {
 		if (!transcript || currentTime === 0) return -1;
