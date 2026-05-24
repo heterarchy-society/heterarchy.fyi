@@ -7,6 +7,7 @@ export type Writing = {
 	type: string;
 	glossary: string[];
 	sources: { path: string; format: string; variant?: string; generated_from?: string }[];
+	audio?: { url: string; duration?: string; peaks?: string; transcript?: string }[];
 	_assets?: Record<string, { size: number; hash: string; mime: string }>;
 	references: { url: string; role: string }[];
 	license: string | null;

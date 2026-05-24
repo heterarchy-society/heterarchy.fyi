@@ -140,6 +140,20 @@ export const load: PageServerLoad = async ({ params, url, fetch }) => {
 		const viewableSourcesMapped = viewableSources.map((s) => mapSource(s, viewableSources));
 		const downloadSourcesMapped = downloadSources.map((s) => mapSource(s, downloadSources));
 
+		const rawAudio = writing.audio?.[0] ?? null;
+		const audio = rawAudio ? {
+			url: rawAudio.url,
+			duration: rawAudio.duration ?? null,
+			peaks: rawAudio.peaks ?? null,
+			transcriptUrl: rawAudio.transcript
+				? `https://writings.data.heterarchy.fyi/writings/${params.id}/${rawAudio.transcript}`
+				: null,
+			durationSeconds: rawAudio.duration
+				? rawAudio.duration.split(':').reduce((m: number, s: string, i: number, a: string[]) =>
+					i === a.length - 1 ? m + Number(s) : m + Number(s) * 60, 0)
+				: null,
+		} : null;
+
 		return {
 			writing,
 			glossaryTerms,
@@ -151,6 +165,7 @@ export const load: PageServerLoad = async ({ params, url, fetch }) => {
 			selectedSource: source
 				? viewableSourcesMapped.find((s) => s.path === source.path) ?? null
 				: null,
+			audio,
 		};
 	} catch (e: any) {
 		if (e?.status === 404) throw e;

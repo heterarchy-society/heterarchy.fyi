@@ -75,6 +75,238 @@
 			active ? 'text-black after:absolute after:left-1/2 after:top-6 after:-translate-x-1/2 after:text-[11px] after:text-black after:content-["↓"]' : 'text-black/40 hover:text-black',
 		].join(' ');
 	}
+
+	// Audio player
+
+	type Word = [string, number, number]; // [text, startMs, endMs]
+	type Transcript = { words: Word[]; paragraphs: number[] };
+	let transcript: Transcript | null = $state(null);
+	let proseEl: HTMLElement | undefined = $state();
+
+	async function loadTranscript() {
+		if (transcript || !data.audio?.transcriptUrl) return;
+		try {
+			const res = await fetch(data.audio.transcriptUrl);
+			if (res.ok) transcript = await res.json();
+		} catch {}
+	}
+
+	const currentWordIdx = $derived.by(() => {
+		if (!transcript || currentTime === 0) return -1;
+		const ms = currentTime * 1000;
+		let idx = -1;
+		for (let i = 0; i < transcript.words.length; i++) {
+			if (ms >= transcript.words[i][1]) idx = i;
+			else break;
+		}
+		return idx;
+	});
+
+	const currentParagraphIdx = $derived.by(() => {
+		if (!transcript?.paragraphs.length || currentWordIdx < 0) return -1;
+		let pi = 0;
+		for (let i = 0; i < transcript.paragraphs.length; i++) {
+			if (transcript.paragraphs[i] <= currentWordIdx) pi = i;
+			else break;
+		}
+		return pi;
+	});
+
+	$effect(() => {
+		if (!isMarkdown || !proseEl) return;
+		const paras = proseEl.querySelectorAll('p');
+		paras.forEach((p, i) => p.classList.toggle('reading-active', i === currentParagraphIdx));
+		if (currentParagraphIdx >= 0) {
+			const para = paras[currentParagraphIdx];
+			if (para) {
+				const rect = para.getBoundingClientRect();
+				const gap = 120;
+				if (rect.top > window.innerHeight - gap || rect.bottom < 0) {
+					window.scrollTo({ top: window.scrollY + rect.top - gap, behavior: 'smooth' });
+				}
+			}
+		}
+	});
+
+	// CSS Custom Highlight API — word-level highlight without DOM wrapping
+	let alignedRanges: (Range | null)[] = [];
+
+	function buildWordRanges(el: HTMLElement): Range[] {
+		const ranges: Range[] = [];
+		const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+		let node: Node | null;
+		while ((node = walker.nextNode())) {
+			const text = (node as Text).textContent ?? '';
+			const re = /\S+/g;
+			let m: RegExpExecArray | null;
+			while ((m = re.exec(text)) !== null) {
+				const r = document.createRange();
+				r.setStart(node, m.index);
+				r.setEnd(node, m.index + m[0].length);
+				ranges.push(r);
+			}
+		}
+		return ranges;
+	}
+
+	function norm(s: string) { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }
+
+	$effect(() => {
+		if (!isMarkdown || !proseEl || !transcript) return;
+		const docRanges = buildWordRanges(proseEl);
+		const docNorm = docRanges.map(r => norm(r.toString()));
+		const result: (Range | null)[] = new Array(transcript.words.length).fill(null);
+		let di = 0;
+		for (let ti = 0; ti < transcript.words.length; ti++) {
+			const tw = norm(transcript.words[ti][0]);
+			for (let k = 0; k < 8 && di + k < docNorm.length; k++) {
+				const dw = docNorm[di + k];
+				if (dw === tw || dw.includes(tw) || tw.includes(dw)) {
+					result[ti] = docRanges[di + k];
+					di = di + k + 1;
+					break;
+				}
+			}
+		}
+		alignedRanges = result;
+	});
+
+	$effect(() => {
+		const hl = (CSS as any).highlights;
+		if (!hl) return;
+		if (currentWordIdx < 0) { hl.delete('reading-word'); return; }
+		const range = alignedRanges[currentWordIdx];
+		if (range) hl.set('reading-word', new (window as any).Highlight(range));
+		return () => hl.delete('reading-word');
+	});
+
+	function seekToClick(e: MouseEvent) {
+		if (!isMarkdown || !playing || !audioEl || !transcript || alignedRanges.length === 0) return;
+		let node: Node | null = null;
+		let offset = 0;
+		if (document.caretRangeFromPoint) {
+			const r = document.caretRangeFromPoint(e.clientX, e.clientY);
+			if (r) { node = r.startContainer; offset = r.startOffset; }
+		} else if ((document as any).caretPositionFromPoint) {
+			const pos = (document as any).caretPositionFromPoint(e.clientX, e.clientY);
+			if (pos) { node = pos.offsetNode; offset = pos.offset; }
+		}
+		if (!node) return;
+		let bestIdx = -1;
+		for (let i = 0; i < alignedRanges.length; i++) {
+			const r = alignedRanges[i];
+			if (!r) continue;
+			try { if (r.isPointInRange(node, offset)) { bestIdx = i; break; } } catch {}
+		}
+		if (bestIdx < 0) {
+			for (let i = alignedRanges.length - 1; i >= 0; i--) {
+				const r = alignedRanges[i];
+				if (!r) continue;
+				try { if (r.comparePoint(node, offset) >= 0) { bestIdx = i; break; } } catch {}
+			}
+		}
+		if (bestIdx >= 0) audioEl.currentTime = transcript.words[bestIdx][1] / 1000;
+	}
+
+	const currentSentence = $derived.by(() => {
+		if (!transcript || currentWordIdx < 0) return null;
+		const words = transcript.words;
+		const idx = currentWordIdx;
+		const isSentenceEnd = (w: Word) => /[.!?]$/.test(w[0]);
+		let start = idx;
+		while (start > 0 && !isSentenceEnd(words[start - 1])) start--;
+		let end = idx;
+		while (end < words.length - 1 && !isSentenceEnd(words[end])) end++;
+		return { words: words.slice(start, end + 1), activeIdx: idx - start };
+	});
+
+	let audioEl: HTMLAudioElement | undefined = $state();
+	let waveCanvas: HTMLCanvasElement | undefined = $state();
+	let playing = $state(false);
+	let currentTime = $state(0);
+	let audioDuration = $state(data.audio?.durationSeconds ?? 0);
+	let speed = $state(1);
+	const speeds = [0.75, 1, 1.25, 1.5, 2];
+
+	function decodePeaks(b64: string): number[] {
+		const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+		return Array.from(new Int8Array(bytes.buffer));
+	}
+
+	const peaks = $derived(data.audio?.peaks ? decodePeaks(data.audio.peaks) : null);
+
+	function drawWaveform() {
+		if (!waveCanvas || !peaks) return;
+		const ctx = waveCanvas.getContext('2d');
+		if (!ctx) return;
+		const dpr = window.devicePixelRatio || 1;
+		const W = waveCanvas.offsetWidth;
+		const H = waveCanvas.offsetHeight;
+		if (waveCanvas.width !== Math.round(W * dpr) || waveCanvas.height !== Math.round(H * dpr)) {
+			waveCanvas.width = Math.round(W * dpr);
+			waveCanvas.height = Math.round(H * dpr);
+		}
+		ctx.save();
+		ctx.scale(dpr, dpr);
+		ctx.clearRect(0, 0, W, H);
+		const barW = 2;
+		const step = 3;
+		const numBars = Math.floor(W / step);
+		const barCount = peaks.length / 2;
+		const progressX = audioDuration > 0 ? (currentTime / audioDuration) * W : 0;
+		for (let i = 0; i < numBars; i++) {
+			const x = i * step;
+			const pi = Math.floor((i / numBars) * barCount);
+			const min = peaks[2 * pi] ?? 0;
+			const max = peaks[2 * pi + 1] ?? 0;
+			const barH = Math.max(2, ((max - min) / 255) * H * 0.85);
+			const y = (H - barH) / 2;
+			ctx.fillStyle = x < progressX ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.13)';
+			ctx.fillRect(x, y, barW, barH);
+		}
+		ctx.restore();
+	}
+
+	$effect(() => {
+		if (!waveCanvas || !peaks) return;
+		drawWaveform();
+		const ro = new ResizeObserver(drawWaveform);
+		ro.observe(waveCanvas);
+		return () => ro.disconnect();
+	});
+
+	$effect(() => {
+		void currentTime;
+		drawWaveform();
+	});
+
+	function togglePlay() {
+		if (!audioEl) return;
+		if (playing) {
+			audioEl.pause();
+		} else {
+			loadTranscript();
+			audioEl.play();
+		}
+	}
+
+	function setSpeed(rate: number) {
+		speed = rate;
+		if (audioEl) audioEl.playbackRate = rate;
+	}
+
+	function seekFromCanvas(e: MouseEvent) {
+		if (!waveCanvas || !audioEl) return;
+		const rect = waveCanvas.getBoundingClientRect();
+		audioEl.currentTime = ((e.clientX - rect.left) / rect.width) * (audioEl.duration || audioDuration);
+	}
+
+	function formatTime(s: number): string {
+		if (!s || isNaN(s)) return '0:00';
+		const m = Math.floor(s / 60);
+		const sec = Math.floor(s % 60);
+		return `${m}:${sec.toString().padStart(2, '0')}`;
+	}
 </script>
 
 <svelte:head>
@@ -126,6 +358,72 @@
 						</div>
 					{/if}
 
+					{#if data.audio}
+						<!-- svelte-ignore a11y_media_has_caption -->
+						<audio
+							bind:this={audioEl}
+							src={data.audio.url}
+							onplay={() => { playing = true; }}
+							onpause={() => { playing = false; }}
+							ontimeupdate={() => { currentTime = audioEl?.currentTime ?? 0; }}
+							onloadedmetadata={() => { if (audioEl) audioDuration = audioEl.duration; }}
+							onended={() => { playing = false; currentTime = 0; if (audioEl) audioEl.currentTime = 0; }}
+						></audio>
+						<div class="mt-6 border px-4 py-3 transition-colors duration-300 {playing ? 'border-black/25 bg-black/[0.04]' : 'border-line'}">
+							<div class="flex items-center gap-4">
+								<button
+									onclick={togglePlay}
+									class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-black/20 text-black/70 hover:border-black/50 hover:text-black"
+									aria-label={playing ? 'Pause' : 'Play'}
+								>
+									{#if playing}
+										<svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+											<rect x="1" y="0" width="4" height="14" rx="1"/>
+											<rect x="9" y="0" width="4" height="14" rx="1"/>
+										</svg>
+									{:else}
+										<svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" style="transform: translateX(1px)">
+											<polygon points="1,0 13,7 1,14"/>
+										</svg>
+									{/if}
+								</button>
+
+								{#if peaks}
+									<canvas
+										bind:this={waveCanvas}
+										onclick={seekFromCanvas}
+										class="min-w-0 flex-1 cursor-pointer"
+										style="height: 48px;"
+									></canvas>
+								{:else}
+									<div class="min-w-0 flex-1"></div>
+								{/if}
+
+								<span class="shrink-0 font-mono text-[11px] tabular-nums text-black/40">
+									{formatTime(currentTime)}<span class="text-black/20"> / </span>{data.audio.duration ?? formatTime(audioDuration)}
+								</span>
+							</div>
+
+							<div class="mt-2 flex items-center justify-end gap-3">
+								<span class="font-mono text-[10px] uppercase tracking-widest text-black/25">speed</span>
+								{#each speeds as rate}
+									<button
+										onclick={() => setSpeed(rate)}
+										class="cursor-pointer font-mono text-[10px] tabular-nums {speed === rate ? 'text-black' : 'text-black/30 hover:text-black/70'}"
+									>{rate}×</button>
+								{/each}
+							</div>
+
+							{#if currentSentence}
+								<p class="mt-3 text-[13px] leading-[1.7] text-black/50 border-t border-line pt-3">
+									{#each currentSentence.words as word, i}
+										<span class={i === currentSentence.activeIdx ? 'text-black font-medium' : ''}>{word[0]}{' '}</span>
+									{/each}
+								</p>
+							{/if}
+						</div>
+					{/if}
+
 					{#if data.readableSources.length > 1}
 						<nav class="-mb-10 mt-10 flex max-w-full flex-wrap items-end justify-center gap-x-4 gap-y-1 pt-1" aria-label="Writing formats">
 							{#each data.readableSources as source}
@@ -162,7 +460,13 @@
 					{:else if isSourceText}
 						<pre class="mx-auto max-w-2xl overflow-x-auto border-l border-line pl-5 font-mono text-[12px] leading-[1.75] text-black/70"><code>{data.content}</code></pre>
 					{:else}
-						<div class="prose mx-auto max-w-2xl">
+						<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+					<div
+						bind:this={proseEl}
+						class="prose mx-auto max-w-2xl"
+						class:seek-cursor={isMarkdown && playing && transcript}
+						onclick={seekToClick}
+					>
 							{#if isMarkdown}
 								{@html data.contentHtml}
 							{:else if isPlainText}
@@ -403,5 +707,28 @@
 		margin: 2rem 0;
 		border: none;
 		border-top: 1px solid rgba(0,0,0,0.1);
+	}
+
+	.seek-cursor :global(*) {
+		cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpolygon points='2,1 14,8 2,15' fill='black' stroke='white' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") 2 8, crosshair !important;
+	}
+
+	::highlight(reading-word) {
+		background-color: rgba(253, 224, 71, 0.55);
+		color: inherit;
+	}
+
+	.prose :global(p.reading-active) {
+		color: rgba(0,0,0,0.88);
+		background: rgba(253, 224, 71, 0.12);
+		margin-top: -0.4rem;
+		margin-bottom: calc(1.35rem - 0.4rem);
+		margin-left: -0.75rem;
+		margin-right: -0.75rem;
+		padding-top: 0.4rem;
+		padding-bottom: 0.4rem;
+		padding-left: 0.75rem;
+		padding-right: 0.75rem;
+		border-radius: 3px;
 	}
 </style>
