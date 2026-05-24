@@ -55,9 +55,9 @@
 				aria-label={isAmbientPlaying ? m.ambient_pause() : m.ambient_play()}
 			>
 				{#if isAmbientPlaying}
-					<Pause size={14} fill="currentColor" strokeWidth={0} />
+					<Pause size={14} strokeWidth={1.7} />
 				{:else}
-					<Play size={14} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" />
+					<Play size={14} strokeWidth={1.7} style="transform: translateX(1px)" />
 				{/if}
 			</button>
 			<ThemeToggle />
@@ -76,9 +76,9 @@
 				aria-label={isAmbientPlaying ? m.ambient_pause() : m.ambient_play()}
 			>
 				{#if isAmbientPlaying}
-					<Pause size={15} fill="currentColor" strokeWidth={0} />
+					<Pause size={15} strokeWidth={1.7} />
 				{:else}
-					<Play size={15} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" />
+					<Play size={15} strokeWidth={1.7} style="transform: translateX(1px)" />
 				{/if}
 			</button>
 			<ThemeToggle />
