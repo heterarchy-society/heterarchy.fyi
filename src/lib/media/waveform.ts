@@ -6,9 +6,11 @@ export function decodePeaks(b64: string): number[] {
 type DrawWaveformOptions = {
 	currentTime: number;
 	duration: number;
+	bufferedTime?: number;
 	hoverTime?: number | null;
 	activeColor?: string;
 	inactiveColor?: string;
+	bufferedColor?: string;
 	hoverColor?: string;
 	barWidth?: number;
 	step?: number;
@@ -38,8 +40,10 @@ export function drawWaveform(canvas: HTMLCanvasElement, peaks: number[], options
 	const numBars = Math.floor(width / step);
 	const barCount = peaks.length / 2;
 	const progressX = options.duration > 0 ? (options.currentTime / options.duration) * width : 0;
+	const bufferedX = options.duration > 0 && options.bufferedTime != null ? (options.bufferedTime / options.duration) * width : progressX;
 	const activeColor = options.activeColor ?? 'rgba(0,0,0,0.7)';
 	const inactiveColor = options.inactiveColor ?? 'rgba(0,0,0,0.13)';
+	const bufferedColor = options.bufferedColor ?? 'rgba(15,118,110,0.35)';
 	const hoverColor = options.hoverColor ?? 'rgba(220,38,38,0.85)';
 
 	for (let i = 0; i < numBars; i++) {
@@ -49,7 +53,7 @@ export function drawWaveform(canvas: HTMLCanvasElement, peaks: number[], options
 		const max = peaks[2 * pi + 1] ?? 0;
 		const barHeight = Math.max(2, ((max - min) / 255) * height * 0.85);
 		const y = (height - barHeight) / 2;
-		ctx.fillStyle = x < progressX ? activeColor : inactiveColor;
+		ctx.fillStyle = x < progressX ? activeColor : x < bufferedX ? bufferedColor : inactiveColor;
 		ctx.fillRect(x, y, barWidth, barHeight);
 	}
 

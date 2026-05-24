@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { fly } from 'svelte/transition';
-	import { Check, Highlighter, Link, Pause, Play, Volume2, VolumeX, X } from 'lucide-svelte';
+	import { Check, Download, Highlighter, Link, Pause, Play, Volume2, VolumeX, X } from 'lucide-svelte';
 	import { mediaPlayer } from '$lib/media/player.svelte';
 	import { decodePeaks, drawWaveform as drawWaveformCanvas, hoverTimeFromPointer, seekTimeFromPointer } from '$lib/media/waveform';
 
@@ -12,6 +12,19 @@
 	let showRemaining = $state(false);
 	let timeCopied = $state(false);
 	const speeds = [0.75, 1, 1.25, 1.5, 2];
+
+	async function downloadAudio() {
+		const src = mediaPlayer.track?.src;
+		if (!src) return;
+		const res = await fetch(src);
+		const blob = await res.blob();
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = src.split('/').pop() ?? 'audio';
+		a.click();
+		URL.revokeObjectURL(url);
+	}
 
 	function copyTimestampLink() {
 		const url = new URL(window.location.href);
@@ -51,6 +64,7 @@
 		drawWaveformCanvas(waveCanvas, peaks, {
 			currentTime: mediaPlayer.currentTime,
 			duration: mediaPlayer.duration,
+			bufferedTime: mediaPlayer.bufferedTime,
 			hoverTime: waveformHoverTime,
 			inactiveColor: 'rgba(0,0,0,0.14)',
 		});
@@ -111,6 +125,7 @@
 		void mediaPlayer.currentTime;
 		void mediaPlayer.duration;
 		void waveformHoverTime;
+		void mediaPlayer.bufferedTime;
 		void peaks;
 		drawWaveform();
 	});
@@ -125,6 +140,7 @@
 	onpause={() => { mediaPlayer.playing = false; stopTracking(); }}
 	ontimeupdate={() => { mediaPlayer.currentTime = audioEl?.currentTime ?? 0; }}
 	onloadedmetadata={() => { if (audioEl) mediaPlayer.duration = audioEl.duration; }}
+	onprogress={() => { if (audioEl?.buffered.length) mediaPlayer.bufferedTime = audioEl.buffered.end(audioEl.buffered.length - 1); }}
 	onended={() => { mediaPlayer.playing = false; stopTracking(); mediaPlayer.currentTime = 0; if (audioEl) audioEl.currentTime = 0; mediaPlayer.clear(); }}
 ></audio>
 
@@ -260,6 +276,15 @@
 						{:else}
 							{formatTime(mediaPlayer.currentTime)}<span class="text-black/20"> / </span>{mediaPlayer.track.duration ?? formatTime(mediaPlayer.duration)}
 						{/if}
+					</button>
+					<button
+						type="button"
+						onclick={downloadAudio}
+						class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
+						aria-label="Download audio"
+						title="Download audio"
+					>
+						<Download size={15} strokeWidth={1.8} />
 					</button>
 					<button
 						type="button"

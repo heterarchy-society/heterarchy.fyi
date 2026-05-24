@@ -14,6 +14,7 @@ class MediaPlayerState {
 	track = $state<MediaTrack | null>(null);
 	currentTime = $state(0);
 	duration = $state(0);
+	bufferedTime = $state(0);
 	playing = $state(false);
 	speed = $state(1);
 	volume = $state(1);
@@ -80,6 +81,7 @@ class MediaPlayerState {
 		this.track = null;
 		this.currentTime = 0;
 		this.duration = 0;
+		this.bufferedTime = 0;
 		this.playing = false;
 		if (this.audio) this.audio.removeAttribute('src');
 	}

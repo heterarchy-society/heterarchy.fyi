@@ -9,7 +9,7 @@
 	import type { PageData } from './$types';
 	import { tick } from 'svelte';
 	import { fly, slide } from 'svelte/transition';
-	import { Captions, Highlighter, Pencil, RotateCcw, X } from 'lucide-svelte';
+	import { Captions, Download, Highlighter, Info, Pencil, RotateCcw, X } from 'lucide-svelte';
 	import { mediaPlayer, type MediaTrack } from '$lib/media/player.svelte';
 	import { decodePeaks, drawWaveform as drawWaveformCanvas, hoverTimeFromPointer, seekTimeFromPointer } from '$lib/media/waveform';
 
@@ -341,36 +341,67 @@
 		return () => hl.delete('reading-word');
 	});
 
-	async function seekToClick(e: MouseEvent) {
-		if (!isMarkdown || !mediaTrack) return;
-		if (mediaPlayer.track && !isActiveMediaTrack) return;
-		if (!isActiveMediaTrack) mediaPlayer.load(mediaTrack);
-		if (!transcript) await loadTranscript();
-		if (!transcript || alignedRanges.length === 0) return;
+	let altPressed = $state(false);
+	let altHoverWordIdx = $state(-1);
+
+	$effect(() => {
+		function onKeyDown(e: KeyboardEvent) {
+			if (e.key === 'Alt') {
+				altPressed = true;
+				if (isMarkdown && data.audio?.transcriptUrl) void loadTranscript();
+			}
+		}
+		function onKeyUp(e: KeyboardEvent) { if (e.key === 'Alt') { altPressed = false; altHoverWordIdx = -1; } }
+		window.addEventListener('keydown', onKeyDown);
+		window.addEventListener('keyup', onKeyUp);
+		return () => { window.removeEventListener('keydown', onKeyDown); window.removeEventListener('keyup', onKeyUp); };
+	});
+
+	$effect(() => {
+		const hl = (CSS as any).highlights;
+		if (!hl) return;
+		if (altHoverWordIdx < 0) { hl.delete('alt-hover-word'); return; }
+		const range = alignedRanges[altHoverWordIdx];
+		if (range) hl.set('alt-hover-word', new (window as any).Highlight(range));
+		else hl.delete('alt-hover-word');
+		return () => hl.delete('alt-hover-word');
+	});
+
+	function findWordIdxAtPoint(clientX: number, clientY: number): number {
 		let node: Node | null = null;
 		let offset = 0;
 		if (document.caretRangeFromPoint) {
-			const r = document.caretRangeFromPoint(e.clientX, e.clientY);
+			const r = document.caretRangeFromPoint(clientX, clientY);
 			if (r) { node = r.startContainer; offset = r.startOffset; }
 		} else if ((document as any).caretPositionFromPoint) {
-			const pos = (document as any).caretPositionFromPoint(e.clientX, e.clientY);
+			const pos = (document as any).caretPositionFromPoint(clientX, clientY);
 			if (pos) { node = pos.offsetNode; offset = pos.offset; }
 		}
-		if (!node) return;
-		let bestIdx = -1;
+		if (!node) return -1;
 		for (let i = 0; i < alignedRanges.length; i++) {
 			const r = alignedRanges[i];
 			if (!r) continue;
-			try { if (r.isPointInRange(node, offset)) { bestIdx = i; break; } } catch {}
+			try { if (r.isPointInRange(node, offset)) return i; } catch {}
 		}
-		if (bestIdx < 0) {
-			for (let i = alignedRanges.length - 1; i >= 0; i--) {
-				const r = alignedRanges[i];
-				if (!r) continue;
-				try { if (r.comparePoint(node, offset) >= 0) { bestIdx = i; break; } } catch {}
-			}
+		return -1;
+	}
+
+	function proseMouseMove(e: MouseEvent) {
+		if (!altPressed || alignedRanges.length === 0) { altHoverWordIdx = -1; return; }
+		altHoverWordIdx = findWordIdxAtPoint(e.clientX, e.clientY);
+	}
+
+	async function seekToClick(e: MouseEvent) {
+		if (!e.altKey || !isMarkdown || !mediaTrack) return;
+		e.preventDefault();
+		if (!transcript) await loadTranscript();
+		if (!transcript || alignedRanges.length === 0) return;
+		const bestIdx = findWordIdxAtPoint(e.clientX, e.clientY);
+		if (bestIdx >= 0) {
+			const seekTime = transcript.words[bestIdx][1] / 1000;
+			await mediaPlayer.play(mediaTrack);
+			mediaPlayer.seek(seekTime);
 		}
-		if (bestIdx >= 0) mediaPlayer.seek(transcript.words[bestIdx][1] / 1000);
 	}
 
 	const currentSentence = $derived.by(() => {
@@ -395,6 +426,7 @@
 	const speed = $derived(mediaPlayer.speed);
 	let readingMode = $state(true);
 	let textHighlightMode = $state(true);
+	let audioInfoOpen = $state(false);
 	const speeds = [0.75, 1, 1.25, 1.5, 2];
 
 	$effect(() => {
@@ -405,7 +437,7 @@
 
 	function drawWaveform() {
 		if (!waveCanvas || !peaks) return;
-		drawWaveformCanvas(waveCanvas, peaks, { currentTime, duration: audioDuration, hoverTime: waveformHoverTime });
+		drawWaveformCanvas(waveCanvas, peaks, { currentTime, duration: audioDuration, bufferedTime: mediaPlayer.bufferedTime, hoverTime: waveformHoverTime });
 	}
 
 	$effect(() => {
@@ -419,6 +451,7 @@
 	$effect(() => {
 		void currentTime;
 		void waveformHoverTime;
+		void mediaPlayer.bufferedTime;
 		drawWaveform();
 	});
 
@@ -456,6 +489,19 @@
 		const hl = (CSS as any).highlights;
 		if (hl) clearWordHighlights(hl);
 		proseEl?.querySelectorAll('p').forEach((p) => p.classList.remove('reading-active'));
+	}
+
+	async function downloadAudio() {
+		const src = data.audio?.url;
+		if (!src) return;
+		const res = await fetch(src);
+		const blob = await res.blob();
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = src.split('/').pop() ?? 'audio';
+		a.click();
+		URL.revokeObjectURL(url);
 	}
 
 	function formatTime(s: number): string {
@@ -598,6 +644,24 @@
 											<Highlighter size={16} strokeWidth={1.8} />
 										</button>
 									{/if}
+									<button
+										type="button"
+										onclick={downloadAudio}
+										class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
+										aria-label="Download audio"
+										title="Download audio"
+									>
+										<Download size={15} strokeWidth={1.8} />
+									</button>
+									<button
+										type="button"
+										onclick={() => { audioInfoOpen = !audioInfoOpen; }}
+										class="flex h-7 w-7 cursor-pointer items-center justify-center transition-colors {audioInfoOpen ? 'text-black/45 hover:text-black/70' : 'text-black/20 hover:text-black/55'}"
+										aria-label="Audio info"
+										title="Audio info"
+									>
+										<Info size={15} strokeWidth={1.8} />
+									</button>
 									<span class="font-mono text-[10px] uppercase tracking-widest text-black/25">speed</span>
 									{#each speeds as rate}
 										<button
@@ -607,6 +671,35 @@
 									{/each}
 								</div>
 							</div>
+
+							{#if audioInfoOpen}
+								<div transition:slide={{ duration: 200 }} class="mt-3 border-t border-line px-4 py-4 font-mono text-[11px] text-black/50">
+									<dl class="space-y-1.5">
+										<div class="flex gap-4">
+											<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">source</dt>
+											<dd class="min-w-0 break-all"><a href={data.audio.url} target="_blank" rel="noopener noreferrer" class="text-black/60 hover:text-black">{data.audio.url}</a></dd>
+										</div>
+										<div class="flex gap-4">
+											<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">format</dt>
+											<dd>{data.audio.url.split('.').pop()?.toUpperCase() ?? '—'}</dd>
+										</div>
+										{#if data.audio.duration}
+											<div class="flex gap-4">
+												<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">duration</dt>
+												<dd>{data.audio.duration}</dd>
+											</div>
+										{/if}
+										<div class="flex gap-4">
+											<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">waveform</dt>
+											<dd>{data.audio.peaks ? 'yes' : 'no'}</dd>
+										</div>
+										<div class="flex gap-4">
+											<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">transcript</dt>
+											<dd>{#if data.audio.transcriptUrl}<a href={data.audio.transcriptUrl} target="_blank" rel="noopener noreferrer" class="text-black/60 hover:text-black">yes</a>{:else}no{/if}</dd>
+										</div>
+									</dl>
+								</div>
+							{/if}
 
 							{#if readingMode && currentSentence}
 								<div
@@ -675,7 +768,9 @@
 					<div
 						bind:this={proseEl}
 						class="prose mx-auto max-w-2xl"
-						class:seek-cursor={isMarkdown && transcript}
+						class:seek-cursor={altPressed && isMarkdown && !!transcript}
+						onmousemove={proseMouseMove}
+						onmouseleave={() => { altHoverWordIdx = -1; }}
 						onclick={seekToClick}
 					>
 							{#if isMarkdown}
@@ -932,6 +1027,11 @@
 	.reading-panel {
 		height: calc((var(--reading-lines) * 1.7em) + 1.5rem);
 		transition: height 260ms ease;
+	}
+
+	:global(::highlight(alt-hover-word)) {
+		background-color: rgba(0, 0, 0, 0.08);
+		color: inherit;
 	}
 
 	:global(::highlight(reading-word)) {
