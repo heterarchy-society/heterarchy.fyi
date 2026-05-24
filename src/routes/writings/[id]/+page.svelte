@@ -2,18 +2,30 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { getLocale, localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 	import { tick } from 'svelte';
-	import { slide } from 'svelte/transition';
-	import { Captions, Highlighter, RotateCcw, X } from 'lucide-svelte';
+	import { fly, slide } from 'svelte/transition';
+	import { Captions, Highlighter, Pencil, RotateCcw, X } from 'lucide-svelte';
 	import { mediaPlayer, type MediaTrack } from '$lib/media/player.svelte';
 	import { decodePeaks, drawWaveform as drawWaveformCanvas, hoverTimeFromPointer, seekTimeFromPointer } from '$lib/media/waveform';
 
 	let { data }: { data: PageData } = $props();
 	const writing = $derived(data.writing);
+
+	const writingWordCount = $derived((() => {
+		if (!writing._assets) return null;
+		for (const s of writing.sources) {
+			if (['md', 'txt'].includes(s.format) && !s.generated_from) {
+				const w = writing._assets[s.path]?.text?.words;
+				if (w) return w;
+			}
+		}
+		return null;
+	})());
 
 	const paragraphs = $derived(
 		data.content
@@ -79,7 +91,7 @@
 		return [
 			'relative px-1 pb-5 pt-1 no-underline transition-colors',
 			'font-mono text-[10px] uppercase tracking-widest',
-			active ? 'text-black after:absolute after:left-1/2 after:top-6 after:-translate-x-1/2 after:text-[11px] after:text-black after:content-["↓"]' : 'text-black/40 hover:text-black',
+			active ? 'text-black' : 'text-black/40 hover:text-black',
 		].join(' ');
 	}
 
@@ -476,6 +488,7 @@
 						{writing.authors.join(', ')}
 						{#if writing.year}<span class="ml-3 text-black/35">·</span> <span class="ml-3">{writing.year}</span>{/if}
 						{#if writing.language}<span class="ml-3 text-black/35">·</span> <span class="ml-3">{new Intl.DisplayNames([getLocale()], { type: 'language' }).of(writing.language) ?? writing.language}</span>{/if}
+						{#if writingWordCount !== null}<span class="ml-3 text-black/35">·</span> <span class="ml-3 text-black/40">{writingWordCount >= 1000 ? `${Math.round(writingWordCount / 100) / 10}k` : writingWordCount} words</span>{/if}
 					</p>
 
 					{#if descParagraphs.length > 0}
@@ -614,11 +627,22 @@
 					{#if data.readableSources.length > 1}
 						<nav class="-mb-10 mt-10 flex max-w-full flex-wrap items-end justify-center gap-x-4 gap-y-1 pt-1" aria-label="Writing formats">
 							{#each data.readableSources as source}
+								{@const active = data.selectedSource?.key === source.key}
 								<a
 									href={formatHref(source)}
+									onclick={(e) => { e.preventDefault(); goto(formatHref(source), { noScroll: true }); }}
 									class={sourceClass(source)}
-									aria-current={data.selectedSource?.key === source.key ? 'true' : undefined}
-								>{formatLabel(source)}</a>
+									aria-current={active ? 'true' : undefined}
+								>
+									{formatLabel(source)}
+									{#if active}
+										<span
+											in:fly={{ y: -5, duration: 200 }}
+											out:fly={{ y: -5, duration: 150 }}
+											class="pointer-events-none absolute left-1/2 top-6 -translate-x-1/2 text-[11px] text-black"
+										>↓</span>
+									{/if}
+								</a>
 							{/each}
 						</nav>
 					{/if}
@@ -720,6 +744,11 @@
 					{#if writing.license}
 						<p class="font-mono text-[11px] text-black/35">{writing.license}</p>
 					{/if}
+
+					<a href="https://github.com/heterarchy-society/writings/tree/main/writings/{writing.id}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 font-mono text-[11px] text-black/30 no-underline transition-colors hover:text-black/60" title="Edit on GitHub">
+						<Pencil size={11} strokeWidth={1.8} />
+						edit on github
+					</a>
 
 					{#if writing.history?.length}
 						<div>

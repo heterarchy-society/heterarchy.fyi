@@ -5,8 +5,10 @@
 	import { localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
+	import WritingStats from '$lib/components/WritingStats.svelte';
 
 	let { data }: { data: PageData } = $props();
+
 </script>
 
 <svelte:head>
@@ -32,12 +34,13 @@
 		{#if data.writings.length > 0}
 			<section>
 				{#each data.writings as writing (writing.id)}
-					<a href={localizeUrl(`/writings/${writing.id}`)} class="block border-b border-line px-8 py-8 no-underline hover:bg-bg-muted lg:px-10">
+					<a href={localizeUrl(`/writings/${writing.id}`)} class="group block border-b border-line px-8 py-8 no-underline lg:px-10">
 						<div class="max-w-2xl">
-							<p class="mb-2 font-mono text-[11px] uppercase tracking-widest text-black/35">
-								{writing.authors.join(', ')}{#if writing.year} · {writing.year}{/if}
+							<p class="mb-2 flex items-center justify-between font-mono text-[11px] uppercase tracking-widest text-black/35">
+								<span>{writing.authors.join(', ')}{#if writing.year} · {writing.year}{/if}</span>
+								<WritingStats {writing} />
 							</p>
-							<h2 class="mb-3 font-mono text-[20px] leading-snug text-black">{writing.title}</h2>
+							<h2 class="mb-3 font-mono text-[20px] leading-snug text-black underline decoration-transparent underline-offset-4 transition-colors group-hover:decoration-current">{writing.title}</h2>
 							{#if writing.description}
 								<p class="text-[14px] leading-[1.65] text-black/60">
 									{writing.description.split(/\n\n+/)[0].replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, '$1')}
