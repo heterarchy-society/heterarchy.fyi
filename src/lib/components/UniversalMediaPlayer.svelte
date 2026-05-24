@@ -4,6 +4,7 @@
 	import { Check, ChevronDown, ChevronUp, Download, Highlighter, Link, Pause, Play, Volume2, VolumeX, X } from 'lucide-svelte';
 	import { mediaPlayer } from '$lib/media/player.svelte';
 	import { decodePeaks, drawWaveform as drawWaveformCanvas, hoverTimeFromPointer, seekTimeFromPointer } from '$lib/media/waveform';
+	import * as m from '$lib/paraglide/messages';
 
 	let audioEl: HTMLAudioElement | undefined = $state();
 	let waveCanvas: HTMLCanvasElement | undefined = $state();
@@ -68,7 +69,6 @@
 			duration: mediaPlayer.duration,
 			bufferedTime: mediaPlayer.bufferedTime,
 			hoverTime: waveformHoverTime,
-			inactiveColor: 'rgba(0,0,0,0.14)',
 		});
 	}
 
@@ -119,8 +119,13 @@
 		if (!waveCanvas || !peaks) return;
 		drawWaveform();
 		const ro = new ResizeObserver(drawWaveform);
+		const redrawForTheme = () => requestAnimationFrame(drawWaveform);
 		ro.observe(waveCanvas);
-		return () => ro.disconnect();
+		window.addEventListener('heterarchy-themechange', redrawForTheme);
+		return () => {
+			ro.disconnect();
+			window.removeEventListener('heterarchy-themechange', redrawForTheme);
+		};
 	});
 
 	$effect(() => {
@@ -160,7 +165,7 @@
 				type="button"
 				onclick={() => mediaPlayer.toggle()}
 				class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-black/20 text-black/70 transition-colors hover:border-black/50 hover:text-black sm:h-7 sm:w-7"
-				aria-label={mediaPlayer.playing ? 'Pause' : 'Play'}
+				aria-label={mediaPlayer.playing ? m.audio_pause() : m.audio_play()}
 			>
 				{#if mediaPlayer.playing}
 					<Pause size={14} fill="currentColor" strokeWidth={0} class="sm:hidden" />
@@ -186,7 +191,7 @@
 				type="button"
 				onclick={() => { mediaPlayer.minimized = false; }}
 				class="min-w-0 flex-1 cursor-pointer text-left {mediaPlayer.track.href ? 'hidden sm:block' : ''}"
-				aria-label="Expand player"
+				aria-label={m.audio_expand_player()}
 			>
 				<span class="block truncate font-mono text-[12px] text-black/70 hover:text-black sm:text-[11px] sm:text-black/65">{mediaPlayer.track.title}</span>
 				{#if mediaPlayer.track.subtitle}
@@ -198,7 +203,7 @@
 				type="button"
 				onclick={() => { showRemaining = !showRemaining; }}
 				class="shrink-0 cursor-pointer font-mono text-[11px] tabular-nums text-black/35 transition-colors hover:text-black/60 sm:text-[10px]"
-				title={showRemaining ? 'Show elapsed time' : 'Show remaining time'}
+				title={showRemaining ? m.audio_show_elapsed() : m.audio_show_remaining()}
 			>
 				{#if showRemaining}
 					−{formatTime(Math.max(0, mediaPlayer.duration - mediaPlayer.currentTime))}
@@ -211,8 +216,8 @@
 				type="button"
 				onclick={() => { mediaPlayer.minimized = false; }}
 				class="hidden h-9 w-9 shrink-0 cursor-pointer items-center justify-center text-black/25 transition-colors hover:text-black/60 sm:flex sm:h-6 sm:w-6"
-				aria-label="Expand player"
-				title="Expand player"
+				aria-label={m.audio_expand_player()}
+				title={m.audio_expand_player()}
 			>
 				<ChevronUp size={16} strokeWidth={1.8} class="sm:hidden" />
 				<ChevronUp size={14} strokeWidth={1.8} class="hidden sm:block" />
@@ -222,8 +227,8 @@
 				type="button"
 				onclick={() => mediaPlayer.clear()}
 				class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55 sm:h-6 sm:w-6"
-				aria-label="Close"
-				title="Close"
+				aria-label={m.audio_close()}
+				title={m.audio_close()}
 			>
 				<X size={16} strokeWidth={1.8} class="sm:hidden" />
 				<X size={14} strokeWidth={1.8} class="hidden sm:block" />
@@ -240,7 +245,7 @@
 				oninput={(e) => mediaPlayer.seek(Number(e.currentTarget.value))}
 				class="mini-seek-slider cursor-pointer"
 				style="--pg: {progress * 100}%; --bf: {mediaPlayer.duration > 0 ? Math.min(100, mediaPlayer.bufferedTime / mediaPlayer.duration * 100) : 0}%"
-				aria-label="Seek"
+				aria-label={m.audio_seek()}
 			/>
 		</div>
 	</div>
@@ -253,7 +258,7 @@
 				type="button"
 				onclick={() => mediaPlayer.toggle()}
 				class="flex h-12 w-12 shrink-0 cursor-pointer items-center justify-center rounded-full border border-black/20 text-black/70 transition-colors hover:border-black/50 hover:text-black"
-				aria-label={mediaPlayer.playing ? 'Pause' : 'Play'}
+				aria-label={mediaPlayer.playing ? m.audio_pause() : m.audio_play()}
 			>
 				{#if mediaPlayer.playing}
 					<Pause size={18} fill="currentColor" strokeWidth={0} />
@@ -286,7 +291,7 @@
 							<button
 								type="button"
 								onclick={copyTimestampLink}
-								title={timeCopied ? 'Copied!' : 'Copy link at current time'}
+								title={timeCopied ? m.audio_copied() : m.audio_copy_timestamp()}
 								class="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center transition-colors {timeCopied ? 'text-black/60' : 'text-black/20 hover:text-black/55'}"
 							>
 								{#if timeCopied}
@@ -301,14 +306,14 @@
 								type="button"
 								onclick={showHighlightedText}
 								class="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
-								aria-label="Show highlighted text"
-								title="Show highlighted text"
+								aria-label={m.audio_show_highlighted_text()}
+								title={m.audio_show_highlighted_text()}
 							>
 								<Highlighter size={14} strokeWidth={1.8} />
 							</button>
 							<span class="text-black/15">|</span>
 						{/if}
-						<span class="font-mono text-[10px] uppercase tracking-widest text-black/25">speed</span>
+						<span class="font-mono text-[10px] uppercase tracking-widest text-black/25">{m.audio_speed()}</span>
 						{#each speeds as rate}
 							<button
 								type="button"
@@ -321,8 +326,8 @@
 								type="button"
 								onclick={() => mediaPlayer.toggleMute()}
 								class="flex h-6 w-6 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
-								aria-label={mediaPlayer.volume > 0 ? 'Mute audio' : 'Unmute audio'}
-								title={mediaPlayer.volume > 0 ? 'Mute audio' : 'Unmute audio'}
+								aria-label={mediaPlayer.volume > 0 ? m.audio_mute() : m.audio_unmute()}
+								title={mediaPlayer.volume > 0 ? m.audio_mute() : m.audio_unmute()}
 							>
 								{#if mediaPlayer.volume > 0}
 									<Volume2 size={14} strokeWidth={1.8} />
@@ -338,8 +343,8 @@
 								value={mediaPlayer.volume}
 								oninput={(e) => mediaPlayer.setVolume(Number(e.currentTarget.value))}
 								class="volume-slider h-6 w-16 cursor-pointer opacity-35 transition-opacity hover:opacity-65"
-								aria-label="Volume"
-								title="Volume"
+								aria-label={m.audio_volume()}
+								title={m.audio_volume()}
 							/>
 						</div>
 					</div>
@@ -355,7 +360,7 @@
 							onpointercancel={waveformPointerUp}
 							onpointerleave={() => { if (!scrubbing) waveformHoverTime = null; }}
 							class="h-9 min-w-0 flex-1 cursor-pointer"
-							aria-label="Seek audio"
+							aria-label={m.audio_seek()}
 						></canvas>
 					{:else}
 						<div
@@ -364,7 +369,7 @@
 							aria-valuemin={0}
 							aria-valuemax={mediaPlayer.duration}
 							aria-valuenow={mediaPlayer.currentTime}
-							aria-label="Seek audio"
+							aria-label={m.audio_seek()}
 							class="relative flex h-9 min-w-0 flex-1 cursor-pointer items-center"
 							onpointerdown={(e) => {
 								linearScrubbing = true;
@@ -384,7 +389,7 @@
 								<div class="absolute inset-y-0 left-0 bg-black/55" style="width: {progress * 100}%"></div>
 								<div class="absolute inset-y-0 bg-teal-600/30" style="left: {progress * 100}%; width: {Math.max(0, (mediaPlayer.duration > 0 ? mediaPlayer.bufferedTime / mediaPlayer.duration : 0) - progress) * 100}%"></div>
 							</div>
-							<div class="pointer-events-none absolute" style="left: {progress * 100}%; top: 50%; transform: translate(-50%, -50%); width: 2px; height: 14px; background: rgba(0,0,0,0.35);"></div>
+							<div class="pointer-events-none absolute" style="left: {progress * 100}%; top: 50%; transform: translate(-50%, -50%); width: 2px; height: 14px; background: color-mix(in srgb, var(--theme-ink) 35%, transparent);"></div>
 							{#if linearHoverTime !== null && mediaPlayer.duration > 0}
 								<div class="pointer-events-none absolute inset-y-0 w-px bg-red-600/80" style="left: {linearHoverTime / mediaPlayer.duration * 100}%"></div>
 							{/if}
@@ -393,7 +398,7 @@
 					<button
 						type="button"
 						onclick={() => { showRemaining = !showRemaining; }}
-						title={showRemaining ? 'Show elapsed time' : 'Show remaining time'}
+						title={showRemaining ? m.audio_show_elapsed() : m.audio_show_remaining()}
 						class="shrink-0 cursor-pointer font-mono text-[11px] tabular-nums text-black/40 transition-colors hover:text-black/65"
 					>
 						{#if showRemaining}
@@ -406,8 +411,8 @@
 						type="button"
 						onclick={downloadAudio}
 						class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
-						aria-label="Download audio"
-						title="Download audio"
+						aria-label={m.audio_download()}
+						title={m.audio_download()}
 					>
 						<Download size={15} strokeWidth={1.8} />
 					</button>
@@ -415,8 +420,8 @@
 						type="button"
 						onclick={() => { mediaPlayer.minimized = true; }}
 						class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
-						aria-label="Minimize player"
-						title="Minimize player"
+						aria-label={m.audio_minimize_player()}
+						title={m.audio_minimize_player()}
 					>
 						<ChevronDown size={16} strokeWidth={1.8} />
 					</button>
@@ -424,8 +429,8 @@
 						type="button"
 						onclick={() => mediaPlayer.clear()}
 						class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
-						aria-label="Close audio player"
-						title="Close audio player"
+						aria-label={m.audio_close_player()}
+						title={m.audio_close_player()}
 					>
 						<X size={16} strokeWidth={1.8} />
 					</button>
@@ -438,27 +443,27 @@
 
 <style>
 	.mini-shell {
-		border-top: 1px solid rgba(0,0,0,0.13);
-		background: rgba(252,252,250,0.92);
+		border-top: 1px solid var(--theme-player-border);
+		background: var(--theme-player-bg);
 		backdrop-filter: blur(12px);
 		-webkit-backdrop-filter: blur(12px);
 	}
 
 	@media (min-width: 640px) {
 		.mini-shell {
-			border: 1px solid rgba(0,0,0,0.10);
+			border: 1px solid var(--theme-player-border);
 			box-shadow:
-				0 4px 24px rgba(0,0,0,0.10),
-				0 1px 4px rgba(0,0,0,0.06);
+				0 4px 24px var(--theme-player-shadow),
+				0 1px 4px var(--theme-player-shadow);
 		}
 	}
 
 	.media-player-shell {
-		border-top: 1px solid rgba(0,0,0,0.13);
-		background: rgba(252,252,250,0.78);
+		border-top: 1px solid var(--theme-player-border);
+		background: var(--theme-player-bg);
 		box-shadow:
-			0 -1px 0 rgba(255,255,255,0.35) inset,
-			0 -8px 24px rgba(0,0,0,0.05);
+			0 -1px 0 color-mix(in srgb, var(--theme-ink) 12%, transparent) inset,
+			0 -8px 24px var(--theme-player-shadow);
 	}
 
 	.volume-slider {
@@ -471,14 +476,14 @@
 	}
 
 	.volume-slider:focus-visible {
-		outline: 1px solid rgba(0,0,0,0.18);
+		outline: 1px solid var(--theme-focus);
 		outline-offset: 3px;
 	}
 
 	.volume-slider::-webkit-slider-runnable-track {
 		height: 2px;
 		border-radius: 999px;
-		background: rgba(0,0,0,0.28);
+		background: color-mix(in srgb, var(--theme-ink) 28%, transparent);
 	}
 
 	.volume-slider::-webkit-slider-thumb {
@@ -488,13 +493,13 @@
 		margin-top: -3.5px;
 		border: 0;
 		border-radius: 999px;
-		background: rgba(0,0,0,0.45);
+		background: color-mix(in srgb, var(--theme-ink) 45%, transparent);
 	}
 
 	.volume-slider::-moz-range-track {
 		height: 2px;
 		border-radius: 999px;
-		background: rgba(0,0,0,0.28);
+		background: color-mix(in srgb, var(--theme-ink) 28%, transparent);
 	}
 
 	.volume-slider::-moz-range-thumb {
@@ -502,7 +507,7 @@
 		height: 9px;
 		border: 0;
 		border-radius: 999px;
-		background: rgba(0,0,0,0.45);
+		background: color-mix(in srgb, var(--theme-ink) 45%, transparent);
 	}
 
 	.mini-seek-wrap {
@@ -528,10 +533,10 @@
 		height: 2px;
 		background: linear-gradient(
 			to right,
-			rgba(0,0,0,0.28) var(--pg, 0%),
-			rgba(15,118,110,0.22) var(--pg, 0%),
-			rgba(15,118,110,0.22) var(--bf, 0%),
-			rgba(0,0,0,0.05) var(--bf, 0%)
+			color-mix(in srgb, var(--theme-ink) 28%, transparent) var(--pg, 0%),
+			var(--theme-accent) var(--pg, 0%),
+			var(--theme-accent) var(--bf, 0%),
+			color-mix(in srgb, var(--theme-ink) 5%, transparent) var(--bf, 0%)
 		);
 	}
 
@@ -541,22 +546,22 @@
 		height: 12px;
 		margin-top: -5px;
 		border: 0;
-		background: rgba(0,0,0,0.35);
+		background: color-mix(in srgb, var(--theme-ink) 35%, transparent);
 	}
 
 	.mini-seek-slider:hover::-webkit-slider-thumb {
 		width: 3px;
-		background: rgba(0,0,0,0.55);
+		background: color-mix(in srgb, var(--theme-ink) 55%, transparent);
 	}
 
 	.mini-seek-slider::-moz-range-track {
 		height: 2px;
-		background: rgba(0,0,0,0.10);
+		background: color-mix(in srgb, var(--theme-ink) 10%, transparent);
 	}
 
 	.mini-seek-slider::-moz-range-progress {
 		height: 2px;
-		background: rgba(0,0,0,0.28);
+		background: color-mix(in srgb, var(--theme-ink) 28%, transparent);
 	}
 
 	.mini-seek-slider::-moz-range-thumb {
@@ -564,11 +569,11 @@
 		height: 12px;
 		border: 0;
 		border-radius: 0;
-		background: rgba(0,0,0,0.35);
+		background: color-mix(in srgb, var(--theme-ink) 35%, transparent);
 	}
 
 	.mini-seek-slider:hover::-moz-range-thumb {
 		width: 3px;
-		background: rgba(0,0,0,0.55);
+		background: color-mix(in srgb, var(--theme-ink) 55%, transparent);
 	}
 </style>

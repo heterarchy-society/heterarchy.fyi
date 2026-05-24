@@ -59,7 +59,12 @@
 	);
 
 	function formatDate(iso: string): string {
-		return new Date(iso).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' });
+		return new Date(iso).toLocaleDateString(getLocale(), { day: 'numeric', month: 'short', year: 'numeric' });
+	}
+
+	function formatWordCount(count: number): string {
+		const label = count >= 1000 ? `${Math.round(count / 100) / 10}k` : String(count);
+		return m.writings_word_count({ count: label });
 	}
 
 	function formatLabel(source: { format: string; variant?: string }): string {
@@ -444,8 +449,13 @@
 		if (!waveCanvas || !peaks) return;
 		drawWaveform();
 		const ro = new ResizeObserver(drawWaveform);
+		const redrawForTheme = () => requestAnimationFrame(drawWaveform);
 		ro.observe(waveCanvas);
-		return () => ro.disconnect();
+		window.addEventListener('heterarchy-themechange', redrawForTheme);
+		return () => {
+			ro.disconnect();
+			window.removeEventListener('heterarchy-themechange', redrawForTheme);
+		};
 	});
 
 	$effect(() => {
@@ -534,7 +544,7 @@
 						{writing.authors.join(', ')}
 						{#if writing.year}<span class="ml-3 text-black/35">·</span> <span class="ml-3">{writing.year}</span>{/if}
 						{#if writing.language}<span class="ml-3 text-black/35">·</span> <span class="ml-3">{new Intl.DisplayNames([getLocale()], { type: 'language' }).of(writing.language) ?? writing.language}</span>{/if}
-						{#if writingWordCount !== null}<span class="ml-3 text-black/35">·</span> <span class="ml-3 text-black/40">{writingWordCount >= 1000 ? `${Math.round(writingWordCount / 100) / 10}k` : writingWordCount} words</span>{/if}
+						{#if writingWordCount !== null}<span class="ml-3 text-black/35">·</span> <span class="ml-3 text-black/40">{formatWordCount(writingWordCount)}</span>{/if}
 					</p>
 
 					{#if descParagraphs.length > 0}
@@ -568,7 +578,7 @@
 								<button
 									onclick={togglePlay}
 									class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-black/20 text-black/70 hover:border-black/50 hover:text-black"
-									aria-label={playing ? 'Pause' : 'Play'}
+									aria-label={playing ? m.audio_pause() : m.audio_play()}
 								>
 									{#if playing}
 										<svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
@@ -607,8 +617,8 @@
 											type="button"
 											onclick={resetAudioState}
 											class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
-											aria-label="Clear audio state"
-											title="Clear audio state"
+											aria-label={m.audio_clear_state()}
+											title={m.audio_clear_state()}
 										>
 											<X size={16} strokeWidth={1.8} />
 										</button>
@@ -616,8 +626,8 @@
 											type="button"
 											onclick={resetAudio}
 											class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/25 transition-colors hover:text-black/60"
-											aria-label="Reset audio"
-											title="Reset audio"
+											aria-label={m.audio_reset()}
+											title={m.audio_reset()}
 										>
 											<RotateCcw size={15} strokeWidth={1.8} />
 										</button>
@@ -627,9 +637,9 @@
 											type="button"
 											onclick={() => { readingMode = !readingMode; }}
 											class="flex h-7 w-7 cursor-pointer items-center justify-center transition-colors {readingMode ? 'text-black/45 hover:text-black/70' : 'text-black/18 hover:text-black/45'}"
-											aria-label={readingMode ? 'Hide reading panel' : 'Show reading panel'}
+											aria-label={readingMode ? m.audio_hide_reading_panel() : m.audio_show_reading_panel()}
 											aria-pressed={readingMode}
-											title={readingMode ? 'Hide reading panel' : 'Show reading panel'}
+											title={readingMode ? m.audio_hide_reading_panel() : m.audio_show_reading_panel()}
 										>
 											<Captions size={16} strokeWidth={1.8} />
 										</button>
@@ -637,9 +647,9 @@
 											type="button"
 											onclick={() => { textHighlightMode = !textHighlightMode; }}
 											class="flex h-7 w-7 cursor-pointer items-center justify-center transition-colors {textHighlightMode ? 'text-black/45 hover:text-black/70' : 'text-black/18 hover:text-black/45'}"
-											aria-label={textHighlightMode ? 'Hide text highlighting' : 'Show text highlighting'}
+											aria-label={textHighlightMode ? m.audio_hide_text_highlighting() : m.audio_show_text_highlighting()}
 											aria-pressed={textHighlightMode}
-											title={textHighlightMode ? 'Hide text highlighting' : 'Show text highlighting'}
+											title={textHighlightMode ? m.audio_hide_text_highlighting() : m.audio_show_text_highlighting()}
 										>
 											<Highlighter size={16} strokeWidth={1.8} />
 										</button>
@@ -648,8 +658,8 @@
 										type="button"
 										onclick={downloadAudio}
 										class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
-										aria-label="Download audio"
-										title="Download audio"
+										aria-label={m.audio_download()}
+										title={m.audio_download()}
 									>
 										<Download size={15} strokeWidth={1.8} />
 									</button>
@@ -657,12 +667,12 @@
 										type="button"
 										onclick={() => { audioInfoOpen = !audioInfoOpen; }}
 										class="flex h-7 w-7 cursor-pointer items-center justify-center transition-colors {audioInfoOpen ? 'text-black/45 hover:text-black/70' : 'text-black/20 hover:text-black/55'}"
-										aria-label="Audio info"
-										title="Audio info"
+										aria-label={m.audio_info()}
+										title={m.audio_info()}
 									>
 										<Info size={15} strokeWidth={1.8} />
 									</button>
-									<span class="font-mono text-[10px] uppercase tracking-widest text-black/25">speed</span>
+									<span class="font-mono text-[10px] uppercase tracking-widest text-black/25">{m.audio_speed()}</span>
 									{#each speeds as rate}
 										<button
 											onclick={() => setSpeed(rate)}
@@ -676,26 +686,26 @@
 								<div transition:slide={{ duration: 200 }} class="mt-3 border-t border-line px-4 py-4 font-mono text-[11px] text-black/50">
 									<dl class="space-y-1.5">
 										<div class="flex gap-4">
-											<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">source</dt>
+											<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">{m.audio_source()}</dt>
 											<dd class="min-w-0 break-all"><a href={data.audio.url} target="_blank" rel="noopener noreferrer" class="text-black/60 hover:text-black">{data.audio.url}</a></dd>
 										</div>
 										<div class="flex gap-4">
-											<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">format</dt>
+											<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">{m.audio_format()}</dt>
 											<dd>{data.audio.url.split('.').pop()?.toUpperCase() ?? '—'}</dd>
 										</div>
 										{#if data.audio.duration}
 											<div class="flex gap-4">
-												<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">duration</dt>
+												<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">{m.audio_duration()}</dt>
 												<dd>{data.audio.duration}</dd>
 											</div>
 										{/if}
 										<div class="flex gap-4">
-											<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">waveform</dt>
-											<dd>{data.audio.peaks ? 'yes' : 'no'}</dd>
+											<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">{m.audio_waveform()}</dt>
+											<dd>{data.audio.peaks ? m.common_yes() : m.common_no()}</dd>
 										</div>
 										<div class="flex gap-4">
-											<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">transcript</dt>
-											<dd>{#if data.audio.transcriptUrl}<a href={data.audio.transcriptUrl} target="_blank" rel="noopener noreferrer" class="text-black/60 hover:text-black">yes</a>{:else}no{/if}</dd>
+											<dt class="w-24 shrink-0 uppercase tracking-widest text-black/30">{m.audio_transcript()}</dt>
+											<dd>{#if data.audio.transcriptUrl}<a href={data.audio.transcriptUrl} target="_blank" rel="noopener noreferrer" class="text-black/60 hover:text-black">{m.common_yes()}</a>{:else}{m.common_no()}{/if}</dd>
 										</div>
 									</dl>
 								</div>
@@ -718,7 +728,7 @@
 					{/if}
 
 					{#if data.readableSources.length > 1}
-						<nav class="-mb-10 mt-10 flex max-w-full flex-wrap items-end justify-center gap-x-4 gap-y-1 pt-1" aria-label="Writing formats">
+						<nav class="-mb-10 mt-10 flex max-w-full flex-wrap items-end justify-center gap-x-4 gap-y-1 pt-1" aria-label={m.writings_formats_nav()}>
 							{#each data.readableSources as source}
 								{@const active = data.selectedSource?.key === source.key}
 								<a
@@ -840,7 +850,7 @@
 						<p class="font-mono text-[11px] text-black/35">{writing.license}</p>
 					{/if}
 
-					<a href="https://github.com/heterarchy-society/writings/tree/main/writings/{writing.id}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 font-mono text-[11px] text-black/30 no-underline transition-colors hover:text-black/60" title="Edit on GitHub">
+					<a href="https://github.com/heterarchy-society/writings/tree/main/writings/{writing.id}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 font-mono text-[11px] text-black/30 no-underline transition-colors hover:text-black/60" title={m.writings_edit_on_github()}>
 						<Pencil size={11} strokeWidth={1.8} />
 						edit on github
 					</a>
@@ -870,19 +880,38 @@
 
 <style>
 	.writing-paper {
-		background: #f8f7f3;
+		background: var(--theme-paper);
 	}
 
 	.prose {
+		color: color-mix(in srgb, var(--theme-ink) 78%, transparent);
 		font-family: Iowan Old Style, Palatino Linotype, Palatino, Charter, Georgia, ui-serif, serif;
 		font-variant-ligatures: common-ligatures;
+		--prose-text: color-mix(in srgb, var(--theme-ink) 78%, transparent);
+		--prose-strong: color-mix(in srgb, var(--theme-ink) 88%, transparent);
+		--prose-heading: color-mix(in srgb, var(--theme-ink) 86%, transparent);
+		--prose-muted: color-mix(in srgb, var(--theme-ink) 55%, transparent);
+		--prose-faint: color-mix(in srgb, var(--theme-ink) 35%, transparent);
+		--prose-line: color-mix(in srgb, var(--theme-ink) 12%, transparent);
+		--prose-soft-bg: color-mix(in srgb, var(--theme-ink) 4.5%, transparent);
 	}
 
 	.prose :global(p) {
 		margin-bottom: 1.35rem;
-		color: rgba(0,0,0,0.78);
+		color: var(--prose-text);
 		font-size: 18px;
 		line-height: 1.78;
+	}
+
+	.prose :global(strong),
+	.prose :global(b) {
+		color: var(--prose-strong);
+		font-weight: 650;
+	}
+
+	.prose :global(em),
+	.prose :global(i) {
+		color: inherit;
 	}
 
 	.prose :global(h1),
@@ -891,7 +920,7 @@
 	.prose :global(h4) {
 		margin-top: 3rem;
 		margin-bottom: 0.85rem;
-		color: rgba(0,0,0,0.86);
+		color: var(--prose-heading);
 		font-family: var(--font-sans);
 		font-weight: 500;
 		line-height: 1.35;
@@ -906,7 +935,7 @@
 	.prose :global(h2),
 	.prose :global(h3),
 	.prose :global(h4) {
-		border-top: 1px solid rgba(0,0,0,0.1);
+		border-top: 1px solid var(--prose-line);
 		padding-top: 1.55rem;
 	}
 
@@ -932,7 +961,7 @@
 	.prose :global(ol) {
 		margin-bottom: 1.35rem;
 		padding-left: 1.5rem;
-		color: rgba(0,0,0,0.78);
+		color: var(--prose-text);
 		font-size: 18px;
 		line-height: 1.78;
 	}
@@ -941,21 +970,21 @@
 
 	.prose :global(blockquote) {
 		margin: 1.75rem 0;
-		border-left: 2px solid rgba(0,0,0,0.14);
+		border-left: 2px solid color-mix(in srgb, var(--theme-ink) 14%, transparent);
 		padding-left: 1.15rem;
-		color: rgba(0,0,0,0.58);
+		color: color-mix(in srgb, var(--theme-ink) 58%, transparent);
 		font-style: italic;
 	}
 
 	.prose :global(a) {
 		color: inherit;
 		text-decoration: underline;
-		text-decoration-color: rgba(0,0,0,0.28);
+		text-decoration-color: color-mix(in srgb, var(--theme-ink) 28%, transparent);
 		text-underline-offset: 0.16em;
 	}
 
 	.prose :global(a:hover) {
-		text-decoration-color: rgba(0,0,0,0.55);
+		text-decoration-color: color-mix(in srgb, var(--theme-ink) 55%, transparent);
 	}
 
 	.prose :global(.footnote-ref) {
@@ -971,12 +1000,12 @@
 
 	.prose :global(.footnotes) {
 		margin-top: 2.75rem;
-		border-top: 1px solid rgba(0,0,0,0.12);
+		border-top: 1px solid var(--prose-line);
 		padding-top: 1rem;
 		font-family: var(--font-sans);
 		font-size: 13px;
 		line-height: 1.65;
-		color: rgba(0,0,0,0.55);
+		color: var(--prose-muted);
 	}
 
 	.prose :global(.footnotes ol) {
@@ -997,18 +1026,18 @@
 	.prose :global(.footnote-number) {
 		flex: none;
 		min-width: 1.4rem;
-		color: rgba(0,0,0,0.4);
+		color: color-mix(in srgb, var(--theme-ink) 40%, transparent);
 		font-variant-numeric: tabular-nums;
 	}
 
 	.prose :global(.footnote-backref) {
 		flex: none;
 		text-decoration: none;
-		color: rgba(0,0,0,0.35);
+		color: var(--prose-faint);
 	}
 
 	.prose :global(code) {
-		background: rgba(0,0,0,0.045);
+		background: var(--prose-soft-bg);
 		padding: 0.1em 0.3em;
 		font-family: var(--font-mono);
 		font-size: 0.82em;
@@ -1019,7 +1048,64 @@
 	.prose :global(hr) {
 		margin: 2rem 0;
 		border: none;
-		border-top: 1px solid rgba(0,0,0,0.1);
+		border-top: 1px solid var(--prose-line);
+	}
+
+	.prose :global(pre) {
+		margin: 1.75rem 0;
+		overflow-x: auto;
+		border-left: 1px solid var(--prose-line);
+		background: var(--prose-soft-bg);
+		padding: 1rem 1.15rem;
+		color: var(--prose-text);
+		font-family: var(--font-mono);
+		font-size: 13px;
+		line-height: 1.65;
+	}
+
+	.prose :global(pre code) {
+		background: transparent;
+		padding: 0;
+		font-size: inherit;
+	}
+
+	.prose :global(table) {
+		margin: 1.75rem 0;
+		width: 100%;
+		border-collapse: collapse;
+		font-family: var(--font-sans);
+		font-size: 14px;
+		color: var(--prose-text);
+	}
+
+	.prose :global(th),
+	.prose :global(td) {
+		border-top: 1px solid var(--prose-line);
+		padding: 0.55rem 0.7rem 0.55rem 0;
+		text-align: left;
+		vertical-align: top;
+	}
+
+	.prose :global(th) {
+		color: var(--prose-strong);
+		font-weight: 600;
+	}
+
+	.prose :global(img) {
+		border: 1px solid var(--prose-line);
+	}
+
+	.prose :global(figcaption) {
+		margin-top: 0.65rem;
+		color: var(--prose-muted);
+		font-family: var(--font-sans);
+		font-size: 12px;
+		line-height: 1.55;
+	}
+
+	.prose :global(::selection) {
+		background: color-mix(in srgb, rgb(253, 224, 71) 30%, transparent);
+		color: var(--theme-ink);
 	}
 
 	.seek-cursor :global(*) {
@@ -1032,7 +1118,7 @@
 	}
 
 	:global(::highlight(alt-hover-word)) {
-		background-color: rgba(0, 0, 0, 0.08);
+		background-color: color-mix(in srgb, var(--theme-ink) 8%, transparent);
 		color: inherit;
 	}
 
@@ -1062,8 +1148,8 @@
 	}
 
 	.prose :global(p.reading-active) {
-		color: rgba(0,0,0,0.88);
-		background: rgba(253, 224, 71, 0.12);
+		color: color-mix(in srgb, var(--theme-ink) 88%, transparent);
+		background: color-mix(in srgb, rgb(253, 224, 71) 12%, transparent);
 		margin-top: -0.4rem;
 		margin-bottom: calc(1.35rem - 0.4rem);
 		margin-left: -0.75rem;

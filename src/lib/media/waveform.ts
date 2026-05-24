@@ -41,10 +41,15 @@ export function drawWaveform(canvas: HTMLCanvasElement, peaks: number[], options
 	const barCount = peaks.length / 2;
 	const progressX = options.duration > 0 ? (options.currentTime / options.duration) * width : 0;
 	const bufferedX = options.duration > 0 && options.bufferedTime != null ? (options.bufferedTime / options.duration) * width : progressX;
-	const activeColor = options.activeColor ?? 'rgba(0,0,0,0.7)';
-	const inactiveColor = options.inactiveColor ?? 'rgba(0,0,0,0.13)';
-	const bufferedColor = options.bufferedColor ?? 'rgba(15,118,110,0.35)';
-	const hoverColor = options.hoverColor ?? 'rgba(220,38,38,0.85)';
+	const styles = getComputedStyle(document.documentElement);
+	const themeActiveColor = styles.getPropertyValue('--theme-wave-active').trim() || 'rgba(0,0,0,0.7)';
+	const themeInactiveColor = styles.getPropertyValue('--theme-wave-inactive').trim() || 'rgba(0,0,0,0.13)';
+	const themeBufferedColor = styles.getPropertyValue('--theme-accent').trim() || 'rgba(15,118,110,0.35)';
+	const themeHoverColor = styles.getPropertyValue('--theme-alert').trim() || 'rgba(220,38,38,0.85)';
+	const activeColor = options.activeColor ?? themeActiveColor;
+	const inactiveColor = options.inactiveColor ?? themeInactiveColor;
+	const bufferedColor = options.bufferedColor ?? themeBufferedColor;
+	const hoverColor = options.hoverColor ?? themeHoverColor;
 
 	for (let i = 0; i < numBars; i++) {
 		const x = i * step;

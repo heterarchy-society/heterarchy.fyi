@@ -206,7 +206,7 @@
 								onclick={pickSpotlight}
 								class="absolute top-0 right-0 cursor-pointer text-black/20 transition-colors hover:text-black disabled:cursor-pointer disabled:text-black/10"
 								disabled={spotlightLoading}
-								aria-label="Next random term"
+								aria-label={m.glossary_next_random()}
 							>
 								<Shuffle size={16} strokeWidth={1.5} />
 							</button>

@@ -17,7 +17,7 @@
 		<!-- logo + version (mobile: one row; desktop: logo only) -->
 		<div class="flex items-center justify-between">
 			<a href={localizeUrl('/')} class="flex items-center gap-2 no-underline hover:opacity-75">
-				<img src="/logo.svg" alt="Heterarchy" class="h-5 w-auto" />
+				<img src="/logo.svg" alt="Heterarchy" class="h-5 w-auto dark:invert" />
 				<span>{siteMeta.footerNotice}</span>
 			</a>
 			<div class="text-[11px] text-black/40 lg:hidden">

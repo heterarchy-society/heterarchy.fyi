@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @font-face {
 	font-family: 'Inter';
 	src: url('/fonts/inter/InterVariable.woff2') format('woff2');
@@ -41,16 +43,55 @@
 }
 
 @theme {
-	--color-bg: #f2f0eb;
-	--color-bg-muted: #e8e6de;
-	--color-line: #c8c6be;
+	--color-black: var(--theme-ink);
+	--color-white: var(--theme-paper);
+	--color-bg: var(--theme-bg);
+	--color-bg-muted: var(--theme-bg-muted);
+	--color-line: var(--theme-line);
 	--font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 	--font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
 @layer base {
+	:root {
+		--theme-bg: #f2f0eb;
+		--theme-bg-muted: #e8e6de;
+		--theme-paper: #f8f7f3;
+		--theme-ink: #050505;
+		--theme-line: #c8c6be;
+		--theme-player-bg: rgba(252, 252, 250, 0.88);
+		--theme-player-border: rgba(0, 0, 0, 0.13);
+		--theme-player-shadow: rgba(0, 0, 0, 0.08);
+		--theme-focus: rgba(0, 0, 0, 0.18);
+		--theme-accent: rgba(15, 118, 110, 0.35);
+		--theme-alert: rgba(220, 38, 38, 0.85);
+		--theme-life-alive: 100 98 94;
+		--theme-life-dead: 250 248 244;
+		--theme-wave-active: rgba(0, 0, 0, 0.7);
+		--theme-wave-inactive: rgba(0, 0, 0, 0.13);
+	}
+
+	:root.dark {
+		--theme-bg: #11100e;
+		--theme-bg-muted: #1b1a17;
+		--theme-paper: #171613;
+		--theme-ink: #f1eee6;
+		--theme-line: #36332d;
+		--theme-player-bg: rgba(19, 18, 16, 0.9);
+		--theme-player-border: rgba(241, 238, 230, 0.16);
+		--theme-player-shadow: rgba(0, 0, 0, 0.45);
+		--theme-focus: rgba(241, 238, 230, 0.32);
+		--theme-accent: rgba(45, 212, 191, 0.28);
+		--theme-alert: rgba(248, 113, 113, 0.85);
+		--theme-life-alive: 206 201 188;
+		--theme-life-dead: 22 21 19;
+		--theme-wave-active: rgba(241, 238, 230, 0.74);
+		--theme-wave-inactive: rgba(241, 238, 230, 0.15);
+	}
+
 	html {
 		@apply antialiased;
+		background: var(--theme-bg);
 	}
 
 	body {

@@ -21,8 +21,15 @@
 	let lastTick = 0;
 	let resizeTimer: ReturnType<typeof setTimeout> | undefined;
 
-	const alivePixel = new Uint8ClampedArray([100, 98, 94, 255]);
-	const deadPixel = new Uint8ClampedArray([250, 248, 244, 255]);
+	function pixelFromTheme(name: string, fallback: [number, number, number]) {
+		if (!browser) return new Uint8ClampedArray([...fallback, 255]);
+		const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+		const rgb = value.split(/\s+/).map((part) => Number(part));
+		if (rgb.length !== 3 || rgb.some((part) => !Number.isFinite(part))) {
+			return new Uint8ClampedArray([...fallback, 255]);
+		}
+		return new Uint8ClampedArray([...rgb, 255]);
+	}
 
 	function thresholds() {
 		const cells = cols * rows;
@@ -191,6 +198,8 @@
 			imageData = ctx.createImageData(cols, rows);
 		}
 		const data = imageData.data;
+		const alivePixel = pixelFromTheme('--theme-life-alive', [100, 98, 94]);
+		const deadPixel = pixelFromTheme('--theme-life-dead', [250, 248, 244]);
 
 		for (let i = 0; i < current.length; i++) {
 			const src = current[i] ? alivePixel : deadPixel;

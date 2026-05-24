@@ -5,6 +5,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import { mediaPlayer } from '$lib/media/player.svelte';
 	import { ambientPlaylist } from '$lib/data/ambient';
+	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 
 	const isAmbientPlaying = $derived(
 		mediaPlayer.playing && ambientPlaylist.some(t => t.id === mediaPlayer.track?.id)
@@ -39,7 +40,7 @@
 <header class="border-b border-line">
 	<div class="flex items-center justify-between px-8 py-5">
 		<a href={localizeUrl('/')} class="flex items-center gap-2.5 no-underline hover:opacity-75">
-			<img src="/logo.svg" alt="Heterarchy" class="h-7 w-auto" />
+			<img src="/logo.svg" alt="Heterarchy" class="h-7 w-auto dark:invert" />
 			<span class="font-mono text-[13px]">heterarchy.fyi</span>
 		</a>
 
@@ -50,8 +51,8 @@
 			<button
 				type="button"
 				onclick={() => mediaPlayer.togglePlaylist(ambientPlaylist)}
-				class="flex cursor-pointer items-center justify-center text-black/18 transition-colors hover:text-black/50"
-				aria-label={isAmbientPlaying ? 'Pause ambient' : 'Play ambient'}
+				class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/35 transition-colors hover:text-black"
+				aria-label={isAmbientPlaying ? m.ambient_pause() : m.ambient_play()}
 			>
 				{#if isAmbientPlaying}
 					<Pause size={14} fill="currentColor" strokeWidth={0} />
@@ -59,6 +60,7 @@
 					<Play size={14} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" />
 				{/if}
 			</button>
+			<ThemeToggle />
 			{#if currentLang === 'en'}
 				<a href={csHref} class="ml-2 font-mono text-[11px] text-black/40 no-underline hover:text-black" data-sveltekit-reload>česky</a>
 			{:else}
@@ -70,15 +72,16 @@
 			<button
 				type="button"
 				onclick={() => mediaPlayer.togglePlaylist(ambientPlaylist)}
-				class="flex cursor-pointer items-center justify-center text-black/18 transition-colors hover:text-black/50"
-				aria-label={isAmbientPlaying ? 'Pause ambient' : 'Play ambient'}
+				class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/35 transition-colors hover:text-black"
+				aria-label={isAmbientPlaying ? m.ambient_pause() : m.ambient_play()}
 			>
 				{#if isAmbientPlaying}
-					<Pause size={16} fill="currentColor" strokeWidth={0} />
+					<Pause size={15} fill="currentColor" strokeWidth={0} />
 				{:else}
-					<Play size={16} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" />
+					<Play size={15} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" />
 				{/if}
 			</button>
+			<ThemeToggle />
 			<button
 				type="button"
 				class="flex items-center justify-center"
