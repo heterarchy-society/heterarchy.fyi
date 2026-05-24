@@ -92,13 +92,13 @@
 					{#if descParagraphs.length > 0}
 						<div class="mt-6 space-y-3 text-[15px] leading-[1.75] text-black/65 italic [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-black/30 [&_a:hover]:decoration-black/60">
 							<p>
-								{@html processWikilinks(descParagraphs[0])}{#if descParagraphs.length > 1 && !descExpanded}<button onclick={() => descExpanded = true} class="not-italic font-mono text-[11px] text-black/35 hover:text-black/60 ml-2 cursor-pointer">↓ expand · {hiddenWordCount} words</button>{/if}
+								{@html processWikilinks(descParagraphs[0])}{#if descParagraphs.length > 1 && !descExpanded}<button onclick={() => descExpanded = true} class="not-italic font-mono text-[11px] text-black/35 hover:text-black/60 ml-2 cursor-pointer">{m.writings_learn_more({ count: String(hiddenWordCount) })}</button>{/if}
 							</p>
 							{#if descExpanded}
 								{#each descParagraphs.slice(1) as para}
 									<p>{@html processWikilinks(para)}</p>
 								{/each}
-								<button onclick={() => descExpanded = false} class="not-italic font-mono text-[11px] text-black/35 hover:text-black/60 cursor-pointer">↑ collapse</button>
+								<button onclick={() => descExpanded = false} class="not-italic font-mono text-[11px] text-black/35 hover:text-black/60 cursor-pointer">{m.writings_collapse()}</button>
 							{/if}
 						</div>
 					{/if}
