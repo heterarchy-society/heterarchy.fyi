@@ -2,6 +2,7 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import AppVersionWatcher from '$lib/components/AppVersionWatcher.svelte';
+	import UniversalMediaPlayer from '$lib/components/UniversalMediaPlayer.svelte';
 
 	let { children } = $props();
 </script>
@@ -11,4 +12,5 @@
 <div class="min-h-screen bg-bg">
 	<AppVersionWatcher />
 	{@render children()}
+	<UniversalMediaPlayer />
 </div>

@@ -4,6 +4,11 @@
 	import { getLocale, localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
+	import { tick } from 'svelte';
+	import { slide } from 'svelte/transition';
+	import { Captions, Highlighter, RotateCcw, X } from 'lucide-svelte';
+	import { mediaPlayer, type MediaTrack } from '$lib/media/player.svelte';
+	import { decodePeaks, drawWaveform as drawWaveformCanvas, hoverTimeFromPointer, seekTimeFromPointer } from '$lib/media/waveform';
 
 	let { data }: { data: PageData } = $props();
 	const writing = $derived(data.writing);
@@ -82,6 +87,20 @@
 	type Transcript = { words: Word[]; paragraphs: number[] };
 	let transcript: Transcript | null = $state(null);
 	let proseEl: HTMLElement | undefined = $state();
+	let handledTextFollowRequest = 0;
+	let pendingTextFollowRequest = $state(0);
+	const mediaTrack = $derived<MediaTrack | null>(data.audio ? {
+		id: `writing:${writing.id}`,
+		title: writing.title,
+		subtitle: writing.authors.join(', '),
+		href: localizeUrl(`/writings/${writing.id}`),
+		src: data.audio.url,
+		duration: data.audio.duration,
+		durationSeconds: data.audio.durationSeconds,
+		peaks: data.audio.peaks,
+		followableText: Boolean(data.audio.transcriptUrl),
+	} : null);
+	const isActiveMediaTrack = $derived(mediaTrack ? mediaPlayer.isTrack(mediaTrack.id) : false);
 
 	async function loadTranscript() {
 		if (transcript || !data.audio?.transcriptUrl) return;
@@ -112,24 +131,87 @@
 		return pi;
 	});
 
-	$effect(() => {
+	function scrollToCurrentParagraph(force = false) {
 		if (!isMarkdown || !proseEl) return;
 		const paras = proseEl.querySelectorAll('p');
-		paras.forEach((p, i) => p.classList.toggle('reading-active', i === currentParagraphIdx));
-		if (currentParagraphIdx >= 0) {
+		if (textHighlightMode && currentParagraphIdx >= 0) {
 			const para = paras[currentParagraphIdx];
 			if (para) {
 				const rect = para.getBoundingClientRect();
 				const gap = 120;
-				if (rect.top > window.innerHeight - gap || rect.bottom < 0) {
+				if (force || rect.top > window.innerHeight - gap || rect.bottom < 0) {
 					window.scrollTo({ top: window.scrollY + rect.top - gap, behavior: 'smooth' });
 				}
 			}
 		}
+	}
+
+	$effect(() => {
+		if (!isMarkdown || !proseEl) return;
+		const paras = proseEl.querySelectorAll('p');
+		paras.forEach((p, i) => p.classList.toggle('reading-active', textHighlightMode && i === currentParagraphIdx));
+		scrollToCurrentParagraph();
+	});
+
+	async function followHighlightedTextRequest(request: number) {
+		if (!mediaTrack || !mediaPlayer.isTrack(mediaTrack.id)) return;
+		handledTextFollowRequest = request;
+		pendingTextFollowRequest = request;
+		textHighlightMode = true;
+		if (data.audio?.transcriptUrl) await loadTranscript();
+		await tick();
+		scrollToCurrentParagraph(true);
+	}
+
+	$effect(() => {
+		const request = mediaPlayer.textFollowRequest;
+		if (!request || request === handledTextFollowRequest) return;
+		void followHighlightedTextRequest(request);
+	});
+
+	$effect(() => {
+		if (!pendingTextFollowRequest || !textHighlightMode || currentParagraphIdx < 0) return;
+		scrollToCurrentParagraph(true);
+		pendingTextFollowRequest = 0;
 	});
 
 	// CSS Custom Highlight API — word-level highlight without DOM wrapping
 	let alignedRanges: (Range | null)[] = [];
+	let lastHighlightedWordIdx = -1;
+	let fadeRaf: number | null = null;
+	let fadingWordHighlights: { range: Range; startedAt: number }[] = [];
+	const fadeHighlightNames = ['reading-word-fade-0', 'reading-word-fade-1', 'reading-word-fade-2', 'reading-word-fade-3'];
+	const wordHighlightFadeMs = 1000;
+
+	function clearWordHighlights(hl: HighlightRegistry) {
+		hl.delete('reading-word');
+		for (const name of fadeHighlightNames) hl.delete(name);
+		fadingWordHighlights = [];
+		lastHighlightedWordIdx = -1;
+		if (fadeRaf !== null) cancelAnimationFrame(fadeRaf);
+		fadeRaf = null;
+	}
+
+	function updateFadingWordHighlights(hl: HighlightRegistry) {
+		const now = performance.now();
+		fadingWordHighlights = fadingWordHighlights.filter((item) => now - item.startedAt < wordHighlightFadeMs);
+		for (const name of fadeHighlightNames) hl.delete(name);
+
+		for (const item of fadingWordHighlights) {
+			const progress = (now - item.startedAt) / wordHighlightFadeMs;
+			const bucket = Math.min(fadeHighlightNames.length - 1, Math.floor(progress * fadeHighlightNames.length));
+			const name = fadeHighlightNames[bucket];
+			const existing = hl.get(name);
+			if (existing) existing.add(item.range);
+			else hl.set(name, new (window as any).Highlight(item.range));
+		}
+
+		if (fadingWordHighlights.length > 0) {
+			fadeRaf = requestAnimationFrame(() => updateFadingWordHighlights(hl));
+		} else {
+			fadeRaf = null;
+		}
+	}
 
 	function buildWordRanges(el: HTMLElement): Range[] {
 		const ranges: Range[] = [];
@@ -174,14 +256,26 @@
 	$effect(() => {
 		const hl = (CSS as any).highlights;
 		if (!hl) return;
-		if (currentWordIdx < 0) { hl.delete('reading-word'); return; }
+		if (!textHighlightMode || currentWordIdx < 0) { clearWordHighlights(hl); return; }
+		if (lastHighlightedWordIdx !== currentWordIdx && lastHighlightedWordIdx >= 0) {
+			const previousRange = alignedRanges[lastHighlightedWordIdx];
+			if (previousRange) {
+				fadingWordHighlights.push({ range: previousRange, startedAt: performance.now() });
+				if (fadeRaf === null) updateFadingWordHighlights(hl);
+			}
+		}
 		const range = alignedRanges[currentWordIdx];
 		if (range) hl.set('reading-word', new (window as any).Highlight(range));
+		lastHighlightedWordIdx = currentWordIdx;
 		return () => hl.delete('reading-word');
 	});
 
-	function seekToClick(e: MouseEvent) {
-		if (!isMarkdown || !playing || !audioEl || !transcript || alignedRanges.length === 0) return;
+	async function seekToClick(e: MouseEvent) {
+		if (!isMarkdown || !mediaTrack) return;
+		if (mediaPlayer.track && !isActiveMediaTrack) return;
+		if (!isActiveMediaTrack) mediaPlayer.load(mediaTrack);
+		if (!transcript) await loadTranscript();
+		if (!transcript || alignedRanges.length === 0) return;
 		let node: Node | null = null;
 		let offset = 0;
 		if (document.caretRangeFromPoint) {
@@ -205,7 +299,7 @@
 				try { if (r.comparePoint(node, offset) >= 0) { bestIdx = i; break; } } catch {}
 			}
 		}
-		if (bestIdx >= 0) audioEl.currentTime = transcript.words[bestIdx][1] / 1000;
+		if (bestIdx >= 0) mediaPlayer.seek(transcript.words[bestIdx][1] / 1000);
 	}
 
 	const currentSentence = $derived.by(() => {
@@ -219,52 +313,28 @@
 		while (end < words.length - 1 && !isSentenceEnd(words[end])) end++;
 		return { words: words.slice(start, end + 1), activeIdx: idx - start };
 	});
+	const currentSentenceText = $derived(currentSentence?.words.map((word) => word[0]).join(' ') ?? '');
+	const readingPanelLines = $derived(Math.min(7, Math.max(3, Math.ceil(currentSentenceText.length / 78))));
 
-	let audioEl: HTMLAudioElement | undefined = $state();
 	let waveCanvas: HTMLCanvasElement | undefined = $state();
-	let playing = $state(false);
-	let currentTime = $state(0);
-	let audioDuration = $state(data.audio?.durationSeconds ?? 0);
-	let speed = $state(1);
+	let waveformHoverTime: number | null = $state(null);
+	const playing = $derived(isActiveMediaTrack && mediaPlayer.playing);
+	const currentTime = $derived(isActiveMediaTrack ? mediaPlayer.currentTime : 0);
+	const audioDuration = $derived(isActiveMediaTrack ? mediaPlayer.duration : (data.audio?.durationSeconds ?? 0));
+	const speed = $derived(mediaPlayer.speed);
+	let readingMode = $state(true);
+	let textHighlightMode = $state(true);
 	const speeds = [0.75, 1, 1.25, 1.5, 2];
 
-	function decodePeaks(b64: string): number[] {
-		const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-		return Array.from(new Int8Array(bytes.buffer));
-	}
+	$effect(() => {
+		if (isActiveMediaTrack && data.audio?.transcriptUrl) void loadTranscript();
+	});
 
 	const peaks = $derived(data.audio?.peaks ? decodePeaks(data.audio.peaks) : null);
 
 	function drawWaveform() {
 		if (!waveCanvas || !peaks) return;
-		const ctx = waveCanvas.getContext('2d');
-		if (!ctx) return;
-		const dpr = window.devicePixelRatio || 1;
-		const W = waveCanvas.offsetWidth;
-		const H = waveCanvas.offsetHeight;
-		if (waveCanvas.width !== Math.round(W * dpr) || waveCanvas.height !== Math.round(H * dpr)) {
-			waveCanvas.width = Math.round(W * dpr);
-			waveCanvas.height = Math.round(H * dpr);
-		}
-		ctx.save();
-		ctx.scale(dpr, dpr);
-		ctx.clearRect(0, 0, W, H);
-		const barW = 2;
-		const step = 3;
-		const numBars = Math.floor(W / step);
-		const barCount = peaks.length / 2;
-		const progressX = audioDuration > 0 ? (currentTime / audioDuration) * W : 0;
-		for (let i = 0; i < numBars; i++) {
-			const x = i * step;
-			const pi = Math.floor((i / numBars) * barCount);
-			const min = peaks[2 * pi] ?? 0;
-			const max = peaks[2 * pi + 1] ?? 0;
-			const barH = Math.max(2, ((max - min) / 255) * H * 0.85);
-			const y = (H - barH) / 2;
-			ctx.fillStyle = x < progressX ? 'rgba(0,0,0,0.7)' : 'rgba(0,0,0,0.13)';
-			ctx.fillRect(x, y, barW, barH);
-		}
-		ctx.restore();
+		drawWaveformCanvas(waveCanvas, peaks, { currentTime, duration: audioDuration, hoverTime: waveformHoverTime });
 	}
 
 	$effect(() => {
@@ -277,28 +347,44 @@
 
 	$effect(() => {
 		void currentTime;
+		void waveformHoverTime;
 		drawWaveform();
 	});
 
 	function togglePlay() {
-		if (!audioEl) return;
 		if (playing) {
-			audioEl.pause();
+			mediaPlayer.pause();
 		} else {
 			loadTranscript();
-			audioEl.play();
+			if (mediaTrack) void mediaPlayer.play(mediaTrack);
 		}
 	}
 
 	function setSpeed(rate: number) {
-		speed = rate;
-		if (audioEl) audioEl.playbackRate = rate;
+		mediaPlayer.setSpeed(rate);
 	}
 
 	function seekFromCanvas(e: MouseEvent) {
-		if (!waveCanvas || !audioEl) return;
-		const rect = waveCanvas.getBoundingClientRect();
-		audioEl.currentTime = ((e.clientX - rect.left) / rect.width) * (audioEl.duration || audioDuration);
+		if (!waveCanvas || !mediaTrack) return;
+		if (!isActiveMediaTrack) mediaPlayer.load(mediaTrack);
+		mediaPlayer.seek(seekTimeFromPointer(e, waveCanvas, audioDuration));
+	}
+
+	function previewCanvasSeek(e: PointerEvent) {
+		if (!waveCanvas) return;
+		waveformHoverTime = hoverTimeFromPointer(e, waveCanvas, audioDuration);
+	}
+
+	function resetAudio() {
+		if (!isActiveMediaTrack && mediaTrack) mediaPlayer.load(mediaTrack);
+		mediaPlayer.reset();
+	}
+
+	function resetAudioState() {
+		if (isActiveMediaTrack) mediaPlayer.clear();
+		const hl = (CSS as any).highlights;
+		if (hl) clearWordHighlights(hl);
+		proseEl?.querySelectorAll('p').forEach((p) => p.classList.remove('reading-active'));
 	}
 
 	function formatTime(s: number): string {
@@ -359,17 +445,7 @@
 					{/if}
 
 					{#if data.audio}
-						<!-- svelte-ignore a11y_media_has_caption -->
-						<audio
-							bind:this={audioEl}
-							src={data.audio.url}
-							onplay={() => { playing = true; }}
-							onpause={() => { playing = false; }}
-							ontimeupdate={() => { currentTime = audioEl?.currentTime ?? 0; }}
-							onloadedmetadata={() => { if (audioEl) audioDuration = audioEl.duration; }}
-							onended={() => { playing = false; currentTime = 0; if (audioEl) audioEl.currentTime = 0; }}
-						></audio>
-						<div class="mt-6 border px-4 py-3 transition-colors duration-300 {playing ? 'border-black/25 bg-black/[0.04]' : 'border-line'}">
+						<div class="mt-6 border px-4 py-3 transition-colors duration-300 {playing ? 'border-black/15 bg-black/[0.04]' : 'border-black/8 bg-black/[0.015]'}">
 							<div class="flex items-center gap-4">
 								<button
 									onclick={togglePlay}
@@ -392,6 +468,8 @@
 									<canvas
 										bind:this={waveCanvas}
 										onclick={seekFromCanvas}
+										onpointermove={previewCanvasSeek}
+										onpointerleave={() => { waveformHoverTime = null; }}
 										class="min-w-0 flex-1 cursor-pointer"
 										style="height: 48px;"
 									></canvas>
@@ -405,21 +483,71 @@
 							</div>
 
 							<div class="mt-2 flex items-center justify-end gap-3">
-								<span class="font-mono text-[10px] uppercase tracking-widest text-black/25">speed</span>
-								{#each speeds as rate}
-									<button
-										onclick={() => setSpeed(rate)}
-										class="cursor-pointer font-mono text-[10px] tabular-nums {speed === rate ? 'text-black' : 'text-black/30 hover:text-black/70'}"
-									>{rate}×</button>
-								{/each}
+								<div class="flex items-center justify-end gap-3">
+									{#if currentTime > 0.2}
+										<button
+											type="button"
+											onclick={resetAudioState}
+											class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
+											aria-label="Clear audio state"
+											title="Clear audio state"
+										>
+											<X size={16} strokeWidth={1.8} />
+										</button>
+										<button
+											type="button"
+											onclick={resetAudio}
+											class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/25 transition-colors hover:text-black/60"
+											aria-label="Reset audio"
+											title="Reset audio"
+										>
+											<RotateCcw size={15} strokeWidth={1.8} />
+										</button>
+									{/if}
+									{#if data.audio.transcriptUrl}
+										<button
+											type="button"
+											onclick={() => { readingMode = !readingMode; }}
+											class="flex h-7 w-7 cursor-pointer items-center justify-center transition-colors {readingMode ? 'text-black/45 hover:text-black/70' : 'text-black/18 hover:text-black/45'}"
+											aria-label={readingMode ? 'Hide reading panel' : 'Show reading panel'}
+											aria-pressed={readingMode}
+											title={readingMode ? 'Hide reading panel' : 'Show reading panel'}
+										>
+											<Captions size={16} strokeWidth={1.8} />
+										</button>
+										<button
+											type="button"
+											onclick={() => { textHighlightMode = !textHighlightMode; }}
+											class="flex h-7 w-7 cursor-pointer items-center justify-center transition-colors {textHighlightMode ? 'text-black/45 hover:text-black/70' : 'text-black/18 hover:text-black/45'}"
+											aria-label={textHighlightMode ? 'Hide text highlighting' : 'Show text highlighting'}
+											aria-pressed={textHighlightMode}
+											title={textHighlightMode ? 'Hide text highlighting' : 'Show text highlighting'}
+										>
+											<Highlighter size={16} strokeWidth={1.8} />
+										</button>
+									{/if}
+									<span class="font-mono text-[10px] uppercase tracking-widest text-black/25">speed</span>
+									{#each speeds as rate}
+										<button
+											onclick={() => setSpeed(rate)}
+											class="cursor-pointer font-mono text-[10px] tabular-nums {speed === rate ? 'text-black' : 'text-black/30 hover:text-black/70'}"
+										>{rate}×</button>
+									{/each}
+								</div>
 							</div>
 
-							{#if currentSentence}
-								<p class="mt-3 text-[13px] leading-[1.7] text-black/50 border-t border-line pt-3">
-									{#each currentSentence.words as word, i}
-										<span class={i === currentSentence.activeIdx ? 'text-black font-medium' : ''}>{word[0]}{' '}</span>
-									{/each}
-								</p>
+							{#if readingMode && currentSentence}
+								<div
+									class="reading-panel mt-3 flex items-center overflow-y-auto border-t border-line py-3"
+									style={`--reading-lines: ${readingPanelLines}`}
+									transition:slide={{ duration: 260 }}
+								>
+									<p class="w-full text-center text-[13px] leading-[1.7] text-black/50">
+										{#each currentSentence.words as word, i}
+											<span class={i === currentSentence.activeIdx ? 'text-black font-medium' : ''}>{word[0]}{' '}</span>
+										{/each}
+									</p>
+								</div>
 							{/if}
 						</div>
 					{/if}
@@ -464,7 +592,7 @@
 					<div
 						bind:this={proseEl}
 						class="prose mx-auto max-w-2xl"
-						class:seek-cursor={isMarkdown && playing && transcript}
+						class:seek-cursor={isMarkdown && transcript}
 						onclick={seekToClick}
 					>
 							{#if isMarkdown}
@@ -713,8 +841,33 @@
 		cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpolygon points='2,1 14,8 2,15' fill='black' stroke='white' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") 2 8, crosshair !important;
 	}
 
-	::highlight(reading-word) {
+	.reading-panel {
+		height: calc((var(--reading-lines) * 1.7em) + 1.5rem);
+		transition: height 260ms ease;
+	}
+
+	:global(::highlight(reading-word)) {
 		background-color: rgba(253, 224, 71, 0.55);
+		color: inherit;
+	}
+
+	:global(::highlight(reading-word-fade-0)) {
+		background-color: rgba(253, 224, 71, 0.42);
+		color: inherit;
+	}
+
+	:global(::highlight(reading-word-fade-1)) {
+		background-color: rgba(253, 224, 71, 0.3);
+		color: inherit;
+	}
+
+	:global(::highlight(reading-word-fade-2)) {
+		background-color: rgba(253, 224, 71, 0.18);
+		color: inherit;
+	}
+
+	:global(::highlight(reading-word-fade-3)) {
+		background-color: rgba(253, 224, 71, 0.08);
 		color: inherit;
 	}
 
