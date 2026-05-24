@@ -103,7 +103,9 @@ export const load: PageServerLoad = async ({ params, url, fetch }) => {
 			? processWikilinks(writing.description, isCs)
 			: null;
 
-		const source = findSource(allSources, url.searchParams.get('format'));
+		let requestedFormat: string | null = null;
+		try { requestedFormat = url.searchParams.get('format'); } catch {}
+		const source = findSource(allSources, requestedFormat);
 		let content: string | null = null;
 		let contentHtml: string | null = null;
 		if (source) {
