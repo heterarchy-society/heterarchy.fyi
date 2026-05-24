@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Highlighter, Pause, Play, Volume2, VolumeX, X } from 'lucide-svelte';
+	import { fly } from 'svelte/transition';
+	import { Check, Highlighter, Link, Pause, Play, Volume2, VolumeX, X } from 'lucide-svelte';
 	import { mediaPlayer } from '$lib/media/player.svelte';
 	import { decodePeaks, drawWaveform as drawWaveformCanvas, hoverTimeFromPointer, seekTimeFromPointer } from '$lib/media/waveform';
 
@@ -8,7 +9,17 @@
 	let waveCanvas: HTMLCanvasElement | undefined = $state();
 	let waveformHoverTime: number | null = $state(null);
 	let raf: number | null = null;
+	let showRemaining = $state(false);
+	let timeCopied = $state(false);
 	const speeds = [0.75, 1, 1.25, 1.5, 2];
+
+	function copyTimestampLink() {
+		const url = new URL(window.location.href);
+		url.searchParams.set('t', String(Math.floor(mediaPlayer.currentTime)));
+		navigator.clipboard.writeText(url.toString());
+		timeCopied = true;
+		setTimeout(() => { timeCopied = false; }, 1500);
+	}
 
 	function formatTime(s: number): string {
 		if (!s || isNaN(s)) return '0:00';
@@ -45,14 +56,25 @@
 		});
 	}
 
-	function seekFromWaveform(e: MouseEvent) {
+	let scrubbing = false;
+
+	function waveformPointerDown(e: PointerEvent) {
 		if (!waveCanvas) return;
+		scrubbing = true;
+		waveCanvas.setPointerCapture(e.pointerId);
 		mediaPlayer.seek(seekTimeFromPointer(e, waveCanvas, mediaPlayer.duration));
 	}
 
-	function previewWaveformSeek(e: PointerEvent) {
+	function waveformPointerMove(e: PointerEvent) {
 		if (!waveCanvas) return;
+		if (scrubbing) {
+			mediaPlayer.seek(seekTimeFromPointer(e, waveCanvas, mediaPlayer.duration));
+		}
 		waveformHoverTime = hoverTimeFromPointer(e, waveCanvas, mediaPlayer.duration);
+	}
+
+	function waveformPointerUp() {
+		scrubbing = false;
 	}
 
 	async function showHighlightedText() {
@@ -103,11 +125,11 @@
 	onpause={() => { mediaPlayer.playing = false; stopTracking(); }}
 	ontimeupdate={() => { mediaPlayer.currentTime = audioEl?.currentTime ?? 0; }}
 	onloadedmetadata={() => { if (audioEl) mediaPlayer.duration = audioEl.duration; }}
-	onended={() => { mediaPlayer.playing = false; stopTracking(); mediaPlayer.currentTime = 0; if (audioEl) audioEl.currentTime = 0; }}
+	onended={() => { mediaPlayer.playing = false; stopTracking(); mediaPlayer.currentTime = 0; if (audioEl) audioEl.currentTime = 0; mediaPlayer.clear(); }}
 ></audio>
 
 {#if mediaPlayer.track}
-	<div class="media-player-shell fixed inset-x-0 bottom-0 z-50 px-4 py-3 backdrop-blur-md">
+	<div transition:fly={{ y: 80, duration: 280 }} class="media-player-shell fixed inset-x-0 bottom-0 z-50 px-4 py-3 backdrop-blur-md">
 		<div class="mx-auto flex max-w-5xl items-center gap-4">
 			<button
 				type="button"
@@ -135,6 +157,23 @@
 						{#if mediaPlayer.track.subtitle}
 							<span class="hidden shrink-0 font-mono text-[10px] uppercase tracking-widest text-black/30 sm:inline">{mediaPlayer.track.subtitle}</span>
 						{/if}
+					</div>
+
+					<div class="hidden shrink-0 items-center gap-2 sm:flex">
+						{#if mediaPlayer.currentTime > 0}
+							<button
+								type="button"
+								onclick={copyTimestampLink}
+								title={timeCopied ? 'Copied!' : 'Copy link at current time'}
+								class="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center transition-colors {timeCopied ? 'text-black/60' : 'text-black/20 hover:text-black/55'}"
+							>
+								{#if timeCopied}
+									<Check size={12} strokeWidth={2.2} />
+								{:else}
+									<Link size={12} strokeWidth={1.8} />
+								{/if}
+							</button>
+						{/if}
 						{#if mediaPlayer.track.followableText}
 							<button
 								type="button"
@@ -145,10 +184,8 @@
 							>
 								<Highlighter size={14} strokeWidth={1.8} />
 							</button>
+							<span class="text-black/15">|</span>
 						{/if}
-					</div>
-
-					<div class="hidden shrink-0 items-center gap-2 sm:flex">
 						<span class="font-mono text-[10px] uppercase tracking-widest text-black/25">speed</span>
 						{#each speeds as rate}
 							<button
@@ -186,45 +223,54 @@
 					</div>
 				</div>
 
-				{#if peaks}
-					<canvas
-						bind:this={waveCanvas}
-						onclick={seekFromWaveform}
-						onpointermove={previewWaveformSeek}
-						onpointerleave={() => { waveformHoverTime = null; }}
-						class="mt-1 h-9 w-full cursor-pointer"
-						aria-label="Seek audio"
-					></canvas>
-				{:else}
+				<div class="mt-1 flex items-center gap-2">
+					{#if peaks}
+						<canvas
+							bind:this={waveCanvas}
+							onpointerdown={waveformPointerDown}
+							onpointermove={waveformPointerMove}
+							onpointerup={waveformPointerUp}
+							onpointercancel={waveformPointerUp}
+							onpointerleave={() => { if (!scrubbing) waveformHoverTime = null; }}
+							class="h-9 min-w-0 flex-1 cursor-pointer"
+							aria-label="Seek audio"
+						></canvas>
+					{:else}
+						<button
+							type="button"
+							onclick={(e) => {
+								mediaPlayer.seek(seekTimeFromPointer(e, e.currentTarget, mediaPlayer.duration));
+							}}
+							class="h-3 min-w-0 flex-1 cursor-pointer py-1"
+							aria-label="Seek audio"
+						>
+							<span class="block h-px w-full bg-black/15">
+								<span class="block h-px bg-black/70" style={`width: ${progress * 100}%`}></span>
+							</span>
+						</button>
+					{/if}
 					<button
 						type="button"
-						onclick={(e) => {
-							mediaPlayer.seek(seekTimeFromPointer(e, e.currentTarget, mediaPlayer.duration));
-						}}
-						class="mt-2 h-3 w-full cursor-pointer py-1"
-						aria-label="Seek audio"
+						onclick={() => { showRemaining = !showRemaining; }}
+						title={showRemaining ? 'Show elapsed time' : 'Show remaining time'}
+						class="shrink-0 cursor-pointer font-mono text-[11px] tabular-nums text-black/40 transition-colors hover:text-black/65"
 					>
-						<span class="block h-px w-full bg-black/15">
-							<span class="block h-px bg-black/70" style={`width: ${progress * 100}%`}></span>
-						</span>
+						{#if showRemaining}
+							−{formatTime(Math.max(0, mediaPlayer.duration - mediaPlayer.currentTime))}<span class="text-black/20"> / </span>{mediaPlayer.track.duration ?? formatTime(mediaPlayer.duration)}
+						{:else}
+							{formatTime(mediaPlayer.currentTime)}<span class="text-black/20"> / </span>{mediaPlayer.track.duration ?? formatTime(mediaPlayer.duration)}
+						{/if}
 					</button>
-				{/if}
-			</div>
-
-			<span class="shrink-0 font-mono text-[11px] tabular-nums text-black/40">
-				{formatTime(mediaPlayer.currentTime)}<span class="text-black/20"> / </span>{mediaPlayer.track.duration ?? formatTime(mediaPlayer.duration)}
-			</span>
-
-			<div class="flex shrink-0 items-center gap-1">
-				<button
-					type="button"
-					onclick={() => mediaPlayer.clear()}
-					class="flex h-8 w-8 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
-					aria-label="Close audio player"
-					title="Close audio player"
-				>
-					<X size={16} strokeWidth={1.8} />
-				</button>
+					<button
+						type="button"
+						onclick={() => mediaPlayer.clear()}
+						class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
+						aria-label="Close audio player"
+						title="Close audio player"
+					>
+						<X size={16} strokeWidth={1.8} />
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -235,8 +281,8 @@
 		border-top: 1px solid rgba(0,0,0,0.13);
 		background: rgba(252,252,250,0.78);
 		box-shadow:
-			0 -1px 0 rgba(255,255,255,0.45) inset,
-			0 -14px 36px rgba(0,0,0,0.09);
+			0 -1px 0 rgba(255,255,255,0.35) inset,
+			0 -8px 24px rgba(0,0,0,0.05);
 	}
 
 	.volume-slider {
