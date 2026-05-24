@@ -87,7 +87,11 @@ class MediaPlayerState {
 	private syncMediaSession() {
 		if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return;
 		navigator.mediaSession.metadata = this.track
-			? new MediaMetadata({ title: this.track.title, artist: this.track.subtitle ?? '' })
+			? new MediaMetadata({
+				title: this.track.title,
+				artist: this.track.subtitle ?? '',
+				artwork: [{ src: '/logo.png', type: 'image/png' }],
+			})
 			: null;
 	}
 
