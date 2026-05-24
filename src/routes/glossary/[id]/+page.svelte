@@ -47,6 +47,9 @@
 	);
 	const lastEdit = $derived((data.term as any).history?.[0]?.date ?? null);
 	const historyCount = $derived((data.term as any).history?.length ?? 0);
+	const bookRows = $derived(
+		Array.from({ length: Math.ceil(data.books.length / 2) }, (_, i) => data.books.slice(i * 2, i * 2 + 2))
+	);
 	const contributors = $derived(
 		((data.term as any).authors ?? []) as { name: string; email: string; avatar: string }[]
 	);
@@ -102,9 +105,29 @@
 					{#if data.books.length > 0}
 						<div class="mt-10 border-t border-line pt-8">
 							<p class="label mb-4">{m.glossary_books()}</p>
-							<div class="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
-								{#each data.books as book}
-									<LibraryBookCard {book} />
+							<div>
+								{#each bookRows as row, rowIndex}
+									<div class="grid md:grid-cols-2" class:border-t={rowIndex > 0} class:border-line={rowIndex > 0}>
+										{#each row as book, colIndex}
+											<div
+												class="py-5 md:px-5"
+												class:pt-0={rowIndex === 0}
+												class:max-md:border-t={colIndex > 0}
+												class:max-md:border-line={colIndex > 0}
+												class:md:border-l={colIndex > 0}
+												class:md:border-line={colIndex > 0}
+												class:md:pl-5={colIndex > 0}
+												class:md:pr-5={colIndex === 0 && row.length > 1}
+												class:md:pl-0={colIndex === 0}
+												class:md:pr-0={colIndex === row.length - 1 && row.length > 1}
+											>
+												<LibraryBookCard {book} compact />
+											</div>
+										{/each}
+										{#if row.length === 1 && data.books.length > 1}
+											<div class="hidden border-l border-line md:block"></div>
+										{/if}
+									</div>
 								{/each}
 							</div>
 						</div>
