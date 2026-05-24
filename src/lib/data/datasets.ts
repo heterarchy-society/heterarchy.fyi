@@ -20,6 +20,13 @@ export const datasetConfigs: DatasetConfig[] = [
 		collections: [{ name: 'terms', changelogPath: '/glossary/changelog' }]
 	},
 	{
+		id: 'writings',
+		endpoint: 'https://writings.data.heterarchy.fyi/',
+		endpointLabel: 'https://writings.data.heterarchy.fyi/',
+		repository: 'https://github.com/heterarchy-society/writings',
+		collections: [{ name: 'writings', changelogPath: '/writings/changelog' }]
+	},
+	{
 		id: 'books',
 		endpoint: 'https://books.data.heterarchy.fyi/index.json',
 		endpointLabel: 'https://books.data.heterarchy.fyi/',

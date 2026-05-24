@@ -1,0 +1,156 @@
+{
+  "meta": {
+    "generated": "2026-05-24T00:16:54.378Z",
+    "version": "1.0.0",
+    "commit": {
+      "hash": "68224786c75eba8e52dd2a712a8489a620af2099",
+      "date": "2026-05-24T02:16:37+02:00"
+    },
+    "atlas": {
+      "version": "1.0.0",
+      "commit": "68224786c75eba8e52dd2a712a8489a620af2099"
+    },
+    "writings": {
+      "count": 3,
+      "latestCommit": {
+        "hash": "68224786c75eba8e52dd2a712a8489a620af2099",
+        "date": "2026-05-24T02:16:37+02:00"
+      }
+    }
+  },
+  "writings": [
+    {
+      "id": "crypto-anarchist-manifesto",
+      "title": "The Crypto Anarchist Manifesto",
+      "authors": [
+        "Timothy C. May"
+      ],
+      "year": 1988,
+      "language": "en",
+      "type": "manifesto",
+      "glossary": [
+        "cryptoanarchy",
+        "cypherpunk",
+        "cryptography",
+        "anonymous-communication"
+      ],
+      "sources": [
+        {
+          "path": "main.txt",
+          "format": "txt"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://www.activism.net/cypherpunk/crypto-anarchy.html",
+          "role": "original"
+        }
+      ],
+      "license": "free to redistribute (per author)",
+      "description": "Předchůdce Cypherpunk Manifestu, napsaný v roce 1988 a poprvé distribuovaný na konferenci\nCrypto '88. May předpovídá, že kryptografie umožní zcela anonymní komunikaci a obchod,\nčímž fundamentálně změní roli vlád a korporací. Text postavil myšlenkový základ\nkryptoanarchistického hnutí a přímo inspiroval vznik skupiny Cypherpunks v roce 1992.",
+      "history": [
+        {
+          "hash": "c8ee277855d9fdd662089b062a4006d6d4823e66",
+          "date": "2026-05-24T01:51:46+02:00",
+          "author": "tree",
+          "message": "Add Crypto Anarchist Manifesto and Paralelní polis writings with metadata and source files"
+        }
+      ]
+    },
+    {
+      "id": "cypherpunks-manifesto",
+      "title": "A Cypherpunk's Manifesto",
+      "authors": [
+        "Eric Hughes"
+      ],
+      "year": 1993,
+      "language": "en",
+      "type": "manifesto",
+      "glossary": [
+        "cypherpunk",
+        "crypto-wars",
+        "privacy",
+        "cryptography"
+      ],
+      "sources": [
+        {
+          "path": "main.txt",
+          "format": "txt"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://www.activism.net/cypherpunk/manifesto.html",
+          "role": "original"
+        },
+        {
+          "url": "https://cdn.nakamotoinstitute.org/docs/cypherpunk-manifesto.txt",
+          "role": "archive-mirror"
+        }
+      ],
+      "license": "free to redistribute (per author)",
+      "description": "Foundational text of the [[cypherpunk]] movement, written during the\n[[Crypto Wars]] of the early 1990s. Hughes argues that privacy in the\nelectronic age must be defended through cryptography, because no\ninstitution will provide it. The manifesto established the link\nbetween strong cryptography, individual privacy, and political\nautonomy, and set the agenda for two decades of crypto-political\nwork that followed.",
+      "history": [
+        {
+          "hash": "c8ee277855d9fdd662089b062a4006d6d4823e66",
+          "date": "2026-05-24T01:51:46+02:00",
+          "author": "tree",
+          "message": "Add Crypto Anarchist Manifesto and Paralelní polis writings with metadata and source files"
+        },
+        {
+          "hash": "17f1cd9614874d708784e0521e52e9cc3ad86316",
+          "date": "2026-05-24T01:28:10+02:00",
+          "author": "tree",
+          "message": "Add initial project structure with configuration, package, and writings"
+        }
+      ]
+    },
+    {
+      "id": "paralelni-polis",
+      "title": "Paralelní polis",
+      "authors": [
+        "Václav Benda"
+      ],
+      "year": 1978,
+      "language": "cs",
+      "type": "essay",
+      "glossary": [
+        "paralelni-polis-essay",
+        "parallel-society",
+        "samizdat"
+      ],
+      "sources": [
+        {
+          "path": "main.md",
+          "format": "md"
+        },
+        {
+          "path": "main.pdf",
+          "format": "pdf"
+        }
+      ],
+      "references": [
+        {
+          "url": "https://www.disent.usd.cas.cz/wp-content/uploads/09_Benda1-1.pdf",
+          "role": "original"
+        }
+      ],
+      "license": "public domain",
+      "description": "Klíčový text českého disentu, v němž Benda formuluje koncept paralelní polis — souběžných\nspolečenských struktur fungujících mimo rámec totalitního státu. Namísto přímé konfrontace\ns mocí navrhuje budovat alternativní instituce: vzdělání, kulturu, informační sítě a právní\nochranu. Esej se stala programovým dokumentem Charty 77 a dodnes tvaruje myšlení o\nbudování autonomních komunit mimo dominantní systémy.",
+      "history": [
+        {
+          "hash": "68224786c75eba8e52dd2a712a8489a620af2099",
+          "date": "2026-05-24T02:16:37+02:00",
+          "author": "tree",
+          "message": "Add main.md file for Paralelní polis writings and update index.md to include new source file"
+        },
+        {
+          "hash": "c8ee277855d9fdd662089b062a4006d6d4823e66",
+          "date": "2026-05-24T01:51:46+02:00",
+          "author": "tree",
+          "message": "Add Crypto Anarchist Manifesto and Paralelní polis writings with metadata and source files"
+        }
+      ]
+    }
+  ]
+}

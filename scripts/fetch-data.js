@@ -26,3 +26,8 @@ const books = raw.books.map(({ cover, ...rest }) => ({
 }));
 writeFileSync(`${DATA}/books.json`, JSON.stringify({ ...raw, books }, null, 2) + '\n');
 console.log(`✓ Books: ${books.length} books → src/lib/data/books.json`);
+
+// Writings
+const writings = await fetchJson('https://writings.data.heterarchy.fyi/');
+writeFileSync(`${DATA}/writings.json`, JSON.stringify(writings, null, 2) + '\n');
+console.log(`✓ Writings: ${writings.writings.length} writings → src/lib/data/writings.json`);

@@ -18,6 +18,7 @@
 	const navItems = $derived([
 		{ label: m.nav_home(), href: localizeUrl('/') },
 		{ label: m.nav_glossary(), href: localizeUrl('/glossary') },
+		{ label: m.nav_writings(), href: localizeUrl('/writings') },
 		{ label: m.nav_books(), href: localizeUrl('/books') },
 		{ label: m.nav_events(), href: localizeUrl('/events') },
 		{ label: m.nav_join(), href: localizeUrl('/join') },

@@ -19,11 +19,15 @@
 	}
 
 	function datasetName(id: string): string {
-		return id === 'glossary' ? m.glossary_label() : m.books_page_label();
+		if (id === 'glossary') return m.glossary_label();
+		if (id === 'books') return m.books_page_label();
+		return m.writings_page_label();
 	}
 
 	function datasetDescription(id: string): string {
-		return id === 'glossary' ? m.data_glossary_desc() : m.data_books_desc();
+		if (id === 'glossary') return m.data_glossary_desc();
+		if (id === 'books') return m.data_books_desc();
+		return m.data_writings_desc();
 	}
 
 	function highlightJson(raw: string): string {
