@@ -3,7 +3,6 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import { getLocale, localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
-	import glossaryData from '$lib/data/glossary.json';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -20,31 +19,6 @@
 	const isSourceText = $derived(selectedFormat === 'typst' || selectedFormat === 'typ');
 	const isPdf = $derived(selectedFormat === 'pdf');
 
-	type GTerm = { id: string; name: string; translations?: Record<string, { slug?: string; name?: string }> };
-	const allTerms = (glossaryData as { terms: GTerm[] }).terms;
-	const glossaryByKey = new Map<string, GTerm>();
-	for (const term of allTerms) {
-		glossaryByKey.set(term.id, term);
-		glossaryByKey.set(term.name.toLowerCase(), term);
-		glossaryByKey.set(term.name.toLowerCase().replace(/\s+/g, '-'), term);
-	}
-
-	function wikilinkHref(term: GTerm): string {
-		const slug = getLocale() === 'cs' ? (term.translations?.cs?.slug ?? term.id) : term.id;
-		return localizeUrl(`/glossary/${slug}`);
-	}
-
-	function processWikilinks(text: string): string {
-		return text.replace(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/g, (_, key, display) => {
-			const label = display ?? key;
-			const term = glossaryByKey.get(key.toLowerCase())
-				?? glossaryByKey.get(key.toLowerCase().replace(/\s+/g, '-'))
-				?? glossaryByKey.get(key);
-			if (!term) return label;
-			return `<a href="${wikilinkHref(term)}">${label}</a>`;
-		});
-	}
-
 	function glossaryTermName(term: PageData['glossaryTerms'][number]): string {
 		const cs = term.translations?.cs;
 		return getLocale() === 'cs' && cs?.name ? cs.name : term.name;
@@ -56,13 +30,13 @@
 	}
 
 	const descParagraphs = $derived(
-		writing.description
-			? writing.description.split(/\n\n+/).map((p) => p.trim()).filter(Boolean)
+		data.descriptionHtml
+			? data.descriptionHtml.split(/\n\n+/).map((p) => p.trim()).filter(Boolean)
 			: []
 	);
 	let descExpanded = $state(false);
 	const hiddenWordCount = $derived(
-		descParagraphs.slice(1).join(' ').replace(/\[\[([^\|\]]+)(?:\|[^\]]+)?\]\]/g, '$1').trim().split(/\s+/).filter(Boolean).length
+		descParagraphs.slice(1).join(' ').replace(/<[^>]+>/g, '').trim().split(/\s+/).filter(Boolean).length
 	);
 
 	function formatDate(iso: string): string {
@@ -105,7 +79,7 @@
 
 <svelte:head>
 	<title>{writing.title} — {m.writings_page_title()}</title>
-	<meta name="description" content={writing.description?.replace(/\[\[([^\|\]]+)(?:\|[^\]]+)?\]\]/g, '$1').slice(0, 160) ?? ''} />
+	<meta name="description" content={data.descriptionHtml?.replace(/<[^>]+>/g, '').slice(0, 160) ?? ''} />
 </svelte:head>
 
 <div class="min-h-screen w-full">
@@ -130,11 +104,11 @@
 					{#if descParagraphs.length > 0}
 						<div class="mt-6 space-y-3 text-[15px] leading-[1.75] text-black/65 italic [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-black/30 [&_a:hover]:decoration-black/60">
 							<p>
-								{@html processWikilinks(descParagraphs[0])}{#if descParagraphs.length > 1 && !descExpanded}<button onclick={() => descExpanded = true} class="not-italic font-mono text-[11px] text-black/35 hover:text-black/60 ml-2 cursor-pointer">{m.writings_learn_more({ count: String(hiddenWordCount) })}</button>{/if}
+								{@html descParagraphs[0]}{#if descParagraphs.length > 1 && !descExpanded}<button onclick={() => descExpanded = true} class="not-italic font-mono text-[11px] text-black/35 hover:text-black/60 ml-2 cursor-pointer">{m.writings_learn_more({ count: String(hiddenWordCount) })}</button>{/if}
 							</p>
 							{#if descExpanded}
 								{#each descParagraphs.slice(1) as para}
-									<p>{@html processWikilinks(para)}</p>
+									<p>{@html para}</p>
 								{/each}
 								<button onclick={() => descExpanded = false} class="not-italic font-mono text-[11px] text-black/35 hover:text-black/60 cursor-pointer">{m.writings_collapse()}</button>
 							{/if}

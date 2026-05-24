@@ -1,7 +1,9 @@
 import { error } from '@sveltejs/kit';
 import glossaryData from '$lib/data/glossary.json';
+import writingsData from '$lib/data/writings.json';
 import { renderMarkdown } from '$lib/markdown';
 import type { Writing } from '../+page';
+import type { PageServerLoad } from './$types';
 
 type WritingSource = Writing['sources'][number];
 
@@ -14,16 +16,17 @@ type GlossaryTerm = {
 
 const glossary = (glossaryData as { terms: GlossaryTerm[] }).terms;
 const glossaryById = new Map(glossary.map((t) => [t.id, t]));
+const glossaryByKey = new Map<string, GlossaryTerm>();
+for (const term of glossary) {
+	glossaryByKey.set(term.id, term);
+	glossaryByKey.set(term.name.toLowerCase(), term);
+	glossaryByKey.set(term.name.toLowerCase().replace(/\s+/g, '-'), term);
+}
 
 const viewableFormats = new Set(['md', 'html', 'txt', 'pdf']);
 const downloadableFormats = new Set(['md', 'html', 'txt', 'pdf', 'typst', 'typ']);
 const formatOrder = new Map([
-	['md', 0],
-	['html', 1],
-	['txt', 2],
-	['pdf', 3],
-	['typst', 4],
-	['typ', 4],
+	['md', 0], ['html', 1], ['txt', 2], ['pdf', 3], ['typst', 4], ['typ', 4],
 ]);
 
 function sortSources(sources: WritingSource[]): WritingSource[] {
@@ -44,17 +47,13 @@ function sourceUrl(id: string, source: WritingSource): string {
 	return `https://writings.data.heterarchy.fyi/writings/${id}/${source.path}`;
 }
 
-
 function findSource(sources: WritingSource[], requested: string | null): WritingSource | null {
-	const readable = sortSources(sources.filter((source) => viewableFormats.has(source.format)));
+	const readable = sortSources(sources.filter((s) => viewableFormats.has(s.format)));
 	if (readable.length === 0) return sources[0] ?? null;
 	if (requested) {
 		const normalized = requested.toLowerCase();
-		const match = readable.find((source) =>
-			sourceKey(source, readable) === normalized
-			|| source.format === normalized
-			|| source.variant === normalized
-			|| source.path === requested
+		const match = readable.find((s) =>
+			sourceKey(s, readable) === normalized || s.format === normalized || s.variant === normalized || s.path === requested
 		);
 		if (match) return match;
 	}
@@ -65,11 +64,33 @@ function findSource(sources: WritingSource[], requested: string | null): Writing
 		?? readable[0];
 }
 
-export async function load({ params, url, fetch }: { params: { id: string }; url: URL; fetch: typeof globalThis.fetch }) {
+function glossaryHref(term: GlossaryTerm, isCs: boolean): string {
+	const slug = isCs ? (term.translations?.cs?.slug ?? term.id) : term.id;
+	return isCs ? `/cs/glosar/${slug}` : `/glossary/${slug}`;
+}
+
+function processWikilinks(text: string, isCs: boolean): string {
+	return text.replace(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/g, (_, key, display) => {
+		const label = display ?? key;
+		const term = glossaryByKey.get(key.toLowerCase())
+			?? glossaryByKey.get(key.toLowerCase().replace(/\s+/g, '-'))
+			?? glossaryByKey.get(key);
+		if (!term) return label;
+		return `<a href="${glossaryHref(term, isCs)}">${label}</a>`;
+	});
+}
+
+export function entries() {
+	return (writingsData as { writings: { id: string }[] }).writings.map((w) => ({ id: w.id }));
+}
+
+export const load: PageServerLoad = async ({ params, url, fetch }) => {
 	try {
 		const res = await fetch(`https://writings.data.heterarchy.fyi/writings/${params.id}.json`);
 		if (!res.ok) error(404, 'Writing not found');
 		const writing: Writing = await res.json();
+
+		const isCs = url.pathname.startsWith('/cs');
 		const allSources = writing.sources ?? [];
 		const viewableSources = sortSources(allSources.filter((s) => viewableFormats.has(s.format)));
 		const downloadSources = sortSources(allSources.filter((s) => downloadableFormats.has(s.format)));
@@ -77,6 +98,10 @@ export async function load({ params, url, fetch }: { params: { id: string }; url
 		const glossaryTerms = (writing.glossary ?? [])
 			.map((id) => glossaryById.get(id))
 			.filter((t): t is GlossaryTerm => Boolean(t));
+
+		const descriptionHtml = writing.description
+			? processWikilinks(writing.description, isCs)
+			: null;
 
 		const source = findSource(allSources, url.searchParams.get('format'));
 		let content: string | null = null;
@@ -116,6 +141,7 @@ export async function load({ params, url, fetch }: { params: { id: string }; url
 		return {
 			writing,
 			glossaryTerms,
+			descriptionHtml,
 			content,
 			contentHtml,
 			readableSources: viewableSourcesMapped,
@@ -128,14 +154,4 @@ export async function load({ params, url, fetch }: { params: { id: string }; url
 		if (e?.status === 404) throw e;
 		error(404, 'Writing not found');
 	}
-}
-
-export async function entries() {
-	try {
-		const res = await fetch('https://writings.data.heterarchy.fyi/');
-		const data = await res.json();
-		return (data.writings ?? []).map((w: { id: string }) => ({ id: w.id }));
-	} catch {
-		return [];
-	}
-}
+};
