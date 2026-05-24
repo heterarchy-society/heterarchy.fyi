@@ -425,6 +425,7 @@
 
 	let waveCanvas: HTMLCanvasElement | undefined = $state();
 	let waveformHoverTime: number | null = $state(null);
+	let waveformScrubbing = false;
 	const playing = $derived(isActiveMediaTrack && mediaPlayer.playing);
 	const currentTime = $derived(isActiveMediaTrack ? mediaPlayer.currentTime : 0);
 	const audioDuration = $derived(isActiveMediaTrack ? mediaPlayer.duration : (data.audio?.durationSeconds ?? 0));
@@ -478,15 +479,31 @@
 		mediaPlayer.setSpeed(rate);
 	}
 
-	function seekFromCanvas(e: MouseEvent) {
+	function seekFromCanvas(e: PointerEvent, playIfIdle = false) {
 		if (!waveCanvas || !mediaTrack) return;
 		if (!isActiveMediaTrack) mediaPlayer.load(mediaTrack);
 		mediaPlayer.seek(seekTimeFromPointer(e, waveCanvas, audioDuration));
+		if (playIfIdle && !playing) {
+			loadTranscript();
+			void mediaPlayer.play();
+		}
 	}
 
-	function previewCanvasSeek(e: PointerEvent) {
+	function waveformPointerDown(e: PointerEvent) {
 		if (!waveCanvas) return;
+		waveformScrubbing = true;
+		waveCanvas.setPointerCapture(e.pointerId);
+		seekFromCanvas(e, true);
+	}
+
+	function waveformPointerMove(e: PointerEvent) {
+		if (!waveCanvas) return;
+		if (waveformScrubbing) seekFromCanvas(e);
 		waveformHoverTime = hoverTimeFromPointer(e, waveCanvas, audioDuration);
+	}
+
+	function waveformPointerUp() {
+		waveformScrubbing = false;
 	}
 
 	function resetAudio() {
@@ -595,11 +612,14 @@
 								{#if peaks}
 									<canvas
 										bind:this={waveCanvas}
-										onclick={seekFromCanvas}
-										onpointermove={previewCanvasSeek}
-										onpointerleave={() => { waveformHoverTime = null; }}
+										onpointerdown={waveformPointerDown}
+										onpointermove={waveformPointerMove}
+										onpointerup={waveformPointerUp}
+										onpointercancel={waveformPointerUp}
+										onpointerleave={() => { if (!waveformScrubbing) waveformHoverTime = null; }}
 										class="min-w-0 flex-1 cursor-pointer"
 										style="height: 48px;"
+										aria-label={m.audio_seek()}
 									></canvas>
 								{:else}
 									<div class="min-w-0 flex-1"></div>

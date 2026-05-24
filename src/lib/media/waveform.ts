@@ -44,7 +44,7 @@ export function drawWaveform(canvas: HTMLCanvasElement, peaks: number[], options
 	const styles = getComputedStyle(document.documentElement);
 	const themeActiveColor = styles.getPropertyValue('--theme-wave-active').trim() || 'rgba(0,0,0,0.7)';
 	const themeInactiveColor = styles.getPropertyValue('--theme-wave-inactive').trim() || 'rgba(0,0,0,0.13)';
-	const themeBufferedColor = styles.getPropertyValue('--theme-accent').trim() || 'rgba(15,118,110,0.35)';
+	const themeBufferedColor = styles.getPropertyValue('--theme-wave-buffered').trim() || 'rgba(0,0,0,0.18)';
 	const themeHoverColor = styles.getPropertyValue('--theme-alert').trim() || 'rgba(220,38,38,0.85)';
 	const activeColor = options.activeColor ?? themeActiveColor;
 	const inactiveColor = options.inactiveColor ?? themeInactiveColor;

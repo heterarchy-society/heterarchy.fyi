@@ -387,7 +387,7 @@
 							<div class="relative h-px w-full">
 								<div class="absolute inset-0 bg-black/10"></div>
 								<div class="absolute inset-y-0 left-0 bg-black/55" style="width: {progress * 100}%"></div>
-								<div class="absolute inset-y-0 bg-teal-600/30" style="left: {progress * 100}%; width: {Math.max(0, (mediaPlayer.duration > 0 ? mediaPlayer.bufferedTime / mediaPlayer.duration : 0) - progress) * 100}%"></div>
+								<div class="absolute inset-y-0 bg-teal-600/20" style="left: {progress * 100}%; width: {Math.max(0, (mediaPlayer.duration > 0 ? mediaPlayer.bufferedTime / mediaPlayer.duration : 0) - progress) * 100}%"></div>
 							</div>
 							<div class="pointer-events-none absolute" style="left: {progress * 100}%; top: 50%; transform: translate(-50%, -50%); width: 2px; height: 14px; background: color-mix(in srgb, var(--theme-ink) 35%, transparent);"></div>
 							{#if linearHoverTime !== null && mediaPlayer.duration > 0}

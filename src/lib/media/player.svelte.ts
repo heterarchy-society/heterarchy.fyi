@@ -1,3 +1,5 @@
+import { untrack } from 'svelte';
+
 export type MediaTrack = {
 	id: string;
 	title: string;
@@ -27,6 +29,8 @@ class MediaPlayerState {
 	playlist = $state<MediaTrack[]>([]);
 	playlistIndex = $state(-1);
 	audio: HTMLAudioElement | null = null;
+	private currentTimePersistTimer: number | null = null;
+	private lastCurrentTimePersistAt = 0;
 
 	constructor() {
 		this.restore();
@@ -38,7 +42,12 @@ class MediaPlayerState {
 				void this.volume;
 				void this.speed;
 				void this.minimized;
-				this.persist();
+				untrack(() => this.persist());
+			});
+
+			$effect(() => {
+				void this.currentTime;
+				this.persistCurrentTimeThrottled();
 			});
 		});
 
@@ -77,6 +86,24 @@ class MediaPlayerState {
 			speed: this.speed,
 			minimized: this.minimized,
 		}));
+	}
+
+	private persistCurrentTimeThrottled() {
+		if (typeof window === 'undefined') return;
+		if (this.currentTimePersistTimer) return;
+
+		const elapsed = Date.now() - this.lastCurrentTimePersistAt;
+		if (elapsed >= 1000) {
+			this.lastCurrentTimePersistAt = Date.now();
+			this.persist();
+			return;
+		}
+
+		this.currentTimePersistTimer = window.setTimeout(() => {
+			this.currentTimePersistTimer = null;
+			this.lastCurrentTimePersistAt = Date.now();
+			this.persist();
+		}, 1000 - elapsed);
 	}
 
 	setAudio(audio: HTMLAudioElement) {

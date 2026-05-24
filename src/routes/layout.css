@@ -69,6 +69,7 @@
 		--theme-life-dead: 250 248 244;
 		--theme-wave-active: rgba(0, 0, 0, 0.7);
 		--theme-wave-inactive: rgba(0, 0, 0, 0.13);
+		--theme-wave-buffered: rgba(15, 118, 110, 0.22);
 	}
 
 	:root.dark {
@@ -87,6 +88,7 @@
 		--theme-life-dead: 22 21 19;
 		--theme-wave-active: rgba(241, 238, 230, 0.74);
 		--theme-wave-inactive: rgba(241, 238, 230, 0.15);
+		--theme-wave-buffered: rgba(45, 212, 191, 0.2);
 	}
 
 	html {
