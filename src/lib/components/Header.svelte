@@ -4,12 +4,11 @@
 	import { localizeUrl, getLocale } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import { mediaPlayer } from '$lib/media/player.svelte';
+	import { ambientPlaylist } from '$lib/data/ambient';
 
-	const AMBIENT_TRACK = {
-		id: 'ambient:tree-shadows-collide',
-		title: 'Tree Shadows Collide',
-		src: 'https://archive.pp0.co/audio/tree-shadows-collide.mp3',
-	};
+	const isAmbientPlaying = $derived(
+		mediaPlayer.playing && ambientPlaylist.some(t => t.id === mediaPlayer.track?.id)
+	);
 
 	let open = $state(false);
 
@@ -50,11 +49,11 @@
 			{/each}
 			<button
 				type="button"
-				onclick={() => mediaPlayer.toggle(AMBIENT_TRACK)}
+				onclick={() => mediaPlayer.togglePlaylist(ambientPlaylist)}
 				class="flex cursor-pointer items-center justify-center text-black/35 transition-colors hover:text-black"
-				aria-label={mediaPlayer.playing && mediaPlayer.isTrack(AMBIENT_TRACK.id) ? 'Pause' : 'Play ambient'}
+				aria-label={isAmbientPlaying ? 'Pause ambient' : 'Play ambient'}
 			>
-				{#if mediaPlayer.playing && mediaPlayer.isTrack(AMBIENT_TRACK.id)}
+				{#if isAmbientPlaying}
 					<Pause size={14} fill="currentColor" strokeWidth={0} />
 				{:else}
 					<Play size={14} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" />

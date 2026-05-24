@@ -147,7 +147,7 @@
 		if (mediaPlayer.currentTime > 0) audioEl.currentTime = mediaPlayer.currentTime;
 	}}
 	onprogress={() => { if (audioEl?.buffered.length) mediaPlayer.bufferedTime = audioEl.buffered.end(audioEl.buffered.length - 1); }}
-	onended={() => { mediaPlayer.playing = false; stopTracking(); mediaPlayer.currentTime = 0; if (audioEl) audioEl.currentTime = 0; mediaPlayer.clear(); }}
+	onended={() => { stopTracking(); mediaPlayer.ended(); }}
 ></audio>
 
 {#if mediaPlayer.track && mediaPlayer.minimized}
@@ -256,6 +256,10 @@
 						{/if}
 						{#if mediaPlayer.track.subtitle}
 							<span class="hidden shrink-0 font-mono text-[10px] uppercase tracking-widest text-black/30 sm:inline">{mediaPlayer.track.subtitle}</span>
+						{/if}
+						{#if mediaPlayer.track.album}
+							<span class="hidden text-black/15 sm:inline">·</span>
+							<span class="hidden shrink-0 font-mono text-[10px] uppercase tracking-widest text-black/20 sm:inline">{mediaPlayer.track.album}</span>
 						{/if}
 					</div>
 
@@ -408,7 +412,8 @@
 						<X size={16} strokeWidth={1.8} />
 					</button>
 				</div>
-			</div>
+
+				</div>
 		</div>
 	</div>
 {/if}

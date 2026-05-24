@@ -2,6 +2,7 @@ export type MediaTrack = {
 	id: string;
 	title: string;
 	subtitle?: string;
+	album?: string;
 	href?: string;
 	src: string;
 	duration?: string | null;
@@ -23,6 +24,8 @@ class MediaPlayerState {
 	minimized = $state(true);
 	lastAudibleVolume = 1;
 	textFollowRequest = $state(0);
+	playlist = $state<MediaTrack[]>([]);
+	playlistIndex = $state(-1);
 	audio: HTMLAudioElement | null = null;
 
 	constructor() {
@@ -90,6 +93,7 @@ class MediaPlayerState {
 			? new MediaMetadata({
 				title: this.track.title,
 				artist: this.track.subtitle ?? '',
+				album: this.track.album ?? '',
 				artwork: [{ src: '/logo.png', type: 'image/png' }],
 			})
 			: null;
@@ -140,6 +144,37 @@ class MediaPlayerState {
 		}
 		if (this.playing) this.pause();
 		else void this.play(track);
+	}
+
+	playFromPlaylist(tracks: MediaTrack[], index = 0) {
+		this.playlist = tracks;
+		this.playlistIndex = index;
+		void this.play(tracks[index]);
+	}
+
+	togglePlaylist(tracks: MediaTrack[]) {
+		const inPlaylist = this.playlistIndex >= 0 && tracks.some(t => t.id === this.track?.id);
+		if (inPlaylist) {
+			if (this.playing) this.pause();
+			else void this.play();
+		} else {
+			this.playFromPlaylist(tracks);
+		}
+	}
+
+	ended() {
+		this.playing = false;
+		this.currentTime = 0;
+		if (this.audio) this.audio.currentTime = 0;
+		const next = this.playlistIndex + 1;
+		if (next < this.playlist.length) {
+			this.playlistIndex = next;
+			void this.play(this.playlist[next]);
+		} else {
+			this.playlist = [];
+			this.playlistIndex = -1;
+			this.clear();
+		}
 	}
 
 	seek(seconds: number) {
