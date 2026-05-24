@@ -13,8 +13,8 @@
 <div class="min-h-screen bg-bg">
 	<AppVersionWatcher />
 	{@render children()}
-	{#if mediaPlayer.track && !mediaPlayer.minimized}
-		<div class="h-20"></div>
+	{#if mediaPlayer.track}
+		<div class={mediaPlayer.minimized ? 'h-16 sm:h-0' : 'h-20'}></div>
 	{/if}
 	<UniversalMediaPlayer />
 </div>

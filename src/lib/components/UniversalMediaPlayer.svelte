@@ -150,22 +150,24 @@
 	onended={() => { stopTracking(); mediaPlayer.ended(); }}
 ></audio>
 
-{#if mediaPlayer.track && mediaPlayer.minimized}
+{#if mediaPlayer.track}
 	<div
-		transition:fly={{ y: 16, x: 16, duration: 220 }}
-		class="mini-shell fixed bottom-5 right-5 z-50 overflow-hidden"
+		transition:fly={{ y: 80, duration: 220 }}
+		class="mini-shell fixed inset-x-0 bottom-0 z-50 overflow-hidden sm:inset-x-auto sm:bottom-5 sm:right-5 {!mediaPlayer.minimized ? 'sm:hidden' : ''}"
 	>
-		<div class="flex items-center gap-2 px-3 py-2.5">
+		<div class="flex items-center gap-2 px-4 py-3 sm:px-3 sm:py-2.5">
 			<button
 				type="button"
 				onclick={() => mediaPlayer.toggle()}
-				class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full border border-black/20 text-black/70 transition-colors hover:border-black/50 hover:text-black"
+				class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-black/20 text-black/70 transition-colors hover:border-black/50 hover:text-black sm:h-7 sm:w-7"
 				aria-label={mediaPlayer.playing ? 'Pause' : 'Play'}
 			>
 				{#if mediaPlayer.playing}
-					<Pause size={12} fill="currentColor" strokeWidth={0} />
+					<Pause size={14} fill="currentColor" strokeWidth={0} class="sm:hidden" />
+					<Pause size={12} fill="currentColor" strokeWidth={0} class="hidden sm:block" />
 				{:else}
-					<Play size={12} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" />
+					<Play size={14} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" class="sm:hidden" />
+					<Play size={12} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" class="hidden sm:block" />
 				{/if}
 			</button>
 
@@ -175,13 +177,16 @@
 				class="min-w-0 flex-1 cursor-pointer text-left"
 				aria-label="Expand player"
 			>
-				<span class="block truncate font-mono text-[11px] text-black/65 hover:text-black">{mediaPlayer.track.title}</span>
+				<span class="block truncate font-mono text-[12px] text-black/70 hover:text-black sm:text-[11px] sm:text-black/65">{mediaPlayer.track.title}</span>
+				{#if mediaPlayer.track.subtitle}
+					<span class="block font-mono text-[10px] text-black/35 sm:hidden">{mediaPlayer.track.subtitle}</span>
+				{/if}
 			</button>
 
 			<button
 				type="button"
 				onclick={() => { showRemaining = !showRemaining; }}
-				class="shrink-0 cursor-pointer font-mono text-[10px] tabular-nums text-black/35 transition-colors hover:text-black/60"
+				class="shrink-0 cursor-pointer font-mono text-[11px] tabular-nums text-black/35 transition-colors hover:text-black/60 sm:text-[10px]"
 				title={showRemaining ? 'Show elapsed time' : 'Show remaining time'}
 			>
 				{#if showRemaining}
@@ -194,21 +199,23 @@
 			<button
 				type="button"
 				onclick={() => { mediaPlayer.minimized = false; }}
-				class="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center text-black/25 transition-colors hover:text-black/60"
+				class="hidden h-9 w-9 shrink-0 cursor-pointer items-center justify-center text-black/25 transition-colors hover:text-black/60 sm:flex sm:h-6 sm:w-6"
 				aria-label="Expand player"
 				title="Expand player"
 			>
-				<ChevronUp size={14} strokeWidth={1.8} />
+				<ChevronUp size={16} strokeWidth={1.8} class="sm:hidden" />
+				<ChevronUp size={14} strokeWidth={1.8} class="hidden sm:block" />
 			</button>
 
 			<button
 				type="button"
 				onclick={() => mediaPlayer.clear()}
-				class="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
+				class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55 sm:h-6 sm:w-6"
 				aria-label="Close"
 				title="Close"
 			>
-				<X size={14} strokeWidth={1.8} />
+				<X size={16} strokeWidth={1.8} class="sm:hidden" />
+				<X size={14} strokeWidth={1.8} class="hidden sm:block" />
 			</button>
 		</div>
 
@@ -229,7 +236,7 @@
 {/if}
 
 {#if mediaPlayer.track && !mediaPlayer.minimized}
-	<div transition:fly={{ y: 80, duration: 280 }} class="media-player-shell fixed inset-x-0 bottom-0 z-50 px-4 py-3 backdrop-blur-md">
+	<div transition:fly={{ y: 80, duration: 280 }} class="media-player-shell fixed inset-x-0 bottom-0 z-50 hidden px-4 py-3 backdrop-blur-md sm:block">
 		<div class="mx-auto flex max-w-5xl items-center gap-4">
 			<button
 				type="button"
@@ -420,13 +427,19 @@
 
 <style>
 	.mini-shell {
-		border: 1px solid rgba(0,0,0,0.10);
-		background: rgba(252,252,250,0.90);
-		box-shadow:
-			0 4px 24px rgba(0,0,0,0.10),
-			0 1px 4px rgba(0,0,0,0.06);
+		border-top: 1px solid rgba(0,0,0,0.13);
+		background: rgba(252,252,250,0.92);
 		backdrop-filter: blur(12px);
 		-webkit-backdrop-filter: blur(12px);
+	}
+
+	@media (min-width: 640px) {
+		.mini-shell {
+			border: 1px solid rgba(0,0,0,0.10);
+			box-shadow:
+				0 4px 24px rgba(0,0,0,0.10),
+				0 1px 4px rgba(0,0,0,0.06);
+		}
 	}
 
 	.media-player-shell {

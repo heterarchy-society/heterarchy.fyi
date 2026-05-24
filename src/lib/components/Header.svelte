@@ -50,7 +50,7 @@
 			<button
 				type="button"
 				onclick={() => mediaPlayer.togglePlaylist(ambientPlaylist)}
-				class="flex cursor-pointer items-center justify-center text-black/35 transition-colors hover:text-black"
+				class="flex cursor-pointer items-center justify-center text-black/18 transition-colors hover:text-black/50"
 				aria-label={isAmbientPlaying ? 'Pause ambient' : 'Play ambient'}
 			>
 				{#if isAmbientPlaying}
@@ -66,20 +66,34 @@
 			{/if}
 		</nav>
 
-		<button
-			type="button"
-			class="flex items-center justify-center lg:hidden"
-			aria-expanded={open}
-			aria-controls="mobile-nav"
-			aria-label={open ? m.nav_aria_close() : m.nav_aria_open()}
-			onclick={toggle}
-		>
-			{#if open}
-				<X size={22} strokeWidth={1.25} />
-			{:else}
-				<Menu size={22} strokeWidth={1.25} />
-			{/if}
-		</button>
+		<div class="flex items-center gap-4 lg:hidden">
+			<button
+				type="button"
+				onclick={() => mediaPlayer.togglePlaylist(ambientPlaylist)}
+				class="flex cursor-pointer items-center justify-center text-black/18 transition-colors hover:text-black/50"
+				aria-label={isAmbientPlaying ? 'Pause ambient' : 'Play ambient'}
+			>
+				{#if isAmbientPlaying}
+					<Pause size={16} fill="currentColor" strokeWidth={0} />
+				{:else}
+					<Play size={16} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" />
+				{/if}
+			</button>
+			<button
+				type="button"
+				class="flex items-center justify-center"
+				aria-expanded={open}
+				aria-controls="mobile-nav"
+				aria-label={open ? m.nav_aria_close() : m.nav_aria_open()}
+				onclick={toggle}
+			>
+				{#if open}
+					<X size={22} strokeWidth={1.25} />
+				{:else}
+					<Menu size={22} strokeWidth={1.25} />
+				{/if}
+			</button>
+		</div>
 	</div>
 
 	{#if open}
