@@ -81,6 +81,23 @@ class MediaPlayerState {
 		audio.playbackRate = this.speed;
 		audio.volume = this.volume;
 		if (this.track && audio.src !== this.track.src) audio.src = this.track.src;
+		this.setupMediaSessionHandlers();
+	}
+
+	private syncMediaSession() {
+		if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return;
+		navigator.mediaSession.metadata = this.track
+			? new MediaMetadata({ title: this.track.title, artist: this.track.subtitle ?? '' })
+			: null;
+	}
+
+	private setupMediaSessionHandlers() {
+		if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return;
+		navigator.mediaSession.setActionHandler('play', () => { void this.play(); });
+		navigator.mediaSession.setActionHandler('pause', () => { this.pause(); });
+		navigator.mediaSession.setActionHandler('seekbackward', (d) => { this.seek(this.currentTime - (d.seekOffset ?? 10)); });
+		navigator.mediaSession.setActionHandler('seekforward', (d) => { this.seek(this.currentTime + (d.seekOffset ?? 10)); });
+		navigator.mediaSession.setActionHandler('seekto', (d) => { if (d.seekTime != null) this.seek(d.seekTime); });
 	}
 
 	isTrack(id: string) {
@@ -91,6 +108,7 @@ class MediaPlayerState {
 		const sameTrack = this.track?.id === track.id;
 		this.track = track;
 		if (track.durationSeconds) this.duration = track.durationSeconds;
+		this.syncMediaSession();
 		if (!this.audio) return;
 		if (!sameTrack || this.audio.src !== track.src) {
 			this.audio.src = track.src;
@@ -134,6 +152,7 @@ class MediaPlayerState {
 		this.pause();
 		this.seek(0);
 		this.track = null;
+		this.syncMediaSession();
 		this.currentTime = 0;
 		this.duration = 0;
 		this.bufferedTime = 0;
