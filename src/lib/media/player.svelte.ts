@@ -10,6 +10,8 @@ export type MediaTrack = {
 	followableText?: boolean;
 };
 
+const STORAGE_KEY = 'heterarchy:player';
+
 class MediaPlayerState {
 	track = $state<MediaTrack | null>(null);
 	currentTime = $state(0);
@@ -18,9 +20,61 @@ class MediaPlayerState {
 	playing = $state(false);
 	speed = $state(1);
 	volume = $state(1);
+	minimized = $state(true);
 	lastAudibleVolume = 1;
 	textFollowRequest = $state(0);
 	audio: HTMLAudioElement | null = null;
+
+	constructor() {
+		this.restore();
+
+		// Save whenever track/volume/speed/minimized change (not currentTime — too frequent)
+		$effect.root(() => {
+			$effect(() => {
+				void this.track;
+				void this.volume;
+				void this.speed;
+				void this.minimized;
+				this.persist();
+			});
+		});
+
+		if (typeof window !== 'undefined') {
+			window.addEventListener('beforeunload', () => this.persist());
+		}
+	}
+
+	private restore() {
+		if (typeof localStorage === 'undefined') return;
+		try {
+			const raw = localStorage.getItem(STORAGE_KEY);
+			if (!raw) return;
+			const s = JSON.parse(raw);
+			if (!s?.track) return;
+			this.track = s.track;
+			this.currentTime = s.currentTime ?? 0;
+			this.volume = s.volume ?? 1;
+			this.lastAudibleVolume = s.volume ?? 1;
+			this.speed = s.speed ?? 1;
+			this.minimized = s.minimized ?? true;
+			if (s.track.durationSeconds) this.duration = s.track.durationSeconds;
+		} catch {}
+	}
+
+	persist() {
+		if (typeof localStorage === 'undefined') return;
+		if (!this.track) {
+			localStorage.removeItem(STORAGE_KEY);
+			return;
+		}
+		localStorage.setItem(STORAGE_KEY, JSON.stringify({
+			track: this.track,
+			currentTime: this.currentTime,
+			volume: this.volume,
+			speed: this.speed,
+			minimized: this.minimized,
+		}));
+	}
 
 	setAudio(audio: HTMLAudioElement) {
 		this.audio = audio;
@@ -54,6 +108,7 @@ class MediaPlayerState {
 
 	pause() {
 		this.audio?.pause();
+		this.persist();
 	}
 
 	toggle(track?: MediaTrack) {
@@ -83,6 +138,7 @@ class MediaPlayerState {
 		this.duration = 0;
 		this.bufferedTime = 0;
 		this.playing = false;
+		this.minimized = true;
 		if (this.audio) this.audio.removeAttribute('src');
 	}
 

@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { fly } from 'svelte/transition';
-	import { Check, Download, Highlighter, Link, Pause, Play, Volume2, VolumeX, X } from 'lucide-svelte';
+	import { Check, ChevronDown, ChevronUp, Download, Highlighter, Link, Pause, Play, Volume2, VolumeX, X } from 'lucide-svelte';
 	import { mediaPlayer } from '$lib/media/player.svelte';
 	import { decodePeaks, drawWaveform as drawWaveformCanvas, hoverTimeFromPointer, seekTimeFromPointer } from '$lib/media/waveform';
 
 	let audioEl: HTMLAudioElement | undefined = $state();
 	let waveCanvas: HTMLCanvasElement | undefined = $state();
 	let waveformHoverTime: number | null = $state(null);
+	let linearHoverTime: number | null = $state(null);
+	let linearScrubbing = false;
 	let raf: number | null = null;
 	let showRemaining = $state(false);
 	let timeCopied = $state(false);
@@ -139,12 +141,94 @@
 	onplay={() => { mediaPlayer.playing = true; startTracking(); }}
 	onpause={() => { mediaPlayer.playing = false; stopTracking(); }}
 	ontimeupdate={() => { mediaPlayer.currentTime = audioEl?.currentTime ?? 0; }}
-	onloadedmetadata={() => { if (audioEl) mediaPlayer.duration = audioEl.duration; }}
+	onloadedmetadata={() => {
+		if (!audioEl) return;
+		mediaPlayer.duration = audioEl.duration;
+		if (mediaPlayer.currentTime > 0) audioEl.currentTime = mediaPlayer.currentTime;
+	}}
 	onprogress={() => { if (audioEl?.buffered.length) mediaPlayer.bufferedTime = audioEl.buffered.end(audioEl.buffered.length - 1); }}
 	onended={() => { mediaPlayer.playing = false; stopTracking(); mediaPlayer.currentTime = 0; if (audioEl) audioEl.currentTime = 0; mediaPlayer.clear(); }}
 ></audio>
 
-{#if mediaPlayer.track}
+{#if mediaPlayer.track && mediaPlayer.minimized}
+	<div
+		transition:fly={{ y: 16, x: 16, duration: 220 }}
+		class="mini-shell fixed bottom-5 right-5 z-50 overflow-hidden"
+	>
+		<div class="flex items-center gap-2 px-3 py-2.5">
+			<button
+				type="button"
+				onclick={() => mediaPlayer.toggle()}
+				class="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full border border-black/20 text-black/70 transition-colors hover:border-black/50 hover:text-black"
+				aria-label={mediaPlayer.playing ? 'Pause' : 'Play'}
+			>
+				{#if mediaPlayer.playing}
+					<Pause size={12} fill="currentColor" strokeWidth={0} />
+				{:else}
+					<Play size={12} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" />
+				{/if}
+			</button>
+
+			<button
+				type="button"
+				onclick={() => { mediaPlayer.minimized = false; }}
+				class="min-w-0 flex-1 cursor-pointer text-left"
+				aria-label="Expand player"
+			>
+				<span class="block truncate font-mono text-[11px] text-black/65 hover:text-black">{mediaPlayer.track.title}</span>
+			</button>
+
+			<button
+				type="button"
+				onclick={() => { showRemaining = !showRemaining; }}
+				class="shrink-0 cursor-pointer font-mono text-[10px] tabular-nums text-black/35 transition-colors hover:text-black/60"
+				title={showRemaining ? 'Show elapsed time' : 'Show remaining time'}
+			>
+				{#if showRemaining}
+					−{formatTime(Math.max(0, mediaPlayer.duration - mediaPlayer.currentTime))}
+				{:else}
+					{formatTime(mediaPlayer.currentTime)}
+				{/if}
+			</button>
+
+			<button
+				type="button"
+				onclick={() => { mediaPlayer.minimized = false; }}
+				class="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center text-black/25 transition-colors hover:text-black/60"
+				aria-label="Expand player"
+				title="Expand player"
+			>
+				<ChevronUp size={14} strokeWidth={1.8} />
+			</button>
+
+			<button
+				type="button"
+				onclick={() => mediaPlayer.clear()}
+				class="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
+				aria-label="Close"
+				title="Close"
+			>
+				<X size={14} strokeWidth={1.8} />
+			</button>
+		</div>
+
+		<div class="mini-seek-wrap">
+			<input
+				type="range"
+				min="0"
+				max={mediaPlayer.duration || 1}
+				step="0.1"
+				value={mediaPlayer.currentTime}
+				oninput={(e) => mediaPlayer.seek(Number(e.currentTarget.value))}
+				class="mini-seek-slider cursor-pointer"
+				style="--pg: {progress * 100}%; --bf: {mediaPlayer.duration > 0 ? Math.min(100, mediaPlayer.bufferedTime / mediaPlayer.duration * 100) : 0}%"
+				aria-label="Seek"
+			/>
+		</div>
+	</div>
+{/if}
+
+{#if mediaPlayer.track && !mediaPlayer.minimized}
 	<div transition:fly={{ y: 80, duration: 280 }} class="media-player-shell fixed inset-x-0 bottom-0 z-50 px-4 py-3 backdrop-blur-md">
 		<div class="mx-auto flex max-w-5xl items-center gap-4">
 			<button
@@ -252,18 +336,37 @@
 							aria-label="Seek audio"
 						></canvas>
 					{:else}
-						<button
-							type="button"
-							onclick={(e) => {
+						<div
+							role="slider"
+							tabindex="0"
+							aria-valuemin={0}
+							aria-valuemax={mediaPlayer.duration}
+							aria-valuenow={mediaPlayer.currentTime}
+							aria-label="Seek audio"
+							class="relative flex h-9 min-w-0 flex-1 cursor-pointer items-center"
+							onpointerdown={(e) => {
+								linearScrubbing = true;
+								e.currentTarget.setPointerCapture(e.pointerId);
 								mediaPlayer.seek(seekTimeFromPointer(e, e.currentTarget, mediaPlayer.duration));
 							}}
-							class="h-3 min-w-0 flex-1 cursor-pointer py-1"
-							aria-label="Seek audio"
+							onpointermove={(e) => {
+								if (linearScrubbing) mediaPlayer.seek(seekTimeFromPointer(e, e.currentTarget, mediaPlayer.duration));
+								linearHoverTime = hoverTimeFromPointer(e, e.currentTarget, mediaPlayer.duration);
+							}}
+							onpointerup={() => { linearScrubbing = false; }}
+							onpointercancel={() => { linearScrubbing = false; }}
+							onpointerleave={() => { if (!linearScrubbing) linearHoverTime = null; }}
 						>
-							<span class="block h-px w-full bg-black/15">
-								<span class="block h-px bg-black/70" style={`width: ${progress * 100}%`}></span>
-							</span>
-						</button>
+							<div class="relative h-px w-full">
+								<div class="absolute inset-0 bg-black/10"></div>
+								<div class="absolute inset-y-0 left-0 bg-black/55" style="width: {progress * 100}%"></div>
+								<div class="absolute inset-y-0 bg-teal-600/30" style="left: {progress * 100}%; width: {Math.max(0, (mediaPlayer.duration > 0 ? mediaPlayer.bufferedTime / mediaPlayer.duration : 0) - progress) * 100}%"></div>
+							</div>
+							<div class="pointer-events-none absolute" style="left: {progress * 100}%; top: 50%; transform: translate(-50%, -50%); width: 2px; height: 14px; background: rgba(0,0,0,0.35);"></div>
+							{#if linearHoverTime !== null && mediaPlayer.duration > 0}
+								<div class="pointer-events-none absolute inset-y-0 w-px bg-red-600/80" style="left: {linearHoverTime / mediaPlayer.duration * 100}%"></div>
+							{/if}
+						</div>
 					{/if}
 					<button
 						type="button"
@@ -288,6 +391,15 @@
 					</button>
 					<button
 						type="button"
+						onclick={() => { mediaPlayer.minimized = true; }}
+						class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
+						aria-label="Minimize player"
+						title="Minimize player"
+					>
+						<ChevronDown size={16} strokeWidth={1.8} />
+					</button>
+					<button
+						type="button"
 						onclick={() => mediaPlayer.clear()}
 						class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
 						aria-label="Close audio player"
@@ -302,6 +414,16 @@
 {/if}
 
 <style>
+	.mini-shell {
+		border: 1px solid rgba(0,0,0,0.10);
+		background: rgba(252,252,250,0.90);
+		box-shadow:
+			0 4px 24px rgba(0,0,0,0.10),
+			0 1px 4px rgba(0,0,0,0.06);
+		backdrop-filter: blur(12px);
+		-webkit-backdrop-filter: blur(12px);
+	}
+
 	.media-player-shell {
 		border-top: 1px solid rgba(0,0,0,0.13);
 		background: rgba(252,252,250,0.78);
@@ -352,5 +474,72 @@
 		border: 0;
 		border-radius: 999px;
 		background: rgba(0,0,0,0.45);
+	}
+
+	.mini-seek-wrap {
+		overflow: hidden;
+		height: 10px;
+	}
+
+	.mini-seek-slider {
+		appearance: none;
+		background: transparent;
+		display: block;
+		height: 10px;
+		width: calc(100% + 8px);
+		margin: 0 -4px;
+		padding: 0;
+	}
+
+	.mini-seek-slider:focus {
+		outline: none;
+	}
+
+	.mini-seek-slider::-webkit-slider-runnable-track {
+		height: 2px;
+		background: linear-gradient(
+			to right,
+			rgba(0,0,0,0.28) var(--pg, 0%),
+			rgba(15,118,110,0.22) var(--pg, 0%),
+			rgba(15,118,110,0.22) var(--bf, 0%),
+			rgba(0,0,0,0.05) var(--bf, 0%)
+		);
+	}
+
+	.mini-seek-slider::-webkit-slider-thumb {
+		appearance: none;
+		width: 2px;
+		height: 12px;
+		margin-top: -5px;
+		border: 0;
+		background: rgba(0,0,0,0.35);
+	}
+
+	.mini-seek-slider:hover::-webkit-slider-thumb {
+		width: 3px;
+		background: rgba(0,0,0,0.55);
+	}
+
+	.mini-seek-slider::-moz-range-track {
+		height: 2px;
+		background: rgba(0,0,0,0.10);
+	}
+
+	.mini-seek-slider::-moz-range-progress {
+		height: 2px;
+		background: rgba(0,0,0,0.28);
+	}
+
+	.mini-seek-slider::-moz-range-thumb {
+		width: 2px;
+		height: 12px;
+		border: 0;
+		border-radius: 0;
+		background: rgba(0,0,0,0.35);
+	}
+
+	.mini-seek-slider:hover::-moz-range-thumb {
+		width: 3px;
+		background: rgba(0,0,0,0.55);
 	}
 </style>

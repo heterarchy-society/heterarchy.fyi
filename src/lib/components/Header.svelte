@@ -1,8 +1,15 @@
 <script lang="ts">
-	import { Menu, X } from 'lucide-svelte';
+	import { Menu, Pause, Play, X } from 'lucide-svelte';
 	import { page } from '$app/state';
 	import { localizeUrl, getLocale } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
+	import { mediaPlayer } from '$lib/media/player.svelte';
+
+	const AMBIENT_TRACK = {
+		id: 'ambient:tree-shadows-collide',
+		title: 'Tree Shadows Collide',
+		src: 'https://archive.pp0.co/audio/tree-shadows-collide.mp3',
+	};
 
 	let open = $state(false);
 
@@ -41,6 +48,18 @@
 			{#each navItems as item}
 				<a href={item.href} class="no-underline hover:underline">{item.label}</a>
 			{/each}
+			<button
+				type="button"
+				onclick={() => mediaPlayer.toggle(AMBIENT_TRACK)}
+				class="flex cursor-pointer items-center justify-center text-black/35 transition-colors hover:text-black"
+				aria-label={mediaPlayer.playing && mediaPlayer.isTrack(AMBIENT_TRACK.id) ? 'Pause' : 'Play ambient'}
+			>
+				{#if mediaPlayer.playing && mediaPlayer.isTrack(AMBIENT_TRACK.id)}
+					<Pause size={14} fill="currentColor" strokeWidth={0} />
+				{:else}
+					<Play size={14} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" />
+				{/if}
+			</button>
 			{#if currentLang === 'en'}
 				<a href={csHref} class="ml-2 font-mono text-[11px] text-black/40 no-underline hover:text-black" data-sveltekit-reload>česky</a>
 			{:else}
