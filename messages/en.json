@@ -197,6 +197,7 @@
 	"audio_transcript": "transcript",
 	"common_yes": "yes",
 	"common_no": "no",
+	"common_loading": "Loading",
 	"data_writings_desc": "Manifestos, essays and foundational texts.",
 	"data_label": "Open Data",
 	"data_lead": "Open datasets published as static JSON files.",

@@ -2,6 +2,7 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import AppVersionWatcher from '$lib/components/AppVersionWatcher.svelte';
+	import NavigationProgress from '$lib/components/NavigationProgress.svelte';
 	import UniversalMediaPlayer from '$lib/components/UniversalMediaPlayer.svelte';
 	import { mediaPlayer } from '$lib/media/player.svelte';
 
@@ -12,6 +13,7 @@
 
 <div class="min-h-screen bg-bg">
 	<AppVersionWatcher />
+	<NavigationProgress />
 	{@render children()}
 	{#if mediaPlayer.track}
 		<div class={mediaPlayer.minimized ? 'h-16 sm:h-0' : 'h-20'}></div>

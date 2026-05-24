@@ -197,6 +197,7 @@
 	"audio_transcript": "transkript",
 	"common_yes": "ano",
 	"common_no": "ne",
+	"common_loading": "Načítání",
 	"data_writings_desc": "Manifesty, eseje a základní texty.",
 	"data_label": "Otevřená data",
 	"data_lead": "Otevřené datasety publikované jako statické JSON soubory.",
