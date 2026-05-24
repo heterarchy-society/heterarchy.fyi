@@ -51,6 +51,16 @@
 		return localizeUrl(`/glossary/${slug}`);
 	}
 
+	const descParagraphs = $derived(
+		writing.description
+			? writing.description.split(/\n\n+/).map((p) => p.trim()).filter(Boolean)
+			: []
+	);
+	let descExpanded = $state(false);
+	const hiddenWordCount = $derived(
+		descParagraphs.slice(1).join(' ').replace(/\[\[([^\|\]]+)(?:\|[^\]]+)?\]\]/g, '$1').trim().split(/\s+/).filter(Boolean).length
+	);
+
 	function formatDate(iso: string): string {
 		return new Date(iso).toLocaleDateString('en', { day: 'numeric', month: 'short', year: 'numeric' });
 	}
@@ -79,8 +89,18 @@
 						{#if writing.year}<span class="ml-3 text-black/35">·</span> <span class="ml-3">{writing.year}</span>{/if}
 					</p>
 
-					{#if writing.description}
-						<p class="mt-6 text-[15px] leading-[1.75] text-black/65 italic [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-black/30 [&_a:hover]:decoration-black/60">{@html processWikilinks(writing.description)}</p>
+					{#if descParagraphs.length > 0}
+						<div class="mt-6 space-y-3 text-[15px] leading-[1.75] text-black/65 italic [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-black/30 [&_a:hover]:decoration-black/60">
+							<p>
+								{@html processWikilinks(descParagraphs[0])}{#if descParagraphs.length > 1 && !descExpanded}<button onclick={() => descExpanded = true} class="not-italic font-mono text-[11px] text-black/35 hover:text-black/60 ml-2 cursor-pointer">↓ expand · {hiddenWordCount} words</button>{/if}
+							</p>
+							{#if descExpanded}
+								{#each descParagraphs.slice(1) as para}
+									<p>{@html processWikilinks(para)}</p>
+								{/each}
+								<button onclick={() => descExpanded = false} class="not-italic font-mono text-[11px] text-black/35 hover:text-black/60 cursor-pointer">↑ collapse</button>
+							{/if}
+						</div>
 					{/if}
 
 					{#if data.glossaryTerms.length > 0}

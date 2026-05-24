@@ -13,12 +13,28 @@ export type Writing = {
 	history?: { hash: string; date: string; author: string; message: string }[];
 };
 
+export type ChangelogEntry = {
+	hash: string;
+	date: string;
+	author: string;
+	message: string;
+};
+
 export async function load({ fetch }: { fetch: typeof globalThis.fetch }) {
-	try {
-		const res = await fetch('https://writings.data.heterarchy.fyi/');
-		const data = await res.json();
-		return { writings: (data.writings ?? []) as Writing[] };
-	} catch {
-		return { writings: [] as Writing[] };
-	}
+	const [indexRes, changelogRes] = await Promise.allSettled([
+		fetch('https://writings.data.heterarchy.fyi/'),
+		fetch('https://writings.data.heterarchy.fyi/changelog.json'),
+	]);
+
+	const writings: Writing[] =
+		indexRes.status === 'fulfilled' && indexRes.value.ok
+			? ((await indexRes.value.json()).writings ?? [])
+			: [];
+
+	const changelog: ChangelogEntry[] =
+		changelogRes.status === 'fulfilled' && changelogRes.value.ok
+			? await changelogRes.value.json()
+			: [];
+
+	return { writings, changelog };
 }

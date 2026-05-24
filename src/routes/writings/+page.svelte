@@ -39,22 +39,17 @@
 							</p>
 							<h2 class="mb-3 font-mono text-[20px] leading-snug text-black">{writing.title}</h2>
 							{#if writing.description}
-								<p class="text-[14px] leading-[1.65] text-black/60 line-clamp-2">
-									{writing.description.replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, '$1')}
+								<p class="text-[14px] leading-[1.65] text-black/60">
+									{writing.description.split(/\n\n+/)[0].replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, '$1')}
 								</p>
 							{/if}
 						</div>
 					</a>
 				{/each}
+				<p class="px-8 py-6 font-mono text-[11px] text-black/35 lg:px-10">{m.writings_count({ count: String(data.writings.length) })}</p>
 			</section>
 		{/if}
 
-		<section class="cell-roomy">
-			<p class="max-w-xl text-[15px] leading-[1.65] text-black/75">{m.writings_contribute_text()}</p>
-			<div class="mt-6">
-				<a href={localizeUrl('/find-us')} class="link-arrow text-[13px]">{m.writings_contribute_where()}</a>
-			</div>
-		</section>
 	</main>
 
 	<Footer />

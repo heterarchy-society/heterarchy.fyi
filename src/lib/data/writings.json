@@ -1,20 +1,20 @@
 {
   "meta": {
-    "generated": "2026-05-24T00:16:54.378Z",
+    "generated": "2026-05-24T01:01:01.299Z",
     "version": "1.0.0",
     "commit": {
-      "hash": "68224786c75eba8e52dd2a712a8489a620af2099",
-      "date": "2026-05-24T02:16:37+02:00"
+      "hash": "dc94c5f48acdc542523b746a204f3b086233efe0",
+      "date": "2026-05-24T03:00:47+02:00"
     },
     "atlas": {
       "version": "1.0.0",
-      "commit": "68224786c75eba8e52dd2a712a8489a620af2099"
+      "commit": "dc94c5f48acdc542523b746a204f3b086233efe0"
     },
     "writings": {
       "count": 3,
       "latestCommit": {
-        "hash": "68224786c75eba8e52dd2a712a8489a620af2099",
-        "date": "2026-05-24T02:16:37+02:00"
+        "hash": "dc94c5f48acdc542523b746a204f3b086233efe0",
+        "date": "2026-05-24T03:00:47+02:00"
       }
     }
   },
@@ -47,8 +47,20 @@
         }
       ],
       "license": "free to redistribute (per author)",
-      "description": "Předchůdce Cypherpunk Manifestu, napsaný v roce 1988 a poprvé distribuovaný na konferenci\nCrypto '88. May předpovídá, že kryptografie umožní zcela anonymní komunikaci a obchod,\nčímž fundamentálně změní roli vlád a korporací. Text postavil myšlenkový základ\nkryptoanarchistického hnutí a přímo inspiroval vznik skupiny Cypherpunks v roce 1992.",
+      "description": "A short, incendiary prediction: [[cryptography]] will make it possible for individuals to\ncommunicate, trade, and contract in total anonymity — beyond the reach of any state. Written\nby Timothy C. May in 1988 and distributed at the founding meeting of the [[cypherpunk|Cypherpunks]]\nin 1992.\n\nMay wrote the manifesto four years before the public internet existed in any meaningful form.\nHe anticipated [[anonymous-communication|anonymous networks]], untraceable transactions, and\ninformation markets — and argued that these technologies would be \"essentially unstoppable\"\nregardless of what governments attempted. The [[cryptoanarchy]] movement that grew from this\ntext treated the manifesto less as a call to arms and more as an engineering specification: a\ndescription of a world already becoming inevitable.",
       "history": [
+        {
+          "hash": "dc94c5f48acdc542523b746a204f3b086233efe0",
+          "date": "2026-05-24T03:00:47+02:00",
+          "author": "tree",
+          "message": "Revise descriptions in Crypto Anarchist Manifesto, Cypherpunks Manifesto, and Paralelní polis to enhance clarity and emphasize key themes of anonymity, privacy, and alternative societal structures."
+        },
+        {
+          "hash": "7462beaa3f3b400093c12a707a355a8a2d3e3cbb",
+          "date": "2026-05-24T02:54:21+02:00",
+          "author": "tree",
+          "message": "Enhance descriptions in Crypto Anarchist Manifesto, Cypherpunks Manifesto, and Paralelní polis to include key concepts and improve clarity"
+        },
         {
           "hash": "c8ee277855d9fdd662089b062a4006d6d4823e66",
           "date": "2026-05-24T01:51:46+02:00",
@@ -89,8 +101,20 @@
         }
       ],
       "license": "free to redistribute (per author)",
-      "description": "Foundational text of the [[cypherpunk]] movement, written during the\n[[Crypto Wars]] of the early 1990s. Hughes argues that privacy in the\nelectronic age must be defended through cryptography, because no\ninstitution will provide it. The manifesto established the link\nbetween strong cryptography, individual privacy, and political\nautonomy, and set the agenda for two decades of crypto-political\nwork that followed.",
+      "description": "Foundational text of the [[cypherpunk]] movement. Hughes argues that [[privacy]] in the\nelectronic age cannot be granted by institutions — it must be seized through [[cryptography]].\n\"Cypherpunks write code.\"\n\nWritten during the [[crypto-wars|Crypto Wars]] of the early 1990s, when governments in the\nUS and Europe were actively trying to restrict [[encryption]] and mandate law-enforcement\naccess to private communications. Hughes's answer was not political lobbying but engineering:\nbuild and deploy the tools, make them freely available, and the problem of institutional\nsurveillance becomes technically unsolvable. The manifesto set the agenda for two decades of\ncrypto-political work that followed — from PGP to Tor to Bitcoin.",
       "history": [
+        {
+          "hash": "dc94c5f48acdc542523b746a204f3b086233efe0",
+          "date": "2026-05-24T03:00:47+02:00",
+          "author": "tree",
+          "message": "Revise descriptions in Crypto Anarchist Manifesto, Cypherpunks Manifesto, and Paralelní polis to enhance clarity and emphasize key themes of anonymity, privacy, and alternative societal structures."
+        },
+        {
+          "hash": "7462beaa3f3b400093c12a707a355a8a2d3e3cbb",
+          "date": "2026-05-24T02:54:21+02:00",
+          "author": "tree",
+          "message": "Enhance descriptions in Crypto Anarchist Manifesto, Cypherpunks Manifesto, and Paralelní polis to include key concepts and improve clarity"
+        },
         {
           "hash": "c8ee277855d9fdd662089b062a4006d6d4823e66",
           "date": "2026-05-24T01:51:46+02:00",
@@ -136,8 +160,20 @@
         }
       ],
       "license": "public domain",
-      "description": "Klíčový text českého disentu, v němž Benda formuluje koncept paralelní polis — souběžných\nspolečenských struktur fungujících mimo rámec totalitního státu. Namísto přímé konfrontace\ns mocí navrhuje budovat alternativní instituce: vzdělání, kulturu, informační sítě a právní\nochranu. Esej se stala programovým dokumentem Charty 77 a dodnes tvaruje myšlení o\nbudování autonomních komunit mimo dominantní systémy.",
+      "description": "Benda's 1978 essay coins the concept of the [[parallel-society|parallel polis]]: a network of\nindependent institutions — schools, courts, media, cultural spaces — built alongside the\ntotalitarian state rather than in direct opposition to it. The goal is not to overthrow the\nsystem but to make it irrelevant.\n\nWritten as [[samizdat]] and circulated within Charter 77, the essay was a response to the\nquestion of what dissidents should actually do after signing a protest document. Benda's answer\nwas structural: build the alternative so completely that people have somewhere else to live,\nlearn, and work. The parallel polis is not a temporary refuge but a permanent construction\nproject. Decades later the essay remains the clearest articulation of why building matters more\nthan protesting — a logic that runs through everything from [[cypherpunk|cypherpunk]] projects\nto contemporary intentional communities.",
       "history": [
+        {
+          "hash": "dc94c5f48acdc542523b746a204f3b086233efe0",
+          "date": "2026-05-24T03:00:47+02:00",
+          "author": "tree",
+          "message": "Revise descriptions in Crypto Anarchist Manifesto, Cypherpunks Manifesto, and Paralelní polis to enhance clarity and emphasize key themes of anonymity, privacy, and alternative societal structures."
+        },
+        {
+          "hash": "7462beaa3f3b400093c12a707a355a8a2d3e3cbb",
+          "date": "2026-05-24T02:54:21+02:00",
+          "author": "tree",
+          "message": "Enhance descriptions in Crypto Anarchist Manifesto, Cypherpunks Manifesto, and Paralelní polis to include key concepts and improve clarity"
+        },
         {
           "hash": "68224786c75eba8e52dd2a712a8489a620af2099",
           "date": "2026-05-24T02:16:37+02:00",
