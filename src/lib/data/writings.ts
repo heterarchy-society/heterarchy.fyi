@@ -12,8 +12,16 @@ type Writing = {
 
 const writings: Writing[] = (writingsData as { writings: Writing[] }).writings;
 
+export type { Writing };
+
 export function getWritingsByGlossaryTerm(termId: string): Writing[] {
 	return writings.filter((w) => w.glossary?.includes(termId));
+}
+
+export function getWritingsByPersonId(personId: string): Writing[] {
+	return writings.filter((w) =>
+		w.authors.some((a) => a.split('|')[1]?.trim() === personId)
+	);
 }
 
 export type WritingAuthorRef = {

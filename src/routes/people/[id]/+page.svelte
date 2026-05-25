@@ -103,6 +103,22 @@
 						</div>
 					{/if}
 
+					{#if data.writings.length > 0}
+						<div class="mt-8 max-w-3xl">
+							<p class="label mb-4">{m.writings_page_label()}</p>
+							<ul class="divide-y divide-line">
+								{#each data.writings as writing (writing.id)}
+									<li>
+										<a href={localizeUrl(`/writings/${writing.id}`)} class="group flex items-baseline justify-between gap-4 py-3 no-underline">
+											<span class="font-mono text-[13px] text-black group-hover:underline">{writing.title}</span>
+											<span class="shrink-0 font-mono text-[11px] text-black/35">{writing.year ?? ''}</span>
+										</a>
+									</li>
+								{/each}
+							</ul>
+						</div>
+					{/if}
+
 					{#if person.refs}
 						<div class="mt-8">
 							<p class="label mb-3">{m.people_detail_refs()}</p>

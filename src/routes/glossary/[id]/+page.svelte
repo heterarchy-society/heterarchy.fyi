@@ -3,6 +3,7 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import LibraryBookCard from '$lib/components/library/LibraryBookCard.svelte';
 	import { renderMarkdown } from '$lib/markdown';
+	import { writingAuthorText } from '$lib/data/writings';
 	import { page } from '$app/stores';
 	import { localizeUrl, getLocale } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
@@ -142,7 +143,7 @@
 										<a href={localizeUrl(`/writings/${writing.id}`)} class="group no-underline">
 											<span class="block font-mono text-[14px] text-black group-hover:underline">{writing.title}</span>
 											<span class="font-mono text-[11px] text-black/40">
-												{writing.authors.join(', ')}{#if writing.year} · {writing.year}{/if}
+												{writingAuthorText(writing.authors)}{#if writing.year}&nbsp;· {writing.year}{/if}
 											</span>
 										</a>
 									</li>

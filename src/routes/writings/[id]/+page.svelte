@@ -561,7 +561,7 @@
 					{#if writing.type}
 						<p class="label mb-4">{writing.type}</p>
 					{/if}
-					<h1 class="page-lead mb-4 font-mono">{writing.title}</h1>
+					<h1 class="page-lead mb-4 font-mono">{writing.title.replace(/-/g, '‑')}</h1>
 					<div class="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[13px] text-black/55">
 						{#each writingAuthorRefs(writing.authors) as author}
 							{#if author.person}
@@ -973,6 +973,14 @@
 	.prose :global(h4) {
 		border-top: 1px solid var(--prose-line);
 		padding-top: 1.55rem;
+	}
+
+	.prose :global(h2:first-child),
+	.prose :global(h3:first-child),
+	.prose :global(h4:first-child) {
+		margin-top: 0;
+		border-top: none;
+		padding-top: 0;
 	}
 
 	.prose :global(h2) {

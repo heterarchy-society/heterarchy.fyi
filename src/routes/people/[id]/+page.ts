@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { bookAuthorRefs, libraryBooks } from '$lib/data/library';
 import { people, peopleById, personAvatarUrl } from '$lib/data/people';
+import { getWritingsByPersonId } from '$lib/data/writings';
 import type { PageLoad } from './$types';
 
 export function load({ params }: Parameters<PageLoad>[0]) {
@@ -15,7 +16,8 @@ export function load({ params }: Parameters<PageLoad>[0]) {
 			...person,
 			avatarUrl: personAvatarUrl(person)
 		},
-		books: libraryBooks.filter((book) => bookAuthorRefs(book).some((author) => author.personId === person.id))
+		books: libraryBooks.filter((book) => bookAuthorRefs(book).some((author) => author.personId === person.id)),
+		writings: getWritingsByPersonId(person.id),
 	};
 }
 
