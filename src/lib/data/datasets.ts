@@ -40,6 +40,7 @@ export const datasetConfigs: DatasetConfig[] = [
 		endpoint: 'https://books.data.heterarchy.fyi/index.json',
 		endpointLabel: 'https://books.data.heterarchy.fyi/',
 		repository: 'https://github.com/heterarchy-society/books',
+		radicle: radicleUrl('rad:zFYLWerMS7reLb372d84oxqy9ZQH'),
 		collections: [{ name: 'books', changelogPath: '/books/changelog' }]
 	},
 	{
@@ -47,7 +48,7 @@ export const datasetConfigs: DatasetConfig[] = [
 		endpoint: 'https://people.data.heterarchy.fyi/',
 		endpointLabel: 'https://people.data.heterarchy.fyi/',
 		repository: 'https://github.com/heterarchy-society/people',
-		radicle: radicleUrl('rad:zFYLWerMS7reLb372d84oxqy9ZQH'),
+		radicle: radicleUrl('rad:z65FF84dMSHS7KcTTJ3PHxktg1Ma'),
 		collections: [{ name: 'people', changelogPath: '/people/changelog' }]
 	}
 ];

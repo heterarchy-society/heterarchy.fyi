@@ -7,7 +7,7 @@
 	import { timeAgo } from '$lib/time';
 
 	const versionHref =
-		buildInfo.commit === 'unknown' ? siteMeta.sourceHref : `${siteMeta.sourceHref}/commit/${buildInfo.commit}`;
+		buildInfo.commit === 'unknown' ? siteMeta.radicleHref : `${siteMeta.radicleHref}/commits/${buildInfo.commit}`;
 	const deployAge = buildInfo.deployedAt === 'unknown' ? 'unknown' : timeAgo(buildInfo.deployedAt, getLocale());
 </script>
 
