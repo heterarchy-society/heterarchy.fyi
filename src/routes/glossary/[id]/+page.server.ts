@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import {
 	findGlossaryTerm,
 	getGlossaryBacklinks,
@@ -7,9 +7,15 @@ import {
 } from '$lib/server/glossary';
 import { getBooksByGlossaryTerm } from '$lib/data/library';
 import { getWritingsByGlossaryTerm } from '$lib/data/writings';
+import glossaryData from '$lib/data/glossary.json';
 import type { PageServerLoad } from './$types';
 
+const redirects = (glossaryData.meta?.redirects ?? {}) as Record<string, string>;
+
 export const load: PageServerLoad = ({ params }) => {
+	const target = redirects[params.id];
+	if (target) redirect(301, `/glossary/${target}`);
+
 	const term = findGlossaryTerm(params.id);
 
 	if (!term) {
@@ -42,5 +48,8 @@ export const load: PageServerLoad = ({ params }) => {
 };
 
 export function entries() {
-	return getGlossaryEntries();
+	return [
+		...getGlossaryEntries(),
+		...Object.keys(redirects).map((id) => ({ id })),
+	];
 }
