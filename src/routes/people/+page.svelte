@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Search } from 'lucide-svelte';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import LatestRevision from '$lib/components/LatestRevision.svelte';
@@ -8,22 +7,6 @@
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
-
-	let query = $state('');
-
-	const filteredPeople = $derived(
-		data.people.filter((person) => {
-			const needle = query.trim().toLowerCase();
-			if (!needle) return true;
-			const refs = Object.values(person.refs ?? {}).join(' ');
-			const aliases = person.altNames?.join(' ') ?? '';
-			return `${person.name} ${aliases} ${person.caption ?? ''} ${person.description ?? ''} ${refs}`
-				.toLowerCase()
-				.includes(needle);
-		})
-	);
-
-	const isSearching = $derived(query.trim().length > 0);
 
 	// Only load alt avatar src on first hover — avoids fetching ~200 extra images on page load
 	let altLoadedIds = $state(new Set<string>());
@@ -56,42 +39,9 @@
 				<p class="max-w-2xl text-[15px] leading-[1.65] text-black/70">{m.people_page_lead()}</p>
 			</div>
 
-			<div class="mb-10">
-				<label class="sr-only" for="people-search">{m.people_search_label()}</label>
-				<div class="relative max-w-md">
-					<Search
-						size={14}
-						strokeWidth={1.25}
-						class="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 text-black/40"
-						aria-hidden="true"
-					/>
-					<input
-						id="people-search"
-						type="search"
-						bind:value={query}
-						placeholder={m.people_search_placeholder()}
-						class="w-full border-0 border-b border-line bg-transparent py-2 pr-8 pl-5 font-mono text-[13px] outline-none placeholder:text-black/40 focus:border-black"
-					/>
-					{#if isSearching}
-						<button
-							type="button"
-							class="absolute top-1/2 right-0 -translate-y-1/2 font-mono text-[11px] text-black/45 hover:text-black"
-							onclick={() => (query = '')}
-						>
-							{m.people_search_cancel()}
-						</button>
-					{/if}
-				</div>
-				{#if isSearching}
-					<p class="mt-3 font-mono text-[11px] text-black/50">
-						{m.people_search_showing({ count: String(filteredPeople.length), total: String(data.people.length) })}
-					</p>
-				{/if}
-			</div>
-
-			{#if filteredPeople.length > 0}
+			{#if data.people.length > 0}
 				<div class="grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
-					{#each filteredPeople as person (person.id)}
+					{#each data.people as person (person.id)}
 						<a
 							href={localizeUrl(`/people/${person.id}`)}
 							class="group block min-w-0 no-underline"
@@ -131,10 +81,6 @@
 						</a>
 					{/each}
 				</div>
-			{:else}
-				<p class="py-12 font-mono text-[13px] text-black/55">
-					{m.people_no_results()}
-				</p>
 			{/if}
 		</section>
 
