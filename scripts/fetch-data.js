@@ -31,3 +31,12 @@ console.log(`✓ Books: ${books.length} books → src/lib/data/books.json`);
 const writings = await fetchJson('https://writings.data.heterarchy.fyi/');
 writeFileSync(`${DATA}/writings.json`, JSON.stringify(writings, null, 2) + '\n');
 console.log(`✓ Writings: ${writings.writings.length} writings → src/lib/data/writings.json`);
+
+// People
+try {
+  const people = await fetchJson('https://people.data.heterarchy.fyi/');
+  writeFileSync(`${DATA}/people.json`, JSON.stringify(people, null, 2) + '\n');
+  console.log(`✓ People: ${people.people?.length ?? 0} people → src/lib/data/people.json`);
+} catch (error) {
+  console.warn(`⚠ People dataset not fetched yet: ${error.message}`);
+}

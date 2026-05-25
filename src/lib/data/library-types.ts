@@ -12,6 +12,7 @@ export type LibraryBook = {
 	id: string;
 	title: string;
 	author: string;
+	authors?: (string | { name: string })[];
 	year?: string;
 	coverUrl?: string;
 	description: string;

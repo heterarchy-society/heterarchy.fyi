@@ -21,13 +21,17 @@
 	function datasetName(id: string): string {
 		if (id === 'glossary') return m.glossary_label();
 		if (id === 'books') return m.books_page_label();
-		return m.writings_page_label();
+		if (id === 'writings') return m.writings_page_label();
+		if (id === 'people') return m.people_label();
+		return id;
 	}
 
 	function datasetDescription(id: string): string {
 		if (id === 'glossary') return m.data_glossary_desc();
 		if (id === 'books') return m.data_books_desc();
-		return m.data_writings_desc();
+		if (id === 'writings') return m.data_writings_desc();
+		if (id === 'people') return m.data_people_desc();
+		return '';
 	}
 
 	function highlightJson(raw: string): string {
@@ -54,7 +58,8 @@
 		{ label: 'term: heterarchy', url: 'https://glossary.data.heterarchy.fyi/terms/heterarchy.json' },
 		{ label: 'books bundle', url: 'https://books.data.heterarchy.fyi/index.json' },
 		{ label: 'book: 1984', url: 'https://books.data.heterarchy.fyi/books/1984.json' },
-		{ label: 'history: 1984', url: 'https://books.data.heterarchy.fyi/history/1984.json' }
+		{ label: 'history: 1984', url: 'https://books.data.heterarchy.fyi/history/1984.json' },
+		{ label: 'people bundle', url: 'https://people.data.heterarchy.fyi/' }
 	];
 
 	let url = $state(examples[0].url);

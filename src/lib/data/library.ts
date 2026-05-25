@@ -1,4 +1,5 @@
 import { libraryBooks as booksByAdded } from './books';
+import { peopleById, type Person } from './people';
 import type { BookFormat, BookLanguage, LibraryBook } from './library-types';
 
 /** Seřazeno podle roku vydání, nejnovější první */
@@ -23,6 +24,36 @@ export const languageLabels: Record<BookLanguage, string> = {
 
 export function bookPath(id: string): string {
 	return `/books/${id}`;
+}
+
+export type BookAuthorRef = {
+	name: string;
+	personId?: string;
+	person?: Person;
+};
+
+function parseBookAuthor(raw: string): BookAuthorRef | null {
+	const [name, personId] = raw.split('|').map((part) => part.trim());
+
+	if (!name) return null;
+
+	return {
+		name,
+		personId,
+		person: personId ? peopleById.get(personId) : undefined
+	};
+}
+
+export function bookAuthorRefs(book: LibraryBook): BookAuthorRef[] {
+	const explicitAuthors = book.authors?.filter((author): author is string => typeof author === 'string' && author.trim().length > 0) ?? [];
+	const authors = explicitAuthors.length ? explicitAuthors : [book.author];
+	return authors.map(parseBookAuthor).filter((author): author is BookAuthorRef => Boolean(author));
+}
+
+export function bookAuthorText(book: LibraryBook): string {
+	return bookAuthorRefs(book)
+		.map((author) => author.name)
+		.join(', ');
 }
 
 export function getBookById(id: string): LibraryBook | undefined {

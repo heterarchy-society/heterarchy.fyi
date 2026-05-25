@@ -1,0 +1,213 @@
+{
+  "meta": {
+    "generated": "2026-05-25T01:50:07.536Z",
+    "version": "1.0.0",
+    "commit": {
+      "hash": "227d96efbf654462c96958f2e5b73ca8cacbc0c3",
+      "date": "2026-05-25T02:55:33+02:00"
+    },
+    "atlas": {
+      "version": "1.0.0",
+      "commit": "227d96efbf654462c96958f2e5b73ca8cacbc0c3"
+    },
+    "people": {
+      "count": 5,
+      "latestCommit": {
+        "hash": "227d96efbf654462c96958f2e5b73ca8cacbc0c3",
+        "date": "2026-05-25T02:55:33+02:00"
+      }
+    }
+  },
+  "people": [
+    {
+      "id": "amir-taaki",
+      "name": "Amir Taaki",
+      "avatar": "avatar.png",
+      "altNames": [
+        "A. Taaki"
+      ],
+      "refs": {
+        "twitter": "Narodism"
+      },
+      "description": "As part of the forming Bitcoin community, Amir became an early Bitcoin developer, author of the BIP process, and the Libbitcoin implementation. With contributions to many free and open-source projects, he collaborated with Cody Wilson on launching Darkwallet and laid the foundations for OpenBazaar. Later, he spent nearly 2 years in the Rojava revolution, first for nearly 4 months fighting in the YPG and then working for the administration on economic projects. Today, Amir is focused on the DarkFi project, a network bringing anonymity to decentralized finance, and is still working towards building an agonistic revolutionary hacker movement.",
+      "_assets": {
+        "avatar.png": {
+          "size": 387357,
+          "hash": "cf9409bc6f3d8a5fd6aef57ace1224c8585155520635c487dfe0b874342df4a6",
+          "mime": "image/png",
+          "image": {
+            "format": "png",
+            "width": 623,
+            "height": 623
+          }
+        }
+      },
+      "history": [
+        {
+          "hash": "227d96efbf654462c96958f2e5b73ca8cacbc0c3",
+          "date": "2026-05-25T02:55:33+02:00",
+          "author": "tree",
+          "message": "Add Mário Havel's profile with avatar and description to the people directory"
+        }
+      ],
+      "contributors": [
+        {
+          "name": "tree"
+        }
+      ]
+    },
+    {
+      "id": "jarrad-hope",
+      "name": "Jarrad Hope",
+      "avatar": "avatar.png",
+      "altNames": [
+        "Jarred Hope",
+        "J. Hope"
+      ],
+      "refs": {
+        "twitter": "jarradhope_"
+      },
+      "description": "Jarrad came to Bitcoin in early 2011 through agorism, counter-economics and crypto-anarchy. Seeing that Bitcoin could operate a monetary policy in a hostile environment, he began to view public blockchains as a voluntary social order, one that did not depend on a monopoly of violence. From there he participated in early attempts to generalise the Bitcoin script to advance institutional libertarianism, ultimately becoming an early contributor to Ethereum. While Jarrad advances privacy technologies through developing an e2e and p2p private messaging client and super app, Status, he realised that privacy technologies are not enough and now is advocating for self-sovereign crypto-networks, the realisation of a latent cypherpunk dream, the crypto-state.",
+      "_assets": {
+        "avatar.png": {
+          "size": 313759,
+          "hash": "03d3d5b506e5ccc0a7e0250b5167b72574307cb62918ee6a6488e4b3a3f72dd2",
+          "mime": "image/png",
+          "image": {
+            "format": "png",
+            "width": 400,
+            "height": 400
+          }
+        }
+      },
+      "history": [
+        {
+          "hash": "227d96efbf654462c96958f2e5b73ca8cacbc0c3",
+          "date": "2026-05-25T02:55:33+02:00",
+          "author": "tree",
+          "message": "Add Mário Havel's profile with avatar and description to the people directory"
+        }
+      ],
+      "contributors": [
+        {
+          "name": "tree"
+        }
+      ]
+    },
+    {
+      "id": "juraj-bednar",
+      "name": "Juraj Bednár",
+      "avatar": "avatar.png",
+      "altNames": [
+        "Juraj Bednar",
+        "Juraj Bednár"
+      ],
+      "refs": {
+        "web": "https://juraj.bednar.io",
+        "twitter": "jurbed",
+        "nostr": "npub1m2mvvpjugwdehtaskrcl7ksvdqnnhnjur9v6g9v266nss504q7mqvlr8p9",
+        "github": "jooray"
+      },
+      "description": "Juraj is a serial entrepreneur and founder of Progressbar, Paralelná Polis, and Hacktrophy. He wrote several books, his latest one being \"Cryptocurrencies - hack your way to a better life\". He creates online courses and content about privacy, crypto, and entrepreneurship.",
+      "_assets": {
+        "avatar.png": {
+          "size": 1312401,
+          "hash": "ac20b0df05ec74782c951041c4fac731b394ddbf08db9b8b9605188be3ed4287",
+          "mime": "image/png",
+          "image": {
+            "format": "png",
+            "width": 1066,
+            "height": 1066
+          }
+        }
+      },
+      "history": [
+        {
+          "hash": "227d96efbf654462c96958f2e5b73ca8cacbc0c3",
+          "date": "2026-05-25T02:55:33+02:00",
+          "author": "tree",
+          "message": "Add Mário Havel's profile with avatar and description to the people directory"
+        }
+      ],
+      "contributors": [
+        {
+          "name": "tree"
+        }
+      ]
+    },
+    {
+      "id": "mario-havel",
+      "name": "Mário Havel",
+      "avatar": "avatar.png",
+      "altNames": [
+        "Mario Havel"
+      ],
+      "refs": {
+        "twitter": "TMIYChao",
+        "github": "taxmeifyoucan"
+      },
+      "description": "Mário is a hacker and researcher working with EF on making the crypto ecosystem more efficient and anonymous. As a member of Paralelní Polis, co-founder of Bordel Hackerspace, and the driving force behind Pizza Day Prague, Mário educates about tools of cryptoanarchy in local communities with a focus on onboarding via Lightning and p2p exchange. He is a vast enjoyer of FOSS, parallel economy, and trolling bitcoiners.",
+      "_assets": {
+        "avatar.png": {
+          "size": 354062,
+          "hash": "7cea3ba775c9cea90a4dfd2694bfc69a7e8768e77a6250520c50eff976071a69",
+          "mime": "image/png",
+          "image": {
+            "format": "png",
+            "width": 499,
+            "height": 499
+          }
+        }
+      },
+      "history": [
+        {
+          "hash": "227d96efbf654462c96958f2e5b73ca8cacbc0c3",
+          "date": "2026-05-25T02:55:33+02:00",
+          "author": "tree",
+          "message": "Add Mário Havel's profile with avatar and description to the people directory"
+        }
+      ],
+      "contributors": [
+        {
+          "name": "tree"
+        }
+      ]
+    },
+    {
+      "id": "urza",
+      "name": "Urza",
+      "avatar": "avatar.jpg",
+      "caption": "Anarchocapitalist author, member of Svoboda učení, head of Ludwig von Mises Institute CZ/SK, author of Urza.cz.",
+      "refs": {
+        "web": "https://urza.cz",
+        "twitter": "urzanarchy"
+      },
+      "description": "Urza is an anarchocapitalist author who wrote almost one thousand libertarian texts. He is a head of Ludwig von Mises Institute CZ & SK, member of Svoboda učení (Freedom to Learn), author of Urza.cz and associate of Paralelní Polis. Urza is mainly focusing on moral aspects of stateless society, free-market based education system and government propaganda at public schools. He is about to publish the first Czech book about anarchocapitalism.",
+      "_assets": {
+        "avatar.jpg": {
+          "size": 57902,
+          "hash": "c18b670c40e2459f78019b726b092c45836a85c4c50b9318ae874be3a8f8dc9a",
+          "mime": "image/jpeg",
+          "image": {
+            "format": "jpeg",
+            "width": 548,
+            "height": 548
+          }
+        }
+      },
+      "history": [
+        {
+          "hash": "227d96efbf654462c96958f2e5b73ca8cacbc0c3",
+          "date": "2026-05-25T02:55:33+02:00",
+          "author": "tree",
+          "message": "Add Mário Havel's profile with avatar and description to the people directory"
+        }
+      ],
+      "contributors": [
+        {
+          "name": "tree"
+        }
+      ]
+    }
+  ]
+}

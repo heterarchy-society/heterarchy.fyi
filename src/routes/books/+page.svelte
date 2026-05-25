@@ -4,7 +4,7 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import LibraryBookCard from '$lib/components/library/LibraryBookCard.svelte';
-	import { libraryBooks, type LibraryBook } from '$lib/data/library';
+	import { bookAuthorText, libraryBooks, type LibraryBook } from '$lib/data/library';
 	import LatestRevision from '$lib/components/LatestRevision.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
@@ -16,7 +16,7 @@
 	function matchesBook(book: LibraryBook, q: string): boolean {
 		const needle = q.trim().toLowerCase();
 		if (!needle) return true;
-		const haystack = `${book.title} ${book.author} ${book.description}`.toLowerCase();
+		const haystack = `${book.title} ${bookAuthorText(book)} ${book.description}`.toLowerCase();
 		return haystack.includes(needle);
 	}
 

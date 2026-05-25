@@ -32,5 +32,12 @@ export const datasetConfigs: DatasetConfig[] = [
 		endpointLabel: 'https://books.data.heterarchy.fyi/',
 		repository: 'https://github.com/heterarchy-society/books',
 		collections: [{ name: 'books', changelogPath: '/books/changelog' }]
+	},
+	{
+		id: 'people',
+		endpoint: 'https://people.data.heterarchy.fyi/',
+		endpointLabel: 'https://people.data.heterarchy.fyi/',
+		repository: 'https://github.com/heterarchy-society/people',
+		collections: [{ name: 'people', changelogPath: '/people/changelog' }]
 	}
 ];

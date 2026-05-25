@@ -3,6 +3,7 @@
 	import { getLocale, localizeUrl } from '$lib/i18n';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import LibraryBookAuthors from '$lib/components/library/LibraryBookAuthors.svelte';
 	import LibraryBookMeta from '$lib/components/library/LibraryBookMeta.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
@@ -59,7 +60,7 @@
 					{/if}
 
 					<h1 class="book-detail-title mb-3 max-w-2xl">{book.title}</h1>
-					<p class="mb-4 font-mono text-[13px] text-black/70">{book.author}</p>
+					<LibraryBookAuthors {book} linked avatars authorClass="mb-4" />
 
 					<LibraryBookMeta {book} fullLanguage />
 

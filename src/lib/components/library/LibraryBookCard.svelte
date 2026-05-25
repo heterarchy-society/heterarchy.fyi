@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { localizeUrl } from '$lib/i18n';
 	import { bookPath, type LibraryBook } from '$lib/data/library';
+	import LibraryBookAuthors from './LibraryBookAuthors.svelte';
 	import LibraryBookMeta from './LibraryBookMeta.svelte';
 	import * as m from '$lib/paraglide/messages';
 
@@ -50,7 +51,7 @@
 			{book.title}
 		</h2>
 
-		<p class="mb-2 font-mono text-[11px] text-black/65">{book.author}</p>
+		<LibraryBookAuthors {book} authorClass="mb-2 font-mono text-[11px] text-black/65" />
 
 		<LibraryBookMeta {book} />
 

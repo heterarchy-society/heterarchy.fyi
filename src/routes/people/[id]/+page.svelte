@@ -1,0 +1,120 @@
+<script lang="ts">
+	import Header from '$lib/components/Header.svelte';
+	import Footer from '$lib/components/Footer.svelte';
+	import LibraryBookCard from '$lib/components/library/LibraryBookCard.svelte';
+	import { localizeUrl } from '$lib/i18n';
+	import * as m from '$lib/paraglide/messages';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
+
+	const person = $derived(data.person);
+
+	function refHref(kind: string, value: string): string {
+		if (/^https?:\/\//.test(value)) return value;
+		if (kind === 'twitter') return `https://x.com/${value}`;
+		if (kind === 'github') return `https://github.com/${value}`;
+		if (kind === 'nostr') return `https://njump.me/${value}`;
+		return value;
+	}
+
+	function refLabel(kind: string, value: string): string {
+		if (kind === 'web') return m.people_ref_web();
+		if (kind === 'twitter') return `@${value}`;
+		if (kind === 'github') return value;
+		if (kind === 'nostr') return m.people_ref_nostr();
+		return kind;
+	}
+</script>
+
+<svelte:head>
+	<title>{person.name} — {m.people_page_label()}</title>
+	<meta name="description" content={person.description ?? m.people_page_lead()} />
+</svelte:head>
+
+<div class="min-h-screen w-full">
+	<Header />
+
+	<main>
+		<section class="cell-roomy">
+			<a href={localizeUrl('/people')} class="link-arrow mb-8 inline-block text-[12px]">{m.people_detail_back()}</a>
+
+			<div class="grid gap-10 lg:grid-cols-[minmax(180px,260px)_1fr] lg:gap-14">
+				<div class="mx-auto w-full max-w-65 lg:mx-0">
+					{#if person.avatarUrl}
+						<img
+							src={person.avatarUrl}
+							alt={m.people_avatar_alt({ name: person.name })}
+							width={260}
+							height={260}
+							class="aspect-square w-full border border-line object-cover"
+						/>
+					{:else}
+						<div class="aspect-square w-full border border-line bg-bg-muted" aria-hidden="true"></div>
+					{/if}
+				</div>
+
+				<div class="min-w-0">
+					<p class="label mb-4">{m.people_detail_label()}</p>
+					<h1 class="book-detail-title mb-4 max-w-2xl">{person.name}</h1>
+
+					{#if person.caption}
+						<p class="mb-6 max-w-2xl text-[15px] leading-[1.65] text-black/65">{person.caption}</p>
+					{/if}
+
+					{#if person.altNames?.length}
+						<p class="font-mono text-[12px] leading-relaxed text-black/45">
+							{m.people_aliases()} {person.altNames.join(' · ')}
+						</p>
+					{/if}
+
+					{#if person.description}
+						<div class="mt-8 max-w-2xl">
+							<p class="label mb-3">{m.people_detail_about()}</p>
+							<p class="text-[15px] leading-[1.7] text-black/80">{person.description}</p>
+						</div>
+					{/if}
+
+					{#if data.books.length > 0}
+						<div class="mt-8 max-w-3xl">
+							<p class="label mb-4">{m.books_label()}</p>
+							<div class="grid gap-5 sm:grid-cols-2">
+								{#each data.books as book (book.id)}
+									<LibraryBookCard {book} compact />
+								{/each}
+							</div>
+						</div>
+					{/if}
+
+					{#if person.refs}
+						<div class="mt-8">
+							<p class="label mb-3">{m.people_detail_refs()}</p>
+							<ul class="flex flex-col gap-3">
+								{#each Object.entries(person.refs) as [kind, value]}
+									<li>
+										<a href={refHref(kind, value)} class="link-external font-mono text-[13px]" target="_blank" rel="noopener noreferrer">
+											{refLabel(kind, value)}
+										</a>
+									</li>
+								{/each}
+							</ul>
+						</div>
+					{/if}
+
+					<p class="mt-10 font-mono text-[11px] text-black/45">
+						<a
+							href="https://github.com/heterarchy-society/people/tree/main/people/{person.id}"
+							class="link-external"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{m.people_detail_source()}
+						</a>
+					</p>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<Footer />
+</div>

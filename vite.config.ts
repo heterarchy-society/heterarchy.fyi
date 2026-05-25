@@ -11,6 +11,7 @@ const csPathMap: Record<string, string> = {
 	'/about': '/o-nas',
 	'/open-data': '/otevrena-data',
 	'/writings': '/texty',
+	'/people': '/lide',
 };
 
 type UrlPattern = { pattern: string; localized: ['en' | 'cs', string][] };
