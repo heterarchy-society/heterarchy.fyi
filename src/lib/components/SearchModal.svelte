@@ -2,6 +2,7 @@
 	import { tick, onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { version } from '$app/environment';
 	import { BookOpen, FileText, Globe, Search, Tag, User, X } from 'lucide-svelte';
 	import Fuse from 'fuse.js';
 	import { search } from '$lib/search.svelte';
@@ -39,7 +40,7 @@
 		if (fuse !== null || loading) return;
 		loading = true;
 		try {
-			const res = await fetch(`/search-index-${getLocale()}.json`);
+			const res = await fetch(`/search-index-${getLocale()}.json?v=${version}`);
 			const data: SearchEntry[] = await res.json();
 			const fuseData: FuseEntry[] = data.map((e) => ({
 				...e,
