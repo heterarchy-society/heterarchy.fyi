@@ -29,7 +29,6 @@
 		{ label: m.nav_books(), href: localizeUrl('/books') },
 		{ label: m.nav_people(), href: localizeUrl('/people') },
 		{ label: m.nav_events(), href: localizeUrl('/events') },
-		{ label: m.nav_join(), href: localizeUrl('/join') },
 	]);
 
 	const altUrls = $derived((page.data as any)?.altUrls as { en: string; cs: string } | undefined);

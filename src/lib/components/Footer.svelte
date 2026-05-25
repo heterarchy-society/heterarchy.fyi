@@ -33,6 +33,8 @@
 		<nav class="flex flex-wrap items-center gap-x-1.5 lg:justify-self-center">
 			<a href={localizeUrl('/find-us')} class="no-underline hover:underline">{m.footer_where_to_find()}</a>
 			<span aria-hidden="true">·</span>
+			<a href={localizeUrl('/join')} class="no-underline hover:underline">{m.nav_join()}</a>
+			<span aria-hidden="true">·</span>
 			<a href={localizeUrl('/open-data')} class="no-underline hover:underline">{m.footer_data()}</a>
 			<span aria-hidden="true">·</span>
 			<a href={siteMeta.sourceHref} class="link-external" target="_blank" rel="noopener noreferrer">{m.footer_git()}</a>
