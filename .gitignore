@@ -30,3 +30,4 @@ src/lib/data/build-info.ts
 src/lib/data/glossary.json
 src/lib/data/books.json
 src/lib/data/writings.json
+src/lib/data/people.json
