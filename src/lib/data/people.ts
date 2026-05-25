@@ -6,6 +6,7 @@ export type Person = {
 	id: string;
 	name: string;
 	avatar?: string;
+	avatarsAlt?: string[];
 	caption?: string;
 	altNames?: string[];
 	refs?: Record<PersonRefKey, string>;
@@ -32,6 +33,11 @@ export function personPath(id: string): string {
 export function personAvatarUrl(person: Person): string | null {
 	if (!person.avatar) return null;
 	return `${PEOPLE_BASE}/people/${person.id}/${person.avatar}`;
+}
+
+export function personAvatarAltUrl(person: Person): string | null {
+	if (!person.avatarsAlt?.length) return null;
+	return `${PEOPLE_BASE}/people/${person.id}/${person.avatarsAlt[0]}`;
 }
 
 export function latestPeopleRevision(): LatestRevision | null {

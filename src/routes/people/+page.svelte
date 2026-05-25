@@ -93,12 +93,22 @@
 						>
 							<article>
 								{#if person.avatarUrl}
-									<img
-										src={person.avatarUrl}
-										alt={m.people_avatar_alt({ name: person.name })}
-										class="aspect-square w-full border border-line object-cover transition-opacity group-hover:opacity-85"
-										loading="lazy"
-									/>
+									<div class="relative aspect-square w-full">
+										<img
+											src={person.avatarUrl}
+											alt={m.people_avatar_alt({ name: person.name })}
+											class="absolute inset-0 h-full w-full border border-line object-cover transition-opacity duration-300 {person.avatarAltUrl ? 'group-hover:opacity-0' : 'group-hover:opacity-85'}"
+											loading="lazy"
+										/>
+										{#if person.avatarAltUrl}
+											<img
+												src={person.avatarAltUrl}
+												alt={m.people_avatar_alt({ name: person.name })}
+												class="absolute inset-0 h-full w-full border border-line object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+												loading="lazy"
+											/>
+										{/if}
+									</div>
 								{:else}
 									<div class="aspect-square w-full border border-line bg-bg-muted" aria-hidden="true"></div>
 								{/if}
