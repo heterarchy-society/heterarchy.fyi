@@ -24,6 +24,12 @@
 	);
 
 	const isSearching = $derived(query.trim().length > 0);
+
+	// Only load alt avatar src on first hover — avoids fetching ~200 extra images on page load
+	let altLoadedIds = $state(new Set<string>());
+	function revealAlt(id: string) {
+		if (!altLoadedIds.has(id)) altLoadedIds = new Set([...altLoadedIds, id]);
+	}
 </script>
 
 <svelte:head>
@@ -90,22 +96,27 @@
 							href={localizeUrl(`/people/${person.id}`)}
 							class="group block min-w-0 no-underline"
 							aria-label={person.name}
+							onmouseenter={() => revealAlt(person.id)}
 						>
 							<article>
 								{#if person.avatarUrl}
 									<div class="relative aspect-square w-full">
 										<img
 											src={person.avatarUrl}
+											srcset={person.avatarSrcset}
+											sizes="(min-width: 1536px) 175px, (min-width: 1280px) 200px, (min-width: 1024px) 240px, (min-width: 640px) 25vw, 50vw"
 											alt={m.people_avatar_alt({ name: person.name })}
 											class="absolute inset-0 h-full w-full border border-line object-cover transition-opacity duration-300 {person.avatarAltUrl ? 'group-hover:opacity-0' : 'group-hover:opacity-85'}"
 											loading="lazy"
+											decoding="async"
 										/>
 										{#if person.avatarAltUrl}
 											<img
-												src={person.avatarAltUrl}
+												src={altLoadedIds.has(person.id) ? person.avatarAltUrl : undefined}
+												srcset={altLoadedIds.has(person.id) ? person.avatarAltSrcset : undefined}
+												sizes="(min-width: 1536px) 175px, (min-width: 1280px) 200px, (min-width: 1024px) 240px, (min-width: 640px) 25vw, 50vw"
 												alt={m.people_avatar_alt({ name: person.name })}
 												class="absolute inset-0 h-full w-full border border-line object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-												loading="lazy"
 											/>
 										{/if}
 									</div>

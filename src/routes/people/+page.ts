@@ -1,4 +1,4 @@
-import { latestPeopleRevision, people as peopleSource, personAvatarUrl, personAvatarAltUrl } from '$lib/data/people';
+import { latestPeopleRevision, people as peopleSource, personAvatarUrl, personAvatarAltUrl, imageSrcset } from '$lib/data/people';
 
 export async function load() {
 	const people = [...peopleSource]
@@ -6,7 +6,9 @@ export async function load() {
 		.map((person) => ({
 			...person,
 			avatarUrl: personAvatarUrl(person),
-			avatarAltUrl: personAvatarAltUrl(person)
+			avatarSrcset: imageSrcset(person.avatarVersions),
+			avatarAltUrl: personAvatarAltUrl(person),
+			avatarAltSrcset: imageSrcset(person.avatarsAltVersions?.[0] ?? undefined),
 		}));
 
 	return {

@@ -13,6 +13,11 @@
 	const book = $derived(data.book);
 	let coverFailed = $state(false);
 	const coverSrc = $derived(coverFailed || !book.coverUrl ? '/book-placeholder.svg' : book.coverUrl);
+	const coverSrcset = $derived(
+		!coverFailed && book.coverVersions
+			? Object.entries(book.coverVersions).map(([w, url]) => `${url} ${w}`).join(', ')
+			: undefined
+	);
 	const booksHref = $derived(localizeUrl('/books'));
 
 	function glossaryTermName(term: PageData['glossary'][number]): string {
@@ -43,6 +48,8 @@
 					<div class="overflow-hidden border border-line bg-bg-muted">
 						<img
 							src={coverSrc}
+							srcset={coverSrcset}
+							sizes="(min-width: 1024px) 280px, 70vw"
 							alt={m.books_detail_cover_alt({ title: book.title })}
 							width={280}
 							height={420}

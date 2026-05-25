@@ -37,11 +37,11 @@
 	const diedLabel = $derived(person.died ? formatLifeDate(person.died) : null);
 
 	const allAvatars = $derived([
-		...(person.avatarUrl ? [person.avatarUrl] : []),
-		...person.avatarAltUrls
+		...(person.avatarUrl ? [{ url: person.avatarUrl, srcset: person.avatarSrcset }] : []),
+		...person.avatarAltUrls.map((url, i) => ({ url, srcset: person.avatarAltSrcsets?.[i] }))
 	]);
 	let activeAvatarIdx = $state(0);
-	const activeAvatarUrl = $derived(allAvatars[activeAvatarIdx] ?? null);
+	const activeAvatar = $derived(allAvatars[activeAvatarIdx] ?? null);
 </script>
 
 <svelte:head>
@@ -58,9 +58,11 @@
 
 			<div class="grid gap-10 lg:grid-cols-[minmax(180px,260px)_1fr] lg:gap-14">
 				<div class="mx-auto w-full max-w-65 lg:mx-0">
-					{#if activeAvatarUrl}
+					{#if activeAvatar}
 						<img
-							src={activeAvatarUrl}
+							src={activeAvatar.url}
+							srcset={activeAvatar.srcset}
+							sizes="(min-width: 1024px) 260px, 65vw"
 							alt={m.people_avatar_alt({ name: person.name })}
 							width={260}
 							height={260}
@@ -72,14 +74,14 @@
 
 					{#if allAvatars.length > 1}
 						<div class="mt-2 flex gap-1.5">
-							{#each allAvatars as url, i}
+							{#each allAvatars as av, i}
 								<button
 									type="button"
 									onclick={() => (activeAvatarIdx = i)}
 									class="size-8 shrink-0 overflow-hidden border transition-colors {activeAvatarIdx === i ? 'border-black/50' : 'border-line hover:border-black/30'}"
 									aria-label="Avatar {i + 1}"
 								>
-									<img src={url} alt="" class="h-full w-full object-cover" />
+									<img src={av.url} alt="" class="h-full w-full object-cover" />
 								</button>
 							{/each}
 						</div>

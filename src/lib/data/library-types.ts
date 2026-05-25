@@ -15,6 +15,7 @@ export type LibraryBook = {
 	authors?: (string | { name: string })[];
 	year?: string;
 	coverUrl?: string;
+	coverVersions?: Record<string, string>;
 	description: string;
 	language: BookLanguage[];
 	formats: BookFormat[];

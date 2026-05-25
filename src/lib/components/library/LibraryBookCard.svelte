@@ -10,6 +10,11 @@
 	let coverFailed = $state(false);
 
 	const coverSrc = $derived(coverFailed || !book.coverUrl ? '/book-placeholder.svg' : book.coverUrl);
+	const coverSrcset = $derived(
+		!coverFailed && book.coverVersions
+			? Object.entries(book.coverVersions).map(([w, url]) => `${url} ${w}`).join(', ')
+			: undefined
+	);
 	const href = $derived(localizeUrl(bookPath(book.id)));
 </script>
 
@@ -29,6 +34,8 @@
 	>
 		<img
 			src={coverSrc}
+			srcset={coverSrcset}
+			sizes={compact ? '96px' : large ? '320px' : '240px'}
 			alt={m.books_detail_cover_alt({ title: book.title })}
 			width={compact ? 96 : large ? 320 : 240}
 			height={compact ? 144 : large ? 480 : 360}

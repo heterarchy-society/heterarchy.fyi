@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { localizeUrl } from '$lib/i18n';
 	import { bookAuthorRefs, bookAuthorText, type LibraryBook } from '$lib/data/library';
-	import { personAvatarUrl, personPath } from '$lib/data/people';
+	import { personAvatarUrl, imageSrcset, personPath } from '$lib/data/people';
 
 	let {
 		book,
@@ -25,6 +25,8 @@
 						{#if avatars && personAvatarUrl(author.person)}
 							<img
 								src={personAvatarUrl(author.person) ?? ''}
+								srcset={imageSrcset(author.person.avatarVersions)}
+								sizes="32px"
 								alt={author.person.name}
 								width={32}
 								height={32}

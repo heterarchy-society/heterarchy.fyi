@@ -2,11 +2,15 @@ import peopleData from './people.json';
 
 export type PersonRefKey = 'web' | 'twitter' | 'github' | 'nostr' | string;
 
+export type ImageVersions = Record<string, string>;
+
 export type Person = {
 	id: string;
 	name: string;
 	avatar?: string;
+	avatarVersions?: ImageVersions;
 	avatarsAlt?: string[];
+	avatarsAltVersions?: (ImageVersions | null)[];
 	caption?: string;
 	altNames?: string[];
 	refs?: Record<PersonRefKey, string>;
@@ -42,6 +46,13 @@ export function personAvatarAltUrl(person: Person): string | null {
 
 export function personAvatarAltUrls(person: Person): string[] {
 	return (person.avatarsAlt ?? []).map((f) => `${PEOPLE_BASE}/people/${person.id}/${f}`);
+}
+
+export function imageSrcset(versions: ImageVersions | null | undefined): string | undefined {
+	if (!versions) return undefined;
+	return Object.entries(versions)
+		.map(([w, url]) => `${url} ${w}`)
+		.join(', ');
 }
 
 export function latestPeopleRevision(): LatestRevision | null {

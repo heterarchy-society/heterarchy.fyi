@@ -8,7 +8,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 	import { writingAuthorRefs, writingAuthorText } from '$lib/data/writings';
-	import { personAvatarUrl, personPath } from '$lib/data/people';
+	import { personAvatarUrl, imageSrcset, personPath } from '$lib/data/people';
 	import { tick } from 'svelte';
 	import { fly, slide } from 'svelte/transition';
 	import { Captions, Download, Highlighter, Info, Pencil, RotateCcw, X } from 'lucide-svelte';
@@ -567,7 +567,7 @@
 							{#if author.person}
 								<a href={localizeUrl(personPath(author.person.id))} class="group inline-flex items-center gap-2 text-inherit no-underline hover:text-black">
 									{#if personAvatarUrl(author.person)}
-										<img src={personAvatarUrl(author.person) ?? ''} alt={author.person.name} width={32} height={32} class="size-8 border border-line object-cover" />
+										<img src={personAvatarUrl(author.person) ?? ''} srcset={imageSrcset(author.person.avatarVersions)} sizes="32px" alt={author.person.name} width={32} height={32} class="size-8 border border-line object-cover" />
 									{/if}
 									<span class="group-hover:underline">{author.person.name}</span>
 								</a>
