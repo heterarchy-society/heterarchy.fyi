@@ -81,7 +81,6 @@ export const siteMeta = {
 	title: 'The Heterarchy Society',
 	description:
 		'Komunita kolem suverénních technologií, decentralizovaných systémů a nehierarchických forem organizace.',
-	version: '0.1',
 	sourceHref: githubWebRepo,
 	footerNotice: 'The Heterarchy Society'
 };

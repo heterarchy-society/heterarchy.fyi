@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { dev } from '$app/environment';
+	import { dev, version } from '$app/environment';
 	import { buildInfo } from '$lib/data/build-info';
 	import { siteMeta } from '$lib/data/placeholder';
 	import { getLocale, localizeUrl } from '$lib/i18n';
@@ -22,9 +22,9 @@
 			</a>
 			<div class="text-[11px] text-black/40 lg:hidden">
 				{#if dev}
-					{siteMeta.version}-dev
+					{version}-dev
 				{:else}
-					v{siteMeta.version} · <a href={versionHref} class="link-external" target="_blank" rel="noopener noreferrer">{buildInfo.shortCommit}</a>
+					v{version} · <a href={versionHref} class="link-external" target="_blank" rel="noopener noreferrer">{buildInfo.shortCommit}</a>
 				{/if}
 			</div>
 		</div>
@@ -43,9 +43,9 @@
 		<!-- version (desktop only) -->
 		<div class="hidden lg:block lg:justify-self-end">
 			{#if dev}
-				{siteMeta.version}-dev
+				{version}-dev
 			{:else}
-				<span>v{siteMeta.version} · </span>
+				<span>v{version} · </span>
 				<a href={versionHref} class="link-external" target="_blank" rel="noopener noreferrer">{buildInfo.shortCommit}</a>
 				<span class="text-black/25">({deployAge})</span>
 			{/if}
