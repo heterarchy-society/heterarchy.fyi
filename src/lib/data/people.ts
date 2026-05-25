@@ -40,6 +40,10 @@ export function personAvatarAltUrl(person: Person): string | null {
 	return `${PEOPLE_BASE}/people/${person.id}/${person.avatarsAlt[0]}`;
 }
 
+export function personAvatarAltUrls(person: Person): string[] {
+	return (person.avatarsAlt ?? []).map((f) => `${PEOPLE_BASE}/people/${person.id}/${f}`);
+}
+
 export function latestPeopleRevision(): LatestRevision | null {
 	return peopleData.meta?.people?.latestCommit ?? peopleData.meta?.commit ?? null;
 }
