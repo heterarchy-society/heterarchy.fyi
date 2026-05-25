@@ -36,10 +36,6 @@
 			<a href={localizeUrl('/join')} class="no-underline hover:underline">{m.nav_join()}</a>
 			<span aria-hidden="true">·</span>
 			<a href={localizeUrl('/open-data')} class="no-underline hover:underline">{m.footer_data()}</a>
-			<span aria-hidden="true">·</span>
-			<a href={siteMeta.radicleHref} class="link-external" target="_blank" rel="noopener noreferrer">radicle</a>
-			<span aria-hidden="true">·</span>
-			<a href={siteMeta.sourceHref} class="link-external" target="_blank" rel="noopener noreferrer">github</a>
 		</nav>
 
 		<!-- version (desktop only) -->
