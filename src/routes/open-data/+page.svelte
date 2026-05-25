@@ -133,10 +133,13 @@
 								<tr class="align-top {i === dataset.collections.length - 1 ? 'border-b border-line' : ''}">
 									{#if i === 0}
 										<td rowspan={dataset.collections.length} class="py-5 pr-10 align-top">
-											<a href={dataset.repository} target="_blank" rel="noopener noreferrer" class="link-external text-[14px] text-black">{datasetName(dataset.id)}</a>
+											<div class="flex items-baseline gap-3">
+												<a href={dataset.radicle ?? dataset.repository} target="_blank" rel="noopener noreferrer" class="link-external text-[14px] text-black">{datasetName(dataset.id)}</a>
+												<a href={dataset.repository} target="_blank" rel="noopener noreferrer" class="text-[12px] text-black/40 no-underline hover:text-black/70">(GitHub)</a>
+											</div>
 											<p class="mt-1 max-w-[13rem] font-sans text-[13px] leading-[1.55] text-black/55">{datasetDescription(dataset.id)}</p>
 											<div class="mt-3">
-												<a href={dataset.endpoint} target="_blank" rel="noopener noreferrer" class="link-external block break-all text-[11px] text-black/45">{dataset.endpointLabel}</a>
+												<a href={dataset.endpoint} target="_blank" rel="noopener noreferrer" class="link-external break-all text-[11px] text-black/45">{dataset.endpointLabel}</a>
 											</div>
 										</td>
 									{/if}
@@ -144,7 +147,7 @@
 									<td class="py-5 pr-6 tabular-nums text-black/65">{collection.count ?? 'unknown'}</td>
 									<td class="py-5 pr-6 text-black/65">
 										{#if collection.commit}
-											<a href="{dataset.repository}/commit/{collection.commit}" target="_blank" rel="noopener noreferrer" class="link-external tabular-nums text-black/70">{collection.commit.slice(0, 7)}</a>
+											<a href="{dataset.radicle ?? dataset.repository}/commits/{collection.commit}" target="_blank" rel="noopener noreferrer" class="link-external tabular-nums text-black/70">{collection.commit.slice(0, 7)}</a>
 										{:else}
 											<span>unknown</span>
 										{/if}

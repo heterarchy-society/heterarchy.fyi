@@ -1,4 +1,6 @@
 import adapter from '@sveltejs/adapter-static';
+import { createRequire } from 'module';
+const { version } = createRequire(import.meta.url)('./package.json');
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -15,6 +17,7 @@ const config = {
 			base: process.env.BASE_PATH ?? ''
 		},
 		version: {
+			name: version,
 			pollInterval: 60_000
 		},
 		prerender: {

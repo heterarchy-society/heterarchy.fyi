@@ -18,6 +18,12 @@ export const contactIntro = {
 
 export const onlineChannels: ContactChannel[] = [
 	{
+		label: 'Radicle',
+		value: 'seed.heterarchy.fyi',
+		href: 'https://radicle.network/nodes/seed.heterarchy.fyi',
+		external: true
+	},
+	{
 		label: 'GitHub',
 		value: 'github.com/heterarchy-society',
 		href: 'https://github.com/heterarchy-society',

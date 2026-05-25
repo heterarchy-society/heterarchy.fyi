@@ -71,6 +71,7 @@ export const latestTexts: TextArticle[] = [
 
 export const githubOrg = 'https://github.com/heterarchy-society';
 export const githubWebRepo = 'https://github.com/heterarchy-society/heterarchy.fyi';
+export const radicleWebRepo = 'https://radicle.network/nodes/seed.heterarchy.fyi/rad:z3D1h2gcMvcA7Uq6yG2EiAZgCh7cw';
 
 export const footerLinks: FooterLink[] = [
 	{ label: 'kde nás najdete?', href: '/find-us' },
@@ -82,5 +83,6 @@ export const siteMeta = {
 	description:
 		'Komunita kolem suverénních technologií, decentralizovaných systémů a nehierarchických forem organizace.',
 	sourceHref: githubWebRepo,
+	radicleHref: radicleWebRepo,
 	footerNotice: 'The Heterarchy Society'
 };
