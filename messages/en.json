@@ -241,5 +241,11 @@
 	"data_playground_truncated": "truncated to {lines} lines — open the URL directly to see the full response",
 	"data_usage_body": "Each dataset has an index endpoint. Some collections also expose individual item files, such as /terms/:id.json for glossary terms. Treat the files as static JSON: fetch them from the data domain, cache them normally, and link back to the source repository when building on them.",
 	"data_example_label": "Example",
-	"site_description": "A community around sovereign technologies, decentralized systems and non-hierarchical forms of organization."
+	"site_description": "A community around sovereign technologies, decentralized systems and non-hierarchical forms of organization.",
+	"search_open": "Search (⌘K)",
+	"search_placeholder": "Search…",
+	"search_clear": "Clear",
+	"search_loading": "Loading…",
+	"search_empty": "Search people, glossary, books, writings…",
+	"search_no_results": "No results for \"{query}\""
 }

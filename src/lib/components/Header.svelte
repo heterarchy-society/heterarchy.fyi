@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { Menu, Pause, Play, X } from 'lucide-svelte';
+	import { Menu, Pause, Play, Search, X } from 'lucide-svelte';
 	import { page } from '$app/state';
 	import { localizeUrl, getLocale } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import { mediaPlayer } from '$lib/media/player.svelte';
 	import { ambientPlaylist } from '$lib/data/ambient';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+	import { search } from '$lib/search.svelte';
 
 	const isAmbientPlaying = $derived(
 		mediaPlayer.playing && ambientPlaylist.some(t => t.id === mediaPlayer.track?.id)
@@ -50,6 +51,15 @@
 			{/each}
 			<button
 				type="button"
+				onclick={() => search.show()}
+				class="flex cursor-pointer items-center gap-1.5 border border-line px-2 py-[3px] font-mono text-[11px] text-black/35 transition-colors hover:border-black/20 hover:text-black"
+				aria-label={m.search_open()}
+			>
+				<Search size={12} strokeWidth={1.7} />
+				<span class="select-none">⌘K</span>
+			</button>
+			<button
+				type="button"
 				onclick={() => mediaPlayer.togglePlaylist(ambientPlaylist)}
 				class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/35 transition-colors hover:text-black"
 				aria-label={isAmbientPlaying ? m.ambient_pause() : m.ambient_play()}
@@ -69,6 +79,14 @@
 		</nav>
 
 		<div class="flex items-center gap-4 lg:hidden">
+			<button
+				type="button"
+				onclick={() => search.show()}
+				class="flex items-center justify-center text-black/35 transition-colors hover:text-black"
+				aria-label={m.search_open()}
+			>
+				<Search size={18} strokeWidth={1.5} />
+			</button>
 			<button
 				type="button"
 				onclick={() => mediaPlayer.togglePlaylist(ambientPlaylist)}

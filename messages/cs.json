@@ -241,5 +241,11 @@
 	"data_playground_truncated": "zkráceno na {lines} řádků — pro celou odpověď otevřete URL přímo",
 	"data_usage_body": "Každý dataset má indexový endpoint. Některé kolekce mají i jednotlivé soubory položek, například /terms/:id.json pro pojmy v glosáři. Ber je jako statický JSON: načítej je z datové domény, normálně cachuj a při dalším použití odkazuj na zdrojový repozitář.",
 	"data_example_label": "Příklad",
-	"site_description": "Komunita kolem suverénních technologií, decentralizovaných systémů a nehierarchických forem organizace."
+	"site_description": "Komunita kolem suverénních technologií, decentralizovaných systémů a nehierarchických forem organizace.",
+	"search_open": "Hledat (⌘K)",
+	"search_placeholder": "Hledat…",
+	"search_clear": "Smazat",
+	"search_loading": "Načítám…",
+	"search_empty": "Hledat osoby, glosář, knihy, texty…",
+	"search_no_results": "Žádné výsledky pro \"{query}\""
 }

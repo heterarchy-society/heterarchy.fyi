@@ -80,7 +80,7 @@
 					<a href={glossaryHref} class="label mb-4 inline-block hover:underline">{m.glossary_label()}</a>
 					<h1 class="page-lead mb-2 font-mono">
 						{activeName}<!--
-					-->{#if showCs && cs.name !== data.term.name}&nbsp;<span class="text-black/35">({data.term.name})</span>{/if}
+					-->{#if showCs && cs.name.toLowerCase() !== data.term.name.toLowerCase()}&nbsp;<span class="text-black/35">({data.term.name})</span>{/if}
 					</h1>
 					{#if activeType}
 						<p class="mb-8 font-mono text-[11px] uppercase tracking-widest text-black/40">{activeType}</p>
