@@ -14,6 +14,7 @@ The site is a static Svelte app with pages for the homepage, events, library, pl
 - [Paraglide JS](https://inlang.com/m/gerre34r/library-inlang-paraglideJs) — i18n with URL-prefix routing (`/` EN, `/cs/` CS)
 - [Bun](https://bun.sh) — package manager and script runner
 - [`@pierre/diffs`](https://www.npmjs.com/package/@pierre/diffs) — git diff rendering in glossary history
+- [Fuse.js](https://www.fusejs.io) — fuzzy search with diacritic folding for the universal search (`⌘K`)
 
 ## Getting Started
 
