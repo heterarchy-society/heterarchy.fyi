@@ -7,6 +7,8 @@
 	import { getLocale, localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
+	import { writingAuthorRefs, writingAuthorText } from '$lib/data/writings';
+	import { personAvatarUrl, personPath } from '$lib/data/people';
 	import { tick } from 'svelte';
 	import { fly, slide } from 'svelte/transition';
 	import { Captions, Download, Highlighter, Info, Pencil, RotateCcw, X } from 'lucide-svelte';
@@ -112,7 +114,7 @@
 	const mediaTrack = $derived<MediaTrack | null>(data.audio ? {
 		id: `writing:${writing.id}`,
 		title: writing.title,
-		subtitle: writing.authors.join(', '),
+		subtitle: writingAuthorText(writing.authors),
 		href: localizeUrl(`/writings/${writing.id}`),
 		src: data.audio.url,
 		duration: data.audio.duration,
@@ -542,6 +544,9 @@
 <svelte:head>
 	<title>{writing.title} — {m.writings_page_title()}</title>
 	<meta name="description" content={data.descriptionHtml?.replace(/<[^>]+>/g, '').slice(0, 160) ?? ''} />
+	{#if data.contentHtml?.includes('katex')}
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous" />
+	{/if}
 </svelte:head>
 
 <div class="min-h-screen w-full">
@@ -557,12 +562,23 @@
 						<p class="label mb-4">{writing.type}</p>
 					{/if}
 					<h1 class="page-lead mb-4 font-mono">{writing.title}</h1>
-					<p class="font-mono text-[13px] text-black/55">
-						{writing.authors.join(', ')}
-						{#if writing.year}<span class="ml-3 text-black/35">·</span> <span class="ml-3">{writing.year}</span>{/if}
-						{#if writing.language}<span class="ml-3 text-black/35">·</span> <span class="ml-3">{new Intl.DisplayNames([getLocale()], { type: 'language' }).of(writing.language) ?? writing.language}</span>{/if}
-						{#if writingWordCount !== null}<span class="ml-3 text-black/35">·</span> <span class="ml-3 text-black/40">{formatWordCount(writingWordCount)}</span>{/if}
-					</p>
+					<div class="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[13px] text-black/55">
+						{#each writingAuthorRefs(writing.authors) as author}
+							{#if author.person}
+								<a href={localizeUrl(personPath(author.person.id))} class="group inline-flex items-center gap-2 text-inherit no-underline hover:text-black">
+									{#if personAvatarUrl(author.person)}
+										<img src={personAvatarUrl(author.person) ?? ''} alt={author.person.name} width={32} height={32} class="size-8 border border-line object-cover" />
+									{/if}
+									<span class="group-hover:underline">{author.person.name}</span>
+								</a>
+							{:else}
+								<span>{author.name}</span>
+							{/if}
+						{/each}
+						{#if writing.year}<span class="text-black/35">·</span> <span>{writing.year}</span>{/if}
+						{#if writing.language}<span class="text-black/35">·</span> <span>{new Intl.DisplayNames([getLocale()], { type: 'language' }).of(writing.language) ?? writing.language}</span>{/if}
+						{#if writingWordCount !== null}<span class="text-black/35">·</span> <span class="text-black/40">{formatWordCount(writingWordCount)}</span>{/if}
+					</div>
 
 					{#if descParagraphs.length > 0}
 						<div class="mt-6 space-y-3 text-[15px] leading-[1.75] text-black/65 italic [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-black/30 [&_a:hover]:decoration-black/60">
@@ -986,6 +1002,9 @@
 		line-height: 1.78;
 	}
 
+	.prose :global(ul) { list-style-type: disc; }
+	.prose :global(ol) { list-style-type: decimal; }
+
 	.prose :global(li) { margin-bottom: 0.45rem; }
 
 	.prose :global(blockquote) {
@@ -1113,6 +1132,9 @@
 
 	.prose :global(img) {
 		border: 1px solid var(--prose-line);
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	.prose :global(figcaption) {
@@ -1179,5 +1201,35 @@
 		padding-left: 0.75rem;
 		padding-right: 0.75rem;
 		border-radius: 3px;
+	}
+
+	/* Shiki dual-theme: apply light/dark variables based on root class */
+	.prose :global(.shiki span) {
+		color: var(--shiki-light);
+	}
+
+	:global(.dark) .prose :global(.shiki span) {
+		color: var(--shiki-dark);
+	}
+
+	/* Math */
+	.prose :global(.math-block) {
+		margin: 1.75rem 0;
+		text-align: center;
+	}
+
+	.prose :global(.katex-display) {
+		margin: 0;
+		overflow-x: visible;
+		overflow-y: visible;
+	}
+
+	.prose :global(.katex) {
+		font-size: 1.3em;
+	}
+
+	/* Anchor targets for inline citations */
+	.prose :global([id^="ref-"]) {
+		scroll-margin-top: 5rem;
 	}
 </style>

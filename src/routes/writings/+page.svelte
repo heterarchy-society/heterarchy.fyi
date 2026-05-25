@@ -6,6 +6,7 @@
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 	import { Headphones } from 'lucide-svelte';
+	import { writingAuthorText } from '$lib/data/writings';
 
 	let { data }: { data: PageData } = $props();
 
@@ -51,7 +52,7 @@
 					<a href={localizeUrl(`/writings/${writing.id}`)} class="group block border-b border-line px-8 py-8 no-underline lg:px-10">
 						<div class="max-w-2xl">
 							<p class="mb-2 flex items-center gap-0 font-mono text-[11px] uppercase tracking-widest text-black/35">
-								<span>{writing.authors.join(', ')}{#if writing.year} · {writing.year}{/if}{#if wordCount(writing) !== null} · {fmtWords(wordCount(writing)!)}W{/if}</span>
+								<span>{writingAuthorText(writing.authors)}{#if writing.year} · {writing.year}{/if}{#if wordCount(writing) !== null} · {fmtWords(wordCount(writing)!)}W{/if}</span>
 								{#if writing.audio?.length}
 									<span class="ml-[0.45em] flex items-center gap-1"> · <Headphones size={11} strokeWidth={1.8} class="ml-[0.45em]" />{#if writing.audio[0].duration}<span class="ml-1">{writing.audio[0].duration}</span>{/if}</span>
 								{/if}

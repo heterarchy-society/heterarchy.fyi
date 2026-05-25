@@ -1,11 +1,16 @@
 <script lang="ts">
 	import { FileDiff, parsePatchFiles } from '@pierre/diffs';
+	import { browser } from '$app/environment';
 
 	let { diff }: { diff: string } = $props();
 
 	let container: HTMLElement;
 	let layout = $state<'unified' | 'split'>('unified');
 	let instance: FileDiff | null = null;
+
+	function isDarkMode(): boolean {
+		return browser && document.documentElement.classList.contains('dark');
+	}
 
 	function render() {
 		if (!container) return;
@@ -14,7 +19,8 @@
 		for (const patch of patches) {
 			for (const fileDiff of patch.files) {
 				instance = new FileDiff({
-					theme: 'pierre-light',
+					theme: { light: 'pierre-light', dark: 'pierre-dark' },
+					themeType: isDarkMode() ? 'dark' : 'light',
 					diffStyle: layout,
 					overflow: 'wrap',
 				});
@@ -26,6 +32,16 @@
 	$effect(() => {
 		diff; // track prop changes
 		render();
+	});
+
+	$effect(() => {
+		if (!browser) return;
+		const observer = new MutationObserver(() => render());
+		observer.observe(document.documentElement, {
+			attributes: true,
+			attributeFilter: ['class'],
+		});
+		return () => observer.disconnect();
 	});
 
 	function toggleLayout() {

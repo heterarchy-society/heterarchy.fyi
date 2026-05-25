@@ -1,28 +1,18 @@
 import { Renderer, marked } from 'marked';
 import type { Tokens } from 'marked';
-
-marked.setOptions({
-	gfm: true,
-	breaks: false
-});
+import katex from 'katex';
 
 const renderer = new Renderer();
 
 function escapeHtml(value: string): string {
 	return value.replace(/[&<>"']/g, (char) => {
 		switch (char) {
-			case '&':
-				return '&amp;';
-			case '<':
-				return '&lt;';
-			case '>':
-				return '&gt;';
-			case '"':
-				return '&quot;';
-			case "'":
-				return '&#39;';
-			default:
-				return char;
+			case '&': return '&amp;';
+			case '<': return '&lt;';
+			case '>': return '&gt;';
+			case '"': return '&quot;';
+			case "'": return '&#39;';
+			default:  return char;
 		}
 	});
 }
@@ -66,13 +56,52 @@ renderer.link = function ({ href, title, tokens }: Tokens.Link): string {
 	const text = this.parser.parseInline(tokens);
 	const safeHref = escapeHtml(href);
 	const safeTitle = title ? ` title="${escapeHtml(title)}"` : '';
-
 	if (!isExternalHref(href)) {
 		return `<a href="${safeHref}"${safeTitle}>${text}</a>`;
 	}
-
 	return `<a href="${safeHref}"${safeTitle} class="link-external" target="_blank" rel="noopener noreferrer">${text}</a>`;
 };
+
+marked.use({
+	gfm: true,
+	breaks: false,
+	extensions: [
+		{
+			name: 'blockMath',
+			level: 'block',
+			start(src: string) { return src.indexOf('$$'); },
+			tokenizer(src: string) {
+				const match = src.match(/^\$\$([\s\S]+?)\$\$/);
+				if (match) return { type: 'blockMath', raw: match[0], math: match[1].trim() };
+			},
+			renderer(token: any) {
+				try {
+					return `<div class="math-block">${katex.renderToString(token.math, { displayMode: true, throwOnError: false })}</div>`;
+				} catch {
+					return `<div class="math-block math-error"><code>$$${token.math}$$</code></div>`;
+				}
+			}
+		},
+		{
+			name: 'inlineMath',
+			level: 'inline',
+			start(src: string) { return src.indexOf('$'); },
+			tokenizer(src: string) {
+				const match = src.match(/^\$([^$\n]+?)\$/);
+				if (match) return { type: 'inlineMath', raw: match[0], math: match[1].trim() };
+			},
+			renderer(token: any) {
+				try {
+					return katex.renderToString(token.math, { displayMode: false, throwOnError: false });
+				} catch {
+					return `<code>$${token.math}$</code>`;
+				}
+			}
+		}
+	]
+});
+
+export { renderer as _markdownRenderer, renderFootnotes as _renderFootnotes };
 
 export function renderMarkdown(source: string): string {
 	return marked.parse(renderFootnotes(source), { async: false, renderer }) as string;

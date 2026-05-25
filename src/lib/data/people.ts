@@ -10,6 +10,8 @@ export type Person = {
 	altNames?: string[];
 	refs?: Record<PersonRefKey, string>;
 	description?: string;
+	born?: string;
+	died?: string;
 	history?: { hash: string; date: string; author: string; message: string }[];
 };
 

@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import glossaryData from '$lib/data/glossary.json';
 import writingsData from '$lib/data/writings.json';
-import { renderMarkdown } from '$lib/markdown';
+import { renderMarkdown } from '$lib/server/markdown';
 import type { Writing } from '../+page';
 import type { PageServerLoad } from './$types';
 
@@ -119,7 +119,7 @@ export const load: PageServerLoad = async ({ params, url, fetch }) => {
 					if (source.format === 'md') {
 						const bodyMarker = raw.indexOf('<!-- body -->');
 						const body = bodyMarker !== -1 ? raw.slice(bodyMarker + '<!-- body -->'.length).trimStart() : raw;
-						contentHtml = rebase(renderMarkdown(body));
+						contentHtml = rebase(await renderMarkdown(body));
 					} else if (source.format === 'html') {
 						contentHtml = rebase(raw);
 					} else {

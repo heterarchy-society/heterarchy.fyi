@@ -25,6 +25,16 @@
 		if (kind === 'nostr') return m.people_ref_nostr();
 		return kind;
 	}
+
+	function formatLifeDate(raw: string): string {
+		if (/^\d{4}$/.test(raw)) return raw;
+		const d = new Date(raw);
+		if (isNaN(d.getTime())) return raw;
+		return d.toLocaleDateString('en', { day: 'numeric', month: 'long', year: 'numeric' });
+	}
+
+	const bornLabel = $derived(person.born ? formatLifeDate(person.born) : null);
+	const diedLabel = $derived(person.died ? formatLifeDate(person.died) : null);
 </script>
 
 <svelte:head>
@@ -57,6 +67,13 @@
 				<div class="min-w-0">
 					<p class="label mb-4">{m.people_detail_label()}</p>
 					<h1 class="book-detail-title mb-4 max-w-2xl">{person.name}</h1>
+
+					{#if bornLabel || diedLabel}
+						<p class="mb-4 flex gap-4 font-mono text-[12px] text-black/40">
+							{#if bornLabel}<span><span class="mr-1.5 text-black/25">∗</span>{bornLabel}</span>{/if}
+							{#if diedLabel}<span><span class="mr-1.5 text-black/25">†</span>{diedLabel}</span>{/if}
+						</p>
+					{/if}
 
 					{#if person.caption}
 						<p class="mb-6 max-w-2xl text-[15px] leading-[1.65] text-black/65">{person.caption}</p>
