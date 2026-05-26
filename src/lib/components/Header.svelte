@@ -22,7 +22,6 @@
 		{ label: m.nav_glossary(), href: localizeUrl('/glossary') },
 		{ label: m.nav_writings(), href: localizeUrl('/writings') },
 		{ label: m.nav_books(), href: localizeUrl('/books') },
-		{ label: m.nav_people(), href: localizeUrl('/people') },
 		{ label: m.nav_events(), href: localizeUrl('/events') },
 	]);
 
