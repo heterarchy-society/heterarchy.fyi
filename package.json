@@ -24,6 +24,7 @@
 		"@tailwindcss/vite": "^4.2.2",
 		"@types/katex": "^0.16.8",
 		"@types/node": "^25.9.1",
+		"isomorphic-git": "^1.38.3",
 		"svelte": "^5.55.2",
 		"svelte-check": "^4.4.6",
 		"tailwindcss": "^4.2.2",
