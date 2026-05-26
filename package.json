@@ -12,8 +12,9 @@
 		"build": "bun run build-info && vite build",
 		"preview": "vite preview",
 		"prepare": "(svelte-kit sync || echo '') && bun run fetch-data",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+		"paraglide": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide --strategy url baseLocale",
+		"check": "bun run paraglide && bun run build-info && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "bun run paraglide && bun run build-info && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^7.0.1",

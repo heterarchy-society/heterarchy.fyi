@@ -10,7 +10,7 @@ import { getWritingsByGlossaryTerm } from '$lib/data/writings';
 import glossaryData from '$lib/data/glossary.json';
 import type { PageServerLoad } from './$types';
 
-const redirects = (glossaryData.meta?.redirects ?? {}) as Record<string, string>;
+const redirects = (glossaryData.meta as { redirects?: Record<string, string> } | undefined)?.redirects ?? {};
 
 export const load: PageServerLoad = ({ params }) => {
 	const target = redirects[params.id];

@@ -1,16 +1,27 @@
 import { marked } from 'marked';
+import type { Tokens } from 'marked';
 import { getSingletonHighlighter, bundledLanguages } from 'shiki';
 import { _markdownRenderer as renderer, _renderFootnotes as renderFootnotes } from '$lib/markdown';
 
 const highlighterPromise = getSingletonHighlighter({ themes: ['min-light', 'min-dark'], langs: [] });
 
-renderer.code = function (token: marked.Tokens.Code & { _shikiHtml?: string }): string {
+function escapeHtml(value: string): string {
+	return value.replace(/[&<>"']/g, (char) => {
+		switch (char) {
+			case '&': return '&amp;';
+			case '<': return '&lt;';
+			case '>': return '&gt;';
+			case '"': return '&quot;';
+			case "'": return '&#39;';
+			default:  return char;
+		}
+	});
+}
+
+renderer.code = function (token: Tokens.Code & { _shikiHtml?: string }): string {
 	if (token._shikiHtml) return token._shikiHtml;
 	const langClass = token.lang ? ` class="language-${token.lang}"` : '';
-	const escaped = token.text.replace(/[&<>"']/g, (c) =>
-		({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] ?? c
-	);
-	return `<pre><code${langClass}>${escaped}</code></pre>`;
+	return `<pre><code${langClass}>${escapeHtml(token.text)}</code></pre>`;
 };
 
 export async function renderMarkdown(source: string): Promise<string> {
@@ -26,7 +37,7 @@ export async function renderMarkdown(source: string): Promise<string> {
 				if (lang && lang in bundledLanguages) {
 					await highlighter.loadLanguage(lang as keyof typeof bundledLanguages);
 				}
-				(token as any)._shikiHtml = highlighter.codeToHtml(token.text, {
+				(token as Tokens.Code & { _shikiHtml?: string })._shikiHtml = highlighter.codeToHtml(token.text, {
 					lang: lang && lang in bundledLanguages ? lang : 'text',
 					themes: { light: 'min-light', dark: 'min-dark' },
 					defaultColor: false,

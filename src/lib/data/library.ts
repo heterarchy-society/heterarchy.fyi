@@ -46,7 +46,7 @@ function parseBookAuthor(raw: string): BookAuthorRef | null {
 
 export function bookAuthorRefs(book: LibraryBook): BookAuthorRef[] {
 	const explicitAuthors = book.authors?.filter((author): author is string => typeof author === 'string' && author.trim().length > 0) ?? [];
-	const authors = explicitAuthors.length ? explicitAuthors : [book.author];
+	const authors = explicitAuthors.length ? explicitAuthors : book.author ? [book.author] : [];
 	return authors.map(parseBookAuthor).filter((author): author is BookAuthorRef => Boolean(author));
 }
 
