@@ -658,76 +658,90 @@
 								</span>
 							</div>
 
-							<div class="mt-2 flex items-center justify-end gap-3">
-								<div class="flex items-center justify-end gap-3">
-									{#if currentTime > 0.2}
+							<div class="mt-2 flex items-center justify-between sm:justify-end sm:gap-3">
+									<!-- Icon controls (left on mobile, left on sm+) -->
+									<div class="flex items-center gap-3">
+										{#if currentTime > 0.2}
+											<button
+												type="button"
+												onclick={resetAudioState}
+												class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
+												aria-label={m.audio_clear_state()}
+												title={m.audio_clear_state()}
+											>
+												<X size={16} strokeWidth={1.8} />
+											</button>
+											<button
+												type="button"
+												onclick={resetAudio}
+												class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/25 transition-colors hover:text-black/60"
+												aria-label={m.audio_reset()}
+												title={m.audio_reset()}
+											>
+												<RotateCcw size={15} strokeWidth={1.8} />
+											</button>
+										{/if}
+										{#if data.audio.transcriptUrl}
+											<button
+												type="button"
+												onclick={() => { readingMode = !readingMode; }}
+												class="flex h-7 w-7 cursor-pointer items-center justify-center transition-colors {readingMode ? 'text-black/45 hover:text-black/70' : 'text-black/18 hover:text-black/45'}"
+												aria-label={readingMode ? m.audio_hide_reading_panel() : m.audio_show_reading_panel()}
+												aria-pressed={readingMode}
+												title={readingMode ? m.audio_hide_reading_panel() : m.audio_show_reading_panel()}
+											>
+												<Captions size={16} strokeWidth={1.8} />
+											</button>
+											<button
+												type="button"
+												onclick={() => { textHighlightMode = !textHighlightMode; }}
+												class="flex h-7 w-7 cursor-pointer items-center justify-center transition-colors {textHighlightMode ? 'text-black/45 hover:text-black/70' : 'text-black/18 hover:text-black/45'}"
+												aria-label={textHighlightMode ? m.audio_hide_text_highlighting() : m.audio_show_text_highlighting()}
+												aria-pressed={textHighlightMode}
+												title={textHighlightMode ? m.audio_hide_text_highlighting() : m.audio_show_text_highlighting()}
+											>
+												<Highlighter size={16} strokeWidth={1.8} />
+											</button>
+										{/if}
 										<button
 											type="button"
-											onclick={resetAudioState}
+											onclick={downloadAudio}
 											class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
-											aria-label={m.audio_clear_state()}
-											title={m.audio_clear_state()}
+											aria-label={m.audio_download()}
+											title={m.audio_download()}
 										>
-											<X size={16} strokeWidth={1.8} />
+											<Download size={15} strokeWidth={1.8} />
 										</button>
 										<button
 											type="button"
-											onclick={resetAudio}
-											class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/25 transition-colors hover:text-black/60"
-											aria-label={m.audio_reset()}
-											title={m.audio_reset()}
+											onclick={() => { audioInfoOpen = !audioInfoOpen; }}
+											class="flex h-7 w-7 cursor-pointer items-center justify-center transition-colors {audioInfoOpen ? 'text-black/45 hover:text-black/70' : 'text-black/20 hover:text-black/55'}"
+											aria-label={m.audio_info()}
+											title={m.audio_info()}
 										>
-											<RotateCcw size={15} strokeWidth={1.8} />
+											<Info size={15} strokeWidth={1.8} />
 										</button>
-									{/if}
-									{#if data.audio.transcriptUrl}
-										<button
-											type="button"
-											onclick={() => { readingMode = !readingMode; }}
-											class="flex h-7 w-7 cursor-pointer items-center justify-center transition-colors {readingMode ? 'text-black/45 hover:text-black/70' : 'text-black/18 hover:text-black/45'}"
-											aria-label={readingMode ? m.audio_hide_reading_panel() : m.audio_show_reading_panel()}
-											aria-pressed={readingMode}
-											title={readingMode ? m.audio_hide_reading_panel() : m.audio_show_reading_panel()}
+									</div>
+									<!-- Speed: select on mobile, buttons on sm+ -->
+									<div class="flex items-center gap-3">
+										<select
+											class="sm:hidden cursor-pointer appearance-none bg-transparent font-mono text-[10px] tabular-nums text-black/50"
+											value={speed}
+											onchange={(e) => setSpeed(Number(e.currentTarget.value))}
+											aria-label={m.audio_speed()}
 										>
-											<Captions size={16} strokeWidth={1.8} />
-										</button>
-										<button
-											type="button"
-											onclick={() => { textHighlightMode = !textHighlightMode; }}
-											class="flex h-7 w-7 cursor-pointer items-center justify-center transition-colors {textHighlightMode ? 'text-black/45 hover:text-black/70' : 'text-black/18 hover:text-black/45'}"
-											aria-label={textHighlightMode ? m.audio_hide_text_highlighting() : m.audio_show_text_highlighting()}
-											aria-pressed={textHighlightMode}
-											title={textHighlightMode ? m.audio_hide_text_highlighting() : m.audio_show_text_highlighting()}
-										>
-											<Highlighter size={16} strokeWidth={1.8} />
-										</button>
-									{/if}
-									<button
-										type="button"
-										onclick={downloadAudio}
-										class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
-										aria-label={m.audio_download()}
-										title={m.audio_download()}
-									>
-										<Download size={15} strokeWidth={1.8} />
-									</button>
-									<button
-										type="button"
-										onclick={() => { audioInfoOpen = !audioInfoOpen; }}
-										class="flex h-7 w-7 cursor-pointer items-center justify-center transition-colors {audioInfoOpen ? 'text-black/45 hover:text-black/70' : 'text-black/20 hover:text-black/55'}"
-										aria-label={m.audio_info()}
-										title={m.audio_info()}
-									>
-										<Info size={15} strokeWidth={1.8} />
-									</button>
-									<span class="font-mono text-[10px] uppercase tracking-widest text-black/25">{m.audio_speed()}</span>
-									{#each speeds as rate}
-										<button
-											onclick={() => setSpeed(rate)}
-											class="cursor-pointer font-mono text-[10px] tabular-nums {speed === rate ? 'text-black' : 'text-black/30 hover:text-black/70'}"
-										>{rate}×</button>
-									{/each}
-								</div>
+											{#each speeds as rate}
+												<option value={rate}>{rate}×</option>
+											{/each}
+										</select>
+										<span class="hidden sm:inline font-mono text-[10px] uppercase tracking-widest text-black/25">{m.audio_speed()}</span>
+										{#each speeds as rate}
+											<button
+												onclick={() => setSpeed(rate)}
+												class="hidden sm:block cursor-pointer font-mono text-[10px] tabular-nums {speed === rate ? 'text-black' : 'text-black/30 hover:text-black/70'}"
+											>{rate}×</button>
+										{/each}
+									</div>
 							</div>
 
 							{#if audioInfoOpen}
