@@ -31,7 +31,7 @@
 					<a href={localizeUrl('/')} class="link-arrow mb-8 inline-block text-[12px]">← home</a>
 
 					<h1 class="max-w-4xl font-mono text-[2.6rem] leading-[1.12] tracking-normal text-black sm:text-[3.8rem] lg:text-[4.6rem] xl:text-[5rem]">
-						<span class="mr-4 text-[#b3261e]">{status}</span>
+						<span class="mr-4 text-[#b3261e] dark:text-[#f87171]">{status}</span>
 						{#if isNotFound}This route has dissolved.{:else}The system blinked.{/if}
 					</h1>
 
@@ -49,7 +49,7 @@
 				</div>
 
 				<div class="font-mono lg:pt-32">
-					<div class="border border-line bg-[#f8f7f3] p-5 lg:min-h-64">
+					<div class="border border-line bg-white p-5 lg:min-h-64">
 						<p class="mb-5 text-[10px] uppercase tracking-[0.2em] text-black/35">route trace</p>
 						<div class="space-y-3 overflow-hidden text-[12px] text-black/55">
 							<p><span class="text-black">home</span> ── glossary</p>
