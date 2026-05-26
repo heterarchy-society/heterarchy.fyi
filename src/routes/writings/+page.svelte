@@ -60,7 +60,7 @@
 							<h2 class="mb-3 font-mono text-[20px] leading-snug text-black underline decoration-transparent underline-offset-4 transition-colors group-hover:decoration-current">{writing.title}</h2>
 							{#if writing.description}
 								<p class="text-[14px] leading-[1.65] text-black/60">
-									{writing.description.split(/\n\n+/)[0].replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, '$1')}
+									{writing.description.split(/\n\n+/)[0].replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, '$1').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')}
 								</p>
 							{/if}
 						</div>
