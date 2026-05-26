@@ -28,10 +28,9 @@
 				<span>{siteMeta.footerNotice}</span>
 			</a>
 			<div class="text-[11px] text-black/40 lg:hidden">
-				{#if dev}
-					{version}-dev
-				{:else}
-					v{version} · <a href={versionHref} class="link-external" target="_blank" rel="noopener noreferrer">{buildInfo.shortCommit}</a>
+				<a href={localizeUrl('/changelog')} class="no-underline hover:underline">v{version}{dev ? '-dev' : ''}</a>
+				{#if !dev}
+					 · <a href={versionHref} class="link-external" target="_blank" rel="noopener noreferrer">{buildInfo.shortCommit}</a>
 				{/if}
 			</div>
 		</div>
@@ -45,8 +44,6 @@
 			<a href={localizeUrl('/join')} class="no-underline hover:underline">{m.footer_join()}</a>
 			<span aria-hidden="true">·</span>
 			<a href={localizeUrl('/open-data')} class="no-underline hover:underline">{m.footer_data()}</a>
-			<span aria-hidden="true">·</span>
-			<a href={localizeUrl('/changelog')} class="no-underline hover:underline">{m.changelog_label()}</a>
 			<span aria-hidden="true">·</span>
 			<button
 				type="button"
@@ -64,10 +61,9 @@
 
 		<!-- version (desktop only) -->
 		<div class="hidden lg:block lg:justify-self-end">
-			{#if dev}
-				{version}-dev
-			{:else}
-				<span>v{version} · </span>
+			<a href={localizeUrl('/changelog')} class="no-underline hover:underline">v{version}{dev ? '-dev' : ''}</a>
+			{#if !dev}
+				<span> · </span>
 				<a href={versionHref} class="link-external" target="_blank" rel="noopener noreferrer">{buildInfo.shortCommit}</a>
 				<span class="text-black/25">({deployAge})</span>
 			{/if}
