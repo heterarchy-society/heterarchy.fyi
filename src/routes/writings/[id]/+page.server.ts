@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import glossaryData from '$lib/data/glossary.json';
 import writingsData from '$lib/data/writings.json';
 import { renderMarkdown } from '$lib/server/markdown';
-import { glossaryUrl, datasetUrl, knownCollections } from '$lib/data/routes';
+import { processWikilinks, type GlossarySlugMap } from '$lib/wikilinks';
 import { getLocale } from '$lib/paraglide/runtime';
 import type { Locale } from '$lib/locale-storage';
 import type { Writing } from '../+page';
@@ -19,11 +19,16 @@ type GlossaryTerm = {
 
 const glossary = (glossaryData as { terms: GlossaryTerm[] }).terms;
 const glossaryById = new Map(glossary.map((t) => [t.id, t]));
-const glossaryByKey = new Map<string, GlossaryTerm>();
-for (const term of glossary) {
-	glossaryByKey.set(term.id, term);
-	glossaryByKey.set(term.name.toLowerCase(), term);
-	glossaryByKey.set(term.name.toLowerCase().replace(/\s+/g, '-'), term);
+
+function buildSlugMap(locale: string): GlossarySlugMap {
+	const map: GlossarySlugMap = {};
+	for (const term of glossary) {
+		const slug = term.translations?.[locale]?.slug ?? term.id;
+		map[term.id] = slug;
+		map[term.name.toLowerCase()] = slug;
+		map[term.name.toLowerCase().replace(/\s+/g, '-')] = slug;
+	}
+	return map;
 }
 
 const viewableFormats = new Set(['md', 'html', 'txt', 'pdf']);
@@ -67,28 +72,6 @@ function findSource(sources: WritingSource[], requested: string | null): Writing
 		?? readable[0];
 }
 
-function processWikilinks(text: string, locale: Locale): string {
-	// [[id]] or [[display|id]] → glossary link
-	let result = text.replace(/\[\[([^\|\]]+?)(?:\|([^\]]+?))?\]\]/g, (_, left, right) => {
-		const display = left.trim();
-		const id = (right !== undefined ? right : left).trim();
-		const term = glossaryByKey.get(id.toLowerCase())
-			?? glossaryByKey.get(id.toLowerCase().replace(/\s+/g, '-'))
-			?? glossaryByKey.get(id);
-		if (!term) return display;
-		const slug = term.translations?.[locale]?.slug ?? term.id;
-		return `<a href="${glossaryUrl(slug, locale)}">${display}</a>`;
-	});
-	// [label](collection:id) → cross-dataset link
-	result = result.replace(/\[([^\]]+)\]\(([a-z]+):([^)\s]+)\)/g, (full, label, collection, id) => {
-		if (!knownCollections.has(collection)) return full;
-		const href = datasetUrl(collection, id, locale);
-		if (!href) return label;
-		return `<a href="${href}">${label}</a>`;
-	});
-	return result;
-}
-
 export function entries() {
 	return (writingsData as { writings: { id: string }[] }).writings.map((w) => ({ id: w.id }));
 }
@@ -100,6 +83,7 @@ export const load: PageServerLoad = async ({ params, url, fetch }) => {
 		const writing: Writing = await res.json();
 
 		const locale = getLocale() as Locale;
+		const slugMap = buildSlugMap(locale);
 		const allSources = writing.sources ?? [];
 		const viewableSources = sortSources(allSources.filter((s) => viewableFormats.has(s.format)));
 		const downloadSources = sortSources(allSources.filter((s) => downloadableFormats.has(s.format)));
@@ -109,7 +93,7 @@ export const load: PageServerLoad = async ({ params, url, fetch }) => {
 			.filter((t): t is GlossaryTerm => Boolean(t));
 
 		const descriptionHtml = writing.description
-			? processWikilinks(writing.description, locale)
+			? processWikilinks(writing.description, locale, slugMap)
 			: null;
 
 		let requestedFormat: string | null = null;
@@ -128,9 +112,9 @@ export const load: PageServerLoad = async ({ params, url, fetch }) => {
 					if (source.format === 'md') {
 						const bodyMarker = raw.indexOf('<!-- body -->');
 						const body = bodyMarker !== -1 ? raw.slice(bodyMarker + '<!-- body -->'.length).trimStart() : raw;
-						contentHtml = rebase(await renderMarkdown(processWikilinks(body, locale)));
+						contentHtml = rebase(await renderMarkdown(processWikilinks(body, locale, slugMap)));
 					} else if (source.format === 'html') {
-						contentHtml = rebase(processWikilinks(raw, locale));
+						contentHtml = rebase(processWikilinks(raw, locale, slugMap));
 					} else {
 						content = raw;
 					}
@@ -175,6 +159,7 @@ export const load: PageServerLoad = async ({ params, url, fetch }) => {
 				? viewableSourcesMapped.find((s) => s.path === source.path) ?? null
 				: null,
 			audio,
+			glossarySlugMap: slugMap,
 		};
 	} catch (e: any) {
 		if (e?.status === 404) throw e;

@@ -4,6 +4,7 @@
 	import { browser } from '$app/environment';
 	import { replaceState } from '$app/navigation';
 	import { renderMarkdown } from '$lib/markdown';
+	import { processWikilinks } from '$lib/wikilinks';
 	import { page } from '$app/state';
 	import { getLocale, localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
@@ -814,9 +815,9 @@
 													if (source.format === 'md') {
 														const bodyMarker = raw.indexOf('<!-- body -->');
 														const body = bodyMarker !== -1 ? raw.slice(bodyMarker + '<!-- body -->'.length).trimStart() : raw;
-														activeContentHtml = rebase(renderMarkdown(body));
+														activeContentHtml = rebase(renderMarkdown(processWikilinks(body, getLocale(), data.glossarySlugMap)));
 													} else if (source.format === 'html') {
-														activeContentHtml = rebase(raw);
+														activeContentHtml = rebase(processWikilinks(raw, getLocale(), data.glossarySlugMap));
 													} else {
 														activeContent = raw;
 													}

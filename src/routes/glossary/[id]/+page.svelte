@@ -24,7 +24,7 @@
 
 	function slugForId(id: string): string {
 		const t = relatedTermsById.get(id);
-		return (t as any)?.translations?.cs?.slug ?? id;
+		return (t as any)?.translations?.[getLocale()]?.slug ?? id;
 	}
 
 	function termHref(id: string): string {
@@ -33,14 +33,14 @@
 
 	function processDescription(text: string, resolvedLinks: any[]): string {
 		let i = 0;
-		// [[id]] or [[display|id]] → glossary link via resolvedLinks
-		let result = text.replace(/\[\[([^\|\]]+?)(?:\|([^\]]+?))?\]\]/g, (_, left) => {
-			const display = left.trim();
+		// [[id]] or [[id|display]] — left is the target id, right is visible label
+		let result = text.replace(/\[\[([^\|\]]+?)(?:\|([^\]]+?))?\]\]/g, (_, left, right) => {
+			const display = (right !== undefined ? right : left).trim();
 			const resolved = resolvedLinks[i++];
 			if (resolved?.target) {
 				return `<a href="${termHref(resolved.target)}">${display}</a>`;
 			}
-			const missingTerm = resolved?.key ?? display;
+			const missingTerm = resolved?.key ?? left.trim();
 			return `<a href="${localizeUrl('/glossary/missing')}?term=${encodeURIComponent(missingTerm)}" class="missing-term">${display}</a>`;
 		});
 		// [label](collection:id) → cross-dataset link
