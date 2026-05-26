@@ -4,7 +4,10 @@
 	import LatestRevision from '$lib/components/LatestRevision.svelte';
 	import { localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
+	import { datasetConfigs } from '$lib/data/datasets';
 	import type { PageData } from './$types';
+
+	const peopleRepository = datasetConfigs.find((d) => d.id === 'people')!.repository;
 
 	let { data }: { data: PageData } = $props();
 
@@ -88,7 +91,7 @@
 			<p class="max-w-xl text-[15px] leading-[1.65] text-black/75">{m.people_contribute_text()}</p>
 			<div class="mt-6 flex flex-wrap gap-x-8 gap-y-3">
 				<a href={localizeUrl('/open-data')} class="link-arrow text-[13px]">{m.people_data_link()}</a>
-				<a href="https://github.com/heterarchy-society/people" class="link-arrow text-[13px]">git</a>
+				<a href={peopleRepository} class="link-arrow text-[13px]">git</a>
 			</div>
 		</section>
 	</main>

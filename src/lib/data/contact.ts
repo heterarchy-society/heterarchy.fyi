@@ -1,9 +1,12 @@
+import { forgejoOrg, githubOrg, radicleOrg } from '$lib/data/placeholder';
+
 export type ContactChannel = {
 	label: string;
 	value: string;
 	href?: string;
 	external?: boolean;
 	logo?: string;
+	mirror?: boolean;
 };
 
 export type OfflineVenue = ContactChannel & {
@@ -18,16 +21,24 @@ export const contactIntro = {
 
 export const onlineChannels: ContactChannel[] = [
 	{
-		label: 'Radicle',
-		value: 'seed.heterarchy.fyi',
-		href: 'https://radicle.network/nodes/seed.heterarchy.fyi',
+		label: 'Git: Forgejo',
+		value: forgejoOrg.replace('https://', ''),
+		href: forgejoOrg,
 		external: true
 	},
 	{
-		label: 'GitHub',
-		value: 'github.com/heterarchy-society',
-		href: 'https://github.com/heterarchy-society',
-		external: true
+		label: 'Git: Radicle',
+		value: radicleOrg.replace('https://radicle.network/nodes/', ''),
+		href: radicleOrg,
+		external: true,
+		mirror: true
+	},
+	{
+		label: 'Git: GitHub',
+		value: githubOrg.replace('https://', ''),
+		href: githubOrg,
+		external: true,
+		mirror: true
 	}
 ];
 

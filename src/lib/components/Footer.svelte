@@ -10,7 +10,7 @@
 	import { ambientPlaylist } from '$lib/data/ambient';
 
 	const versionHref =
-		buildInfo.commit === 'unknown' ? siteMeta.radicleHref : `${siteMeta.radicleHref}/commits/${buildInfo.commit}`;
+		buildInfo.commit === 'unknown' ? siteMeta.sourceHref : `${siteMeta.sourceHref}/commit/${buildInfo.commit}`;
 	const deployAge = buildInfo.deployedAt === 'unknown' ? 'unknown' : timeAgo(buildInfo.deployedAt, getLocale());
 
 	const isAmbientPlaying = $derived(

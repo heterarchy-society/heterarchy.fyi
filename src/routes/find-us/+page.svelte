@@ -32,7 +32,10 @@
 									rel={channel.external ? 'noopener noreferrer' : undefined}
 								>
 									<span class="font-mono text-[11px] tracking-wide uppercase">{channel.label}</span>
-									<span class={channel.external ? 'link-external text-[15px]' : 'text-[15px]'}>{channel.value}</span>
+									<span class="flex items-baseline gap-3">
+										<span class={channel.external ? 'link-external text-[15px]' : 'text-[15px]'}>{channel.value}</span>
+										{#if channel.mirror}<span class="rounded border border-line px-1 py-px font-mono text-[9px] text-black/35">mirror</span>{/if}
+									</span>
 								</a>
 							</li>
 						{/each}

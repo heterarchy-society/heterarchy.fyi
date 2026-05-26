@@ -4,7 +4,10 @@
 	import CollectionChangelog from '$lib/components/CollectionChangelog.svelte';
 	import { getLocale, localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
+	import { datasetConfigs } from '$lib/data/datasets';
 	import type { PageData } from './$types';
+
+	const glossaryRepository = datasetConfigs.find((d) => d.id === 'glossary')!.repository;
 
 	let { data }: { data: PageData } = $props();
 
@@ -45,7 +48,7 @@
 
 			<CollectionChangelog
 				entries={data.changelog}
-				repository="heterarchy-society/glossary"
+				repository={glossaryRepository}
 				itemName={termName}
 				itemHref={termHref}
 				diffHref={diffHref}

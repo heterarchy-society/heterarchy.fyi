@@ -56,12 +56,23 @@
 
 	<p class="mb-6 flex-1 text-[15px] leading-[1.65]">{content.desc}</p>
 
-	<a
-		{href}
-		class={option.external ? 'link-external mt-auto font-mono text-[13px]' : 'link-arrow mt-auto text-[13px]'}
-		target={option.external ? '_blank' : undefined}
-		rel={option.external ? 'noopener noreferrer' : undefined}
-	>
-		{content.link}
-	</a>
+	<div class="mt-auto">
+		<a
+			{href}
+			class={option.external ? 'link-external font-mono text-[13px]' : 'link-arrow text-[13px]'}
+			target={option.external ? '_blank' : undefined}
+			rel={option.external ? 'noopener noreferrer' : undefined}
+		>
+			{content.link}
+		</a>
+		{#if option.mirrors?.length}
+			<p class="mt-2 font-mono text-[11px] text-black/35">
+				mirrors:
+				{#each option.mirrors as mirror, i}
+					{#if i > 0}<span class="text-black/20">,</span>{/if}
+					<a href={mirror.href} target="_blank" rel="noopener noreferrer" class="text-black/40 no-underline hover:text-black/70">{mirror.label}</a>
+				{/each}
+			</p>
+		{/if}
+	</div>
 </article>

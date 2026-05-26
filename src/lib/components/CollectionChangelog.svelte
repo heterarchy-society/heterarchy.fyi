@@ -46,7 +46,7 @@
 					<span>{entry.author}</span>
 					<span class="text-black/20">·</span>
 					<a
-						href="https://github.com/{repository}/commit/{entry.hash}"
+						href="{repository}/commit/{entry.hash}"
 						target="_blank"
 						rel="noopener noreferrer"
 						class="no-underline hover:text-black hover:underline"

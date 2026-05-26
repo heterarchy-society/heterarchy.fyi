@@ -4,7 +4,10 @@ import {
 	type CollectionChangelogEntry
 } from '$lib/server/changelog';
 import glossaryData from '$lib/data/glossary.json';
+import { datasetConfigs } from '$lib/data/datasets';
 import { getLocale, localizeUrl } from '$lib/i18n';
+
+const glossaryRepository = datasetConfigs.find((d) => d.id === 'glossary')!.repository;
 import { renderMarkdownInline } from '$lib/markdown';
 
 export type ChangelogEntry = CollectionChangelogEntry;
@@ -144,7 +147,7 @@ export async function load() {
 			dateLabel: formatDate(entry.date, locale),
 			author: entry.author,
 			authorGh: ghByName.get(entry.author) ?? null,
-			commitHref: `https://github.com/heterarchy-society/glossary/commit/${entry.hash}`,
+			commitHref: `${glossaryRepository}/commit/${entry.hash}`,
 			changes: entry.changes.map((change) => {
 				const term = termsById.get(change.id);
 				return {

@@ -8,7 +8,10 @@ import {
 import { getBooksByGlossaryTerm } from '$lib/data/library';
 import { getWritingsByGlossaryTerm } from '$lib/data/writings';
 import glossaryData from '$lib/data/glossary.json';
+import { datasetConfigs } from '$lib/data/datasets';
 import type { PageServerLoad } from './$types';
+
+const glossaryRepository = datasetConfigs.find((d) => d.id === 'glossary')!.repository;
 
 const redirects = (glossaryData.meta as { redirects?: Record<string, string> } | undefined)?.redirects ?? {};
 
@@ -39,6 +42,7 @@ export const load: PageServerLoad = ({ params }) => {
 		books: getBooksByGlossaryTerm(term.id),
 		writings: getWritingsByGlossaryTerm(term.id),
 		relatedTerms: getGlossarySummaryTerms(relatedTermIds),
+		repository: glossaryRepository,
 		// Alternate URLs for the language switcher
 		altUrls: {
 			en: `/glossary/${term.id}`,

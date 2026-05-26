@@ -160,7 +160,7 @@
 
 					<p class="mt-10 font-mono text-[11px] text-black/45">
 						<a
-							href="https://github.com/heterarchy-society/people/tree/main/people/{person.id}"
+							href="{data.repository}/src/branch/main/people/{person.id}"
 							class="link-external"
 							target="_blank"
 							rel="noopener noreferrer"

@@ -962,7 +962,7 @@
 						<p class="font-mono text-[11px] text-black/35">{writing.license}</p>
 					{/if}
 
-					<a href="https://github.com/heterarchy-society/writings/tree/main/writings/{writing.id}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 font-mono text-[11px] text-black/30 no-underline transition-colors hover:text-black/60" title={m.writings_edit_on_github()}>
+					<a href="{data.repository}/src/branch/main/writings/{writing.id}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 font-mono text-[11px] text-black/30 no-underline transition-colors hover:text-black/60" title={m.writings_edit_on_github()}>
 						<Pencil size={11} strokeWidth={1.8} />
 						edit on github
 					</a>
@@ -973,7 +973,7 @@
 							<ul class="space-y-2">
 								{#each writing.history as entry}
 									<li class="flex flex-wrap items-baseline gap-x-4 gap-y-0.5 font-mono text-[12px]">
-										<a href="https://github.com/heterarchy-society/writings/commit/{entry.hash}" class="link-external tabular-nums text-black/45" target="_blank" rel="noopener noreferrer">{entry.hash.slice(0, 7)}</a>
+										<a href="{data.repository}/commit/{entry.hash}" class="link-external tabular-nums text-black/45" target="_blank" rel="noopener noreferrer">{entry.hash.slice(0, 7)}</a>
 										<span class="text-black/30">{formatDate(entry.date)}</span>
 										<span class="text-black/55">{entry.author}</span>
 										<span class="text-black/65">{entry.message}</span>

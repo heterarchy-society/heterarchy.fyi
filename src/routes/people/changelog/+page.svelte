@@ -4,7 +4,10 @@
 	import CollectionChangelog from '$lib/components/CollectionChangelog.svelte';
 	import { localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
+	import { datasetConfigs } from '$lib/data/datasets';
 	import type { PageData } from './$types';
+
+	const peopleRepository = datasetConfigs.find((d) => d.id === 'people')!.repository;
 
 	let { data }: { data: PageData } = $props();
 
@@ -36,7 +39,7 @@
 
 			<CollectionChangelog
 				entries={data.changelog}
-				repository="heterarchy-society/people"
+				repository={peopleRepository}
 				itemName={personName}
 				itemHref={personHref}
 			/>

@@ -187,7 +187,7 @@
 				<aside class="flex flex-col gap-8 border-t border-line pt-8 font-mono text-[12px] lg:border-t-0 lg:border-l lg:border-line lg:pl-8 lg:pt-0">
 					<div class="flex flex-col gap-1">
 						<a
-							href="https://github.com/heterarchy-society/glossary/blob/main/glossary/{data.term.id}.md"
+							href="{data.repository}/src/branch/main/glossary/{data.term.id}.md"
 							target="_blank"
 							rel="noopener noreferrer"
 							class="link-external text-[11px] text-black/40 hover:text-black"

@@ -80,7 +80,7 @@
 						<span>{formatDate(selectedEntry.date)}</span>
 						<span>{selectedEntry.author}</span>
 						<a
-							href="https://github.com/heterarchy-society/glossary/commit/{selectedEntry.hash}"
+							href="{data.repository}/commit/{selectedEntry.hash}"
 							target="_blank"
 							rel="noopener noreferrer"
 							class="link-external hover:text-black"

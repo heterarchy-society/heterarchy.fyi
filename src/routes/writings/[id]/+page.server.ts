@@ -1,6 +1,9 @@
 import { error } from '@sveltejs/kit';
 import glossaryData from '$lib/data/glossary.json';
 import writingsData from '$lib/data/writings.json';
+import { datasetConfigs } from '$lib/data/datasets';
+
+const writingsRepository = datasetConfigs.find((d) => d.id === 'writings')!.repository;
 import { renderMarkdown } from '$lib/server/markdown';
 import { processWikilinks, type GlossarySlugMap } from '$lib/wikilinks';
 import { getLocale } from '$lib/paraglide/runtime';
@@ -160,6 +163,7 @@ export const load: PageServerLoad = async ({ params, url, fetch }) => {
 				: null,
 			audio,
 			glossarySlugMap: slugMap,
+			repository: writingsRepository,
 		};
 	} catch (e: any) {
 		if (e?.status === 404) throw e;

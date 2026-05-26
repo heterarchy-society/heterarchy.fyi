@@ -1,6 +1,9 @@
 import { error } from '@sveltejs/kit';
 import { getGlossaryHistoryTerm } from '$lib/server/glossary';
+import { datasetConfigs } from '$lib/data/datasets';
 import type { PageServerLoad } from './$types';
+
+const glossaryRepository = datasetConfigs.find((d) => d.id === 'glossary')!.repository;
 
 export const load: PageServerLoad = ({ params }) => {
 	const term = getGlossaryHistoryTerm(params.id);
@@ -9,5 +12,5 @@ export const load: PageServerLoad = ({ params }) => {
 		error(404, 'Term not found');
 	}
 
-	return { term, termId: term.id };
+	return { term, termId: term.id, repository: glossaryRepository };
 };
