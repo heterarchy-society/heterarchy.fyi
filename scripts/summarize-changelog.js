@@ -69,6 +69,7 @@ Format:
 - ...
 
 Rules:
+- Ignore any existing files in the changelog/ directory — base the entry solely on the commits below
 - Only include sections that have actual changes — omit empty sections
 - Each bullet is one short sentence (max ~12 words), naming the feature or page
 - Do not start bullets with "Added", "Improved", "Fixed" or any verb matching the section header — the header already says it
