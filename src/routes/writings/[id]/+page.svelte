@@ -11,7 +11,7 @@
 	import type { PageData } from './$types';
 	import { writingAuthorRefs, writingAuthorText } from '$lib/data/writings';
 	import { personAvatarUrl, imageSrcset, personPath } from '$lib/data/people';
-	import { tick } from 'svelte';
+	import { tick, untrack } from 'svelte';
 	import { fly, slide } from 'svelte/transition';
 	import { Captions, Download, Highlighter, Info, Pencil, RotateCcw, X } from 'lucide-svelte';
 	import { mediaPlayer, type MediaTrack } from '$lib/media/player.svelte';
@@ -20,9 +20,9 @@
 	let { data }: { data: PageData } = $props();
 	const writing = $derived(data.writing);
 
-	let activeSource = $state(data.selectedSource);
-	let activeContent = $state(data.content);
-	let activeContentHtml = $state(data.contentHtml);
+	let activeSource = $state(untrack(() => data.selectedSource));
+	let activeContent = $state(untrack(() => data.content));
+	let activeContentHtml = $state(untrack(() => data.contentHtml));
 	let loadingContent = $state(false);
 
 	$effect(() => {
@@ -410,6 +410,22 @@
 		if (!altPressed || alignedRanges.length === 0) { altHoverWordIdx = -1; return; }
 		altHoverWordIdx = findWordIdxAtPoint(e.clientX, e.clientY);
 	}
+
+	$effect(() => {
+		const el = proseEl;
+		if (!el) return;
+		const onMove = (e: MouseEvent) => proseMouseMove(e);
+		const onLeave = () => { altHoverWordIdx = -1; };
+		const onClick = (e: MouseEvent) => void seekToClick(e);
+		el.addEventListener('mousemove', onMove);
+		el.addEventListener('mouseleave', onLeave);
+		el.addEventListener('click', onClick);
+		return () => {
+			el.removeEventListener('mousemove', onMove);
+			el.removeEventListener('mouseleave', onLeave);
+			el.removeEventListener('click', onClick);
+		};
+	});
 
 	async function seekToClick(e: MouseEvent) {
 		if (!e.altKey || !isMarkdown || !mediaTrack) return;
@@ -874,14 +890,10 @@
 					{:else if isSourceText}
 						<pre class="mx-auto max-w-2xl overflow-x-auto border-l border-line pl-5 font-mono text-[12px] leading-[1.75] text-black/70"><code>{activeContent}</code></pre>
 					{:else}
-						<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 					<div
 						bind:this={proseEl}
 						class="prose mx-auto max-w-2xl"
 						class:seek-cursor={altPressed && isMarkdown && !!transcript}
-						onmousemove={proseMouseMove}
-						onmouseleave={() => { altHoverWordIdx = -1; }}
-						onclick={seekToClick}
 					>
 							{#if isMarkdown}
 								{@html activeContentHtml}

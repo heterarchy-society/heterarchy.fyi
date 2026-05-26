@@ -9,9 +9,9 @@
 		"fetch-data": "bun scripts/fetch-data.js",
 		"check-translations": "bun scripts/check-translations.js",
 		"dev": "vite dev",
-		"build": "bun scripts/write-build-info.js && bun scripts/fetch-data.js && vite build",
+		"build": "bun run build-info && vite build",
 		"preview": "vite preview",
-		"prepare": "svelte-kit sync || echo ''",
+		"prepare": "(svelte-kit sync || echo '') && bun run fetch-data",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},

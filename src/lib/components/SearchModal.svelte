@@ -138,6 +138,7 @@
 
 		<!-- Panel -->
 		<div
+			role="none"
 			class="relative mx-auto mt-[12vh] w-full max-w-xl border border-line bg-bg shadow-2xl"
 			onclick={(e) => e.stopPropagation()}
 			onkeydown={(e) => e.stopPropagation()}
