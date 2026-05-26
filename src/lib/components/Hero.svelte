@@ -3,7 +3,7 @@
 	import * as m from '$lib/paraglide/messages';
 
 	const ctas = $derived([
-		{ label: m.hero_cta_concept(), href: localizeUrl('/') + '#manifesto' },
+		{ label: m.hero_cta_concept(), href: localizeUrl('/about') },
 		{ label: m.hero_cta_join(), href: localizeUrl('/join') },
 	]);
 </script>

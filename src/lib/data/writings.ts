@@ -12,6 +12,10 @@ type Writing = {
 
 const writings: Writing[] = (writingsData as { writings: Writing[] }).writings;
 
+export const latestWritings = [...writings]
+	.sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
+	.slice(0, 5);
+
 export type { Writing };
 
 export function getWritingsByGlossaryTerm(termId: string): Writing[] {

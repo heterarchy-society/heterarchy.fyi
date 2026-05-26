@@ -5,14 +5,15 @@
 	import GameOfLife from '$lib/components/GameOfLife.svelte';
 	import FeaturedEvent from '$lib/components/FeaturedEvent.svelte';
 	import UpcomingEvents from '$lib/components/UpcomingEvents.svelte';
-	import Manifesto from '$lib/components/about/Manifesto.svelte';
 	import LibraryLinks from '$lib/components/LibraryLinks.svelte';
 	import Partners from '$lib/components/Partners.svelte';
 	import { featuredEvent, upcomingEvents } from '$lib/data/events';
+	import { localizeUrl } from '$lib/i18n';
 
 	const sidebarEvents = upcomingEvents.filter((e) => e.date !== 'TBD');
 	import { libraryPreview } from '$lib/data/library';
 	import { siteMeta } from '$lib/data/placeholder';
+	import { latestWritings, writingAuthorText } from '$lib/data/writings';
 	import * as m from '$lib/paraglide/messages';
 </script>
 
@@ -40,7 +41,22 @@
 		</div>
 
 		<div class="cell-roomy lg:col-span-2 lg:border-r lg:border-line">
-			<Manifesto labeled />
+			<p class="label mb-6">{m.writings_page_label()}</p>
+			<ul class="flex flex-col divide-y divide-line">
+				{#each latestWritings as writing (writing.id)}
+					<li>
+						<a href={localizeUrl(`/writings/${writing.id}`)} class="group block py-5 no-underline first:pt-0">
+							<p class="mb-1.5 font-mono text-[11px] uppercase tracking-widest text-black/35">
+								{writingAuthorText(writing.authors)}{writing.year ? ` · ${writing.year}` : ''}
+							</p>
+							<h2 class="font-mono text-[15px] leading-snug text-black underline decoration-transparent underline-offset-4 transition-colors group-hover:decoration-current">{writing.title}</h2>
+						</a>
+					</li>
+				{/each}
+			</ul>
+			<div class="mt-6 border-t border-line pt-6">
+				<a href={localizeUrl('/writings')} class="link-arrow text-[13px]">{m.writings_link()}</a>
+			</div>
 		</div>
 		<div class="cell-roomy lg:col-span-1">
 			<LibraryLinks books={libraryPreview} />

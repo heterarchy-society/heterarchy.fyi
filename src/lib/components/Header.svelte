@@ -1,16 +1,10 @@
 <script lang="ts">
-	import { Menu, Pause, Play, Search, X } from 'lucide-svelte';
+	import { Menu, Search, X } from 'lucide-svelte';
 	import { page } from '$app/state';
 	import { localizeUrl, getLocale } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
-	import { mediaPlayer } from '$lib/media/player.svelte';
-	import { ambientPlaylist } from '$lib/data/ambient';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { search } from '$lib/search.svelte';
-
-	const isAmbientPlaying = $derived(
-		mediaPlayer.playing && ambientPlaylist.some(t => t.id === mediaPlayer.track?.id)
-	);
 
 	let open = $state(false);
 
@@ -58,18 +52,6 @@
 				<Search size={12} strokeWidth={1.7} />
 				<span class="select-none">⌘K</span>
 			</button>
-			<button
-				type="button"
-				onclick={() => mediaPlayer.togglePlaylist(ambientPlaylist)}
-				class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/35 transition-colors hover:text-black"
-				aria-label={isAmbientPlaying ? m.ambient_pause() : m.ambient_play()}
-			>
-				{#if isAmbientPlaying}
-					<Pause size={14} strokeWidth={1.7} />
-				{:else}
-					<Play size={14} strokeWidth={1.7} style="transform: translateX(1px)" />
-				{/if}
-			</button>
 			<ThemeToggle />
 			{#if currentLang === 'en'}
 				<a href={csHref} class="ml-2 font-mono text-[11px] text-black/40 no-underline hover:text-black" data-sveltekit-reload>česky</a>
@@ -86,18 +68,6 @@
 				aria-label={m.search_open()}
 			>
 				<Search size={18} strokeWidth={1.5} />
-			</button>
-			<button
-				type="button"
-				onclick={() => mediaPlayer.togglePlaylist(ambientPlaylist)}
-				class="flex h-7 w-7 cursor-pointer items-center justify-center text-black/35 transition-colors hover:text-black"
-				aria-label={isAmbientPlaying ? m.ambient_pause() : m.ambient_play()}
-			>
-				{#if isAmbientPlaying}
-					<Pause size={15} strokeWidth={1.7} />
-				{:else}
-					<Play size={15} strokeWidth={1.7} style="transform: translateX(1px)" />
-				{/if}
 			</button>
 			<ThemeToggle />
 			<button
