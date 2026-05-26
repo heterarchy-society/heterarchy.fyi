@@ -2,7 +2,8 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
+	import { replaceState } from '$app/navigation';
+	import { renderMarkdown } from '$lib/markdown';
 	import { page } from '$app/state';
 	import { getLocale, localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
@@ -18,6 +19,17 @@
 	let { data }: { data: PageData } = $props();
 	const writing = $derived(data.writing);
 
+	let activeSource = $state(data.selectedSource);
+	let activeContent = $state(data.content);
+	let activeContentHtml = $state(data.contentHtml);
+	let loadingContent = $state(false);
+
+	$effect(() => {
+		activeSource = data.selectedSource;
+		activeContent = data.content;
+		activeContentHtml = data.contentHtml;
+	});
+
 	const writingWordCount = $derived((() => {
 		if (!writing._assets) return null;
 		for (const s of writing.sources) {
@@ -30,12 +42,12 @@
 	})());
 
 	const paragraphs = $derived(
-		data.content
-			? data.content.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean)
+		activeContent
+			? activeContent.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean)
 			: []
 	);
-	const isMarkdown = $derived(Boolean(data.contentHtml));
-	const selectedFormat = $derived(data.selectedSource?.format);
+	const isMarkdown = $derived(Boolean(activeContentHtml));
+	const selectedFormat = $derived(activeSource?.format);
 	const isPlainText = $derived(selectedFormat === 'txt');
 	const isSourceText = $derived(selectedFormat === 'typst' || selectedFormat === 'typ');
 	const isPdf = $derived(selectedFormat === 'pdf');
@@ -94,7 +106,7 @@
 	}
 
 	function sourceClass(source: PageData['readableSources'][number]): string {
-		const active = data.selectedSource?.key === source.key;
+		const active = activeSource?.key === source.key;
 		return [
 			'relative px-1 pb-5 pt-1 no-underline transition-colors',
 			'font-mono text-[10px] uppercase tracking-widest',
@@ -766,10 +778,39 @@
 					{#if data.readableSources.length > 1}
 						<nav class="-mb-10 mt-10 flex max-w-full flex-wrap items-end justify-center gap-x-4 gap-y-1 pt-1" aria-label={m.writings_formats_nav()}>
 							{#each data.readableSources as source}
-								{@const active = data.selectedSource?.key === source.key}
+								{@const active = activeSource?.key === source.key}
 								<a
 									href={formatHref(source)}
-									onclick={(e) => { e.preventDefault(); goto(formatHref(source), { noScroll: true }); }}
+									onclick={async (e) => {
+										e.preventDefault();
+										if (activeSource?.key === source.key) return;
+										replaceState(formatHref(source), {});
+										activeSource = source;
+										activeContent = null;
+										activeContentHtml = null;
+										if (source.format !== 'pdf') {
+											loadingContent = true;
+											try {
+												const res = await fetch(source.url);
+												if (res.ok) {
+													const raw = await res.text();
+													const base = source.url.replace(/\/[^/]+$/, '/');
+													const rebase = (html: string) =>
+														html.replace(/\s(src|href)="(?!https?:\/\/|\/\/|#)([^"]+)"/g, ` $1="${base}$2"`);
+													if (source.format === 'md') {
+														const bodyMarker = raw.indexOf('<!-- body -->');
+														const body = bodyMarker !== -1 ? raw.slice(bodyMarker + '<!-- body -->'.length).trimStart() : raw;
+														activeContentHtml = rebase(renderMarkdown(body));
+													} else if (source.format === 'html') {
+														activeContentHtml = rebase(raw);
+													} else {
+														activeContent = raw;
+													}
+												}
+											} catch {}
+											loadingContent = false;
+										}
+									}}
 									class={sourceClass(source)}
 									aria-current={active ? 'true' : undefined}
 								>
@@ -789,18 +830,26 @@
 			</header>
 
 			<!-- Body -->
-			{#if isMarkdown || paragraphs.length > 0 || isPdf || isSourceText}
+			{#if loadingContent}
+				<section class="writing-paper border-b border-line px-8 py-10 lg:px-10 lg:py-12">
+					<div class="mx-auto max-w-2xl space-y-3 animate-pulse">
+						{#each [1, 0.95, 0.88, 1, 0.6, 0.92, 0.78, 1, 0.85, 0.4] as w}
+							<div class="h-[1.1em] rounded-sm bg-black/8" style="width: {w * 100}%"></div>
+						{/each}
+					</div>
+				</section>
+			{:else if isMarkdown || paragraphs.length > 0 || isPdf || isSourceText}
 				<section class={isPdf ? 'cell-roomy border-b border-line' : 'writing-paper border-b border-line px-8 py-10 lg:px-10 lg:py-12'}>
-					{#if isPdf && data.selectedSource}
+					{#if isPdf && activeSource}
 						<div class="mx-auto max-w-4xl">
 							<iframe
-								src={data.selectedSource.url}
+								src={activeSource.url}
 								title={writing.title}
 								class="h-[78vh] min-h-[520px] w-full border border-line bg-white"
 							></iframe>
 							<div class="mt-3 text-right">
 								<a
-									href={data.selectedSource.url}
+									href={activeSource?.url}
 									class="link-external font-mono text-[11px] text-black/45"
 									target="_blank"
 									rel="noopener noreferrer"
@@ -808,7 +857,7 @@
 							</div>
 						</div>
 					{:else if isSourceText}
-						<pre class="mx-auto max-w-2xl overflow-x-auto border-l border-line pl-5 font-mono text-[12px] leading-[1.75] text-black/70"><code>{data.content}</code></pre>
+						<pre class="mx-auto max-w-2xl overflow-x-auto border-l border-line pl-5 font-mono text-[12px] leading-[1.75] text-black/70"><code>{activeContent}</code></pre>
 					{:else}
 						<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
 					<div
@@ -820,7 +869,7 @@
 						onclick={seekToClick}
 					>
 							{#if isMarkdown}
-								{@html data.contentHtml}
+								{@html activeContentHtml}
 							{:else if isPlainText}
 								{#each paragraphs as para}
 									<p style="white-space: pre-wrap;">{para}</p>
