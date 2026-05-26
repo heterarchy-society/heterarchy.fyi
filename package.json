@@ -2,9 +2,10 @@
 	"name": "heterarchy.fyi",
 	"private": true,
 	"license": "Unlicense",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"type": "module",
 	"scripts": {
+		"bump": "bun scripts/bump-version.js",
 		"build-info": "bun scripts/write-build-info.js",
 		"fetch-data": "bun scripts/fetch-data.js",
 		"check-translations": "bun scripts/check-translations.js",
