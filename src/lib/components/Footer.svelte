@@ -38,6 +38,8 @@
 
 		<!-- nav -->
 		<nav class="flex flex-wrap items-center gap-x-1.5 lg:justify-self-center">
+			<a href={localizeUrl('/about')} class="no-underline hover:underline first-letter:uppercase">{m.nav_about()}</a>
+			<span aria-hidden="true">·</span>
 			<a href={localizeUrl('/find-us')} class="no-underline hover:underline">{m.footer_where_to_find()}</a>
 			<span aria-hidden="true">·</span>
 			<a href={localizeUrl('/join')} class="no-underline hover:underline">{m.footer_join()}</a>
