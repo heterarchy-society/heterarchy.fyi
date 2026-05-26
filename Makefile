@@ -27,6 +27,21 @@ build:
 preview:
 	$(BUN) run preview
 
+## bump: bump version, generate changelog, and create git tag (usage: make bump V=patch|minor|major|x.y.z)
+.PHONY: bump
+bump:
+	$(BUN) scripts/bump-version.js $(V)
+
+## bump-dry: preview what bump would do without making changes (usage: make bump-dry V=patch|minor|major|x.y.z)
+.PHONY: bump-dry
+bump-dry:
+	$(BUN) scripts/bump-version.js $(V) --dry-run
+
+## changelog: generate changelog entry for a version without bumping (usage: make changelog V=x.y.z)
+.PHONY: changelog
+changelog:
+	$(BUN) scripts/summarize-changelog.js $(V)
+
 ## check-translations: check if long-form content translations are up to date
 .PHONY: check-translations
 check-translations:
