@@ -1,19 +1,26 @@
 <script lang="ts">
-	import { FileDiff, parsePatchFiles } from '@pierre/diffs';
 	import { browser } from '$app/environment';
 
 	let { diff }: { diff: string } = $props();
 
 	let container: HTMLElement;
 	let layout = $state<'unified' | 'split'>('unified');
-	let instance: FileDiff | null = null;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	let instance: any = null;
+	let pierreModule: typeof import('@pierre/diffs') | null = null;
+
+	async function getModule() {
+		if (!pierreModule) pierreModule = await import('@pierre/diffs');
+		return pierreModule;
+	}
 
 	function isDarkMode(): boolean {
 		return browser && document.documentElement.classList.contains('dark');
 	}
 
-	function render() {
+	async function render() {
 		if (!container) return;
+		const { FileDiff, parsePatchFiles } = await getModule();
 		container.innerHTML = '';
 		const patches = parsePatchFiles(diff);
 		for (const patch of patches) {
