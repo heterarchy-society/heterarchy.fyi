@@ -5,6 +5,7 @@ export type CollectionConfig = {
 
 export type DatasetConfig = {
 	id: string;
+	path: string;
 	endpoint: string;
 	endpointLabel: string;
 	repository: string;
@@ -21,6 +22,7 @@ export function radicleUrl(rid: string): string {
 export const datasetConfigs: DatasetConfig[] = [
 	{
 		id: 'glossary',
+		path: '/glossary',
 		endpoint: 'https://glossary.data.heterarchy.fyi/',
 		endpointLabel: 'https://glossary.data.heterarchy.fyi/',
 		repository: 'https://github.com/heterarchy-society/glossary',
@@ -29,6 +31,7 @@ export const datasetConfigs: DatasetConfig[] = [
 	},
 	{
 		id: 'writings',
+		path: '/writings',
 		endpoint: 'https://writings.data.heterarchy.fyi/',
 		endpointLabel: 'https://writings.data.heterarchy.fyi/',
 		repository: 'https://github.com/heterarchy-society/writings',
@@ -37,6 +40,7 @@ export const datasetConfigs: DatasetConfig[] = [
 	},
 	{
 		id: 'books',
+		path: '/books',
 		endpoint: 'https://books.data.heterarchy.fyi/index.json',
 		endpointLabel: 'https://books.data.heterarchy.fyi/',
 		repository: 'https://github.com/heterarchy-society/books',
@@ -45,6 +49,7 @@ export const datasetConfigs: DatasetConfig[] = [
 	},
 	{
 		id: 'people',
+		path: '/people',
 		endpoint: 'https://people.data.heterarchy.fyi/',
 		endpointLabel: 'https://people.data.heterarchy.fyi/',
 		repository: 'https://github.com/heterarchy-society/people',

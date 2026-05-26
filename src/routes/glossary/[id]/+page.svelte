@@ -6,6 +6,7 @@
 	import { writingAuthorText } from '$lib/data/writings';
 	import { page } from '$app/stores';
 	import { localizeUrl, getLocale } from '$lib/i18n';
+	import { datasetUrl, knownCollections } from '$lib/data/routes';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
@@ -32,14 +33,24 @@
 
 	function processDescription(text: string, resolvedLinks: any[]): string {
 		let i = 0;
-		return text.replace(/\[\[([^\|\]]+)\|?([^\]]*)\]\]/g, (_, key) => {
+		// [[id]] or [[display|id]] → glossary link via resolvedLinks
+		let result = text.replace(/\[\[([^\|\]]+?)(?:\|([^\]]+?))?\]\]/g, (_, left) => {
+			const display = left.trim();
 			const resolved = resolvedLinks[i++];
 			if (resolved?.target) {
-				return `<a href="${termHref(resolved.target)}">${key}</a>`;
+				return `<a href="${termHref(resolved.target)}">${display}</a>`;
 			}
-			const missingTerm = resolved?.key ?? key;
-			return `<a href="${localizeUrl('/glossary/missing')}?term=${encodeURIComponent(missingTerm)}" class="missing-term">${key}</a>`;
+			const missingTerm = resolved?.key ?? display;
+			return `<a href="${localizeUrl('/glossary/missing')}?term=${encodeURIComponent(missingTerm)}" class="missing-term">${display}</a>`;
 		});
+		// [label](collection:id) → cross-dataset link
+		result = result.replace(/\[([^\]]+)\]\(([a-z]+):([^)\s]+)\)/g, (full, label, collection, id) => {
+			if (!knownCollections.has(collection)) return full;
+			const href = datasetUrl(collection, id);
+			if (!href) return label;
+			return `<a href="${href}">${label}</a>`;
+		});
+		return result;
 	}
 
 	const html = $derived(renderMarkdown(processDescription(activeDescription, data.term.resolvedLinks ?? [])));

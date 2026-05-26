@@ -2,6 +2,9 @@ import { error } from '@sveltejs/kit';
 import glossaryData from '$lib/data/glossary.json';
 import writingsData from '$lib/data/writings.json';
 import { renderMarkdown } from '$lib/server/markdown';
+import { glossaryUrl, datasetUrl, knownCollections } from '$lib/data/routes';
+import { getLocale } from '$lib/paraglide/runtime';
+import type { Locale } from '$lib/locale-storage';
 import type { Writing } from '../+page';
 import type { PageServerLoad } from './$types';
 
@@ -64,20 +67,26 @@ function findSource(sources: WritingSource[], requested: string | null): Writing
 		?? readable[0];
 }
 
-function glossaryHref(term: GlossaryTerm, isCs: boolean): string {
-	const slug = isCs ? (term.translations?.cs?.slug ?? term.id) : term.id;
-	return isCs ? `/cs/glosar/${slug}` : `/glossary/${slug}`;
-}
-
-function processWikilinks(text: string, isCs: boolean): string {
-	return text.replace(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/g, (_, key, display) => {
-		const label = display ?? key;
-		const term = glossaryByKey.get(key.toLowerCase())
-			?? glossaryByKey.get(key.toLowerCase().replace(/\s+/g, '-'))
-			?? glossaryByKey.get(key);
-		if (!term) return label;
-		return `<a href="${glossaryHref(term, isCs)}">${label}</a>`;
+function processWikilinks(text: string, locale: Locale): string {
+	// [[id]] or [[display|id]] → glossary link
+	let result = text.replace(/\[\[([^\|\]]+?)(?:\|([^\]]+?))?\]\]/g, (_, left, right) => {
+		const display = left.trim();
+		const id = (right !== undefined ? right : left).trim();
+		const term = glossaryByKey.get(id.toLowerCase())
+			?? glossaryByKey.get(id.toLowerCase().replace(/\s+/g, '-'))
+			?? glossaryByKey.get(id);
+		if (!term) return display;
+		const slug = term.translations?.[locale]?.slug ?? term.id;
+		return `<a href="${glossaryUrl(slug, locale)}">${display}</a>`;
 	});
+	// [label](collection:id) → cross-dataset link
+	result = result.replace(/\[([^\]]+)\]\(([a-z]+):([^)\s]+)\)/g, (full, label, collection, id) => {
+		if (!knownCollections.has(collection)) return full;
+		const href = datasetUrl(collection, id, locale);
+		if (!href) return label;
+		return `<a href="${href}">${label}</a>`;
+	});
+	return result;
 }
 
 export function entries() {
@@ -90,7 +99,7 @@ export const load: PageServerLoad = async ({ params, url, fetch }) => {
 		if (!res.ok) error(404, 'Writing not found');
 		const writing: Writing = await res.json();
 
-		const isCs = url.pathname.startsWith('/cs');
+		const locale = getLocale() as Locale;
 		const allSources = writing.sources ?? [];
 		const viewableSources = sortSources(allSources.filter((s) => viewableFormats.has(s.format)));
 		const downloadSources = sortSources(allSources.filter((s) => downloadableFormats.has(s.format)));
@@ -100,7 +109,7 @@ export const load: PageServerLoad = async ({ params, url, fetch }) => {
 			.filter((t): t is GlossaryTerm => Boolean(t));
 
 		const descriptionHtml = writing.description
-			? processWikilinks(writing.description, isCs)
+			? processWikilinks(writing.description, locale)
 			: null;
 
 		let requestedFormat: string | null = null;
@@ -119,9 +128,9 @@ export const load: PageServerLoad = async ({ params, url, fetch }) => {
 					if (source.format === 'md') {
 						const bodyMarker = raw.indexOf('<!-- body -->');
 						const body = bodyMarker !== -1 ? raw.slice(bodyMarker + '<!-- body -->'.length).trimStart() : raw;
-						contentHtml = rebase(await renderMarkdown(body));
+						contentHtml = rebase(await renderMarkdown(processWikilinks(body, locale)));
 					} else if (source.format === 'html') {
-						contentHtml = rebase(raw);
+						contentHtml = rebase(processWikilinks(raw, locale));
 					} else {
 						content = raw;
 					}
