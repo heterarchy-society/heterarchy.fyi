@@ -964,7 +964,7 @@
 
 					<a href="{data.repository}/src/branch/main/writings/{writing.id}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 font-mono text-[11px] text-black/30 no-underline transition-colors hover:text-black/60" title={m.writings_edit_on_github()}>
 						<Pencil size={11} strokeWidth={1.8} />
-						edit on github
+						view on Forgejo
 					</a>
 
 					{#if writing.history?.length}

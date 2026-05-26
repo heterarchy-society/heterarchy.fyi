@@ -191,7 +191,15 @@
 							target="_blank"
 							rel="noopener noreferrer"
 							class="link-external text-[11px] text-black/40 hover:text-black"
-						>{m.glossary_edit_on_github()}</a>
+						>→ view on Forgejo</a>
+						{#if data.github}
+							<a
+								href="{data.github}/blob/main/glossary/{data.term.id}.md"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="link-external text-[11px] text-black/30 hover:text-black"
+							>→ view on GitHub</a>
+						{/if}
 						<a href={historyHref} class="text-[11px] text-black/40 no-underline hover:underline hover:text-black">
 							{#if historyCount > 0}{m.glossary_edit_history_count({ count: String(historyCount) })}{:else}{m.glossary_edit_history()}{/if}
 						</a>
