@@ -9,6 +9,7 @@ export type DatasetConfig = {
 	endpoint: string;
 	endpointLabel: string;
 	repository: string;
+	github?: string;
 	radicle?: string;
 	collections: CollectionConfig[];
 };
@@ -25,7 +26,8 @@ export const datasetConfigs: DatasetConfig[] = [
 		path: '/glossary',
 		endpoint: 'https://glossary.data.heterarchy.fyi/',
 		endpointLabel: 'https://glossary.data.heterarchy.fyi/',
-		repository: 'https://github.com/heterarchy-society/glossary',
+		repository: 'https://git.heterarchy.fyi/heterarchy-society/glossary',
+		github: 'https://github.com/heterarchy-society/glossary',
 		radicle: radicleUrl('rad:zuqmPxXRzgtN1cVzHq8PyMomWTLu'),
 		collections: [{ name: 'terms', changelogPath: '/glossary/changelog' }]
 	},
@@ -34,7 +36,8 @@ export const datasetConfigs: DatasetConfig[] = [
 		path: '/writings',
 		endpoint: 'https://writings.data.heterarchy.fyi/',
 		endpointLabel: 'https://writings.data.heterarchy.fyi/',
-		repository: 'https://github.com/heterarchy-society/writings',
+		repository: 'https://git.heterarchy.fyi/heterarchy-society/writings',
+		github: 'https://github.com/heterarchy-society/writings',
 		radicle: radicleUrl('rad:z249Sc89XWm4sfthkCJM4Jp4foQdk'),
 		collections: [{ name: 'writings', changelogPath: '/writings/changelog' }]
 	},
@@ -43,7 +46,8 @@ export const datasetConfigs: DatasetConfig[] = [
 		path: '/books',
 		endpoint: 'https://books.data.heterarchy.fyi/index.json',
 		endpointLabel: 'https://books.data.heterarchy.fyi/',
-		repository: 'https://github.com/heterarchy-society/books',
+		repository: 'https://git.heterarchy.fyi/heterarchy-society/books',
+		github: 'https://github.com/heterarchy-society/books',
 		radicle: radicleUrl('rad:zFYLWerMS7reLb372d84oxqy9ZQH'),
 		collections: [{ name: 'books', changelogPath: '/books/changelog' }]
 	},
@@ -52,7 +56,8 @@ export const datasetConfigs: DatasetConfig[] = [
 		path: '/people',
 		endpoint: 'https://people.data.heterarchy.fyi/',
 		endpointLabel: 'https://people.data.heterarchy.fyi/',
-		repository: 'https://github.com/heterarchy-society/people',
+		repository: 'https://git.heterarchy.fyi/heterarchy-society/people',
+		github: 'https://github.com/heterarchy-society/people',
 		radicle: radicleUrl('rad:z65FF84dMSHS7KcTTJ3PHxktg1Ma'),
 		collections: [{ name: 'people', changelogPath: '/people/changelog' }]
 	}
