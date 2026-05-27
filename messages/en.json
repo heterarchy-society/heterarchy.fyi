@@ -155,6 +155,7 @@
 	"find_us_lead": "We're where our people are.",
 	"find_us_online": "Online",
 	"find_us_offline": "Offline",
+	"find_us_git": "Git",
 	"find_us_offline_intro": "We don't have our own space. These venues currently host us:",
 	"changelog_label": "Changelog",
 	"changelog_lead": "Release notes for the heterarchy.fyi website.",

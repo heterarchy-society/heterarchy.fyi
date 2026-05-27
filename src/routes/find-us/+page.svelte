@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
-	import { onlineChannels, offlineVenues, contactMeta } from '$lib/data/contact';
+	import { onlineChannels, gitChannels, offlineVenues, contactMeta } from '$lib/data/contact';
 	import * as m from '$lib/paraglide/messages';
 </script>
 
@@ -20,11 +20,10 @@
 			<p class="page-lead mb-6">{m.find_us_lead()}</p>
 
 			<div class="flex flex-col gap-12">
-				<div>
-					<p class="font-mono text-[11px] tracking-wide uppercase mb-4 text-black/50">{m.find_us_online()}</p>
+				{#snippet channelList(channels: typeof onlineChannels)}
 					<ul>
-						{#each onlineChannels as channel, i}
-							<li class:border-b-0={i === onlineChannels.length - 1} class="border-b border-line">
+						{#each channels as channel, i}
+							<li class:border-b-0={i === channels.length - 1} class="border-b border-line">
 								<a
 									href={channel.href}
 									class="grid gap-1 py-5 no-underline hover:underline sm:grid-cols-[8rem_1fr] sm:items-baseline sm:gap-6"
@@ -40,6 +39,16 @@
 							</li>
 						{/each}
 					</ul>
+				{/snippet}
+
+				<div>
+					<p class="font-mono text-[11px] tracking-wide uppercase mb-4 text-black/50">{m.find_us_online()}</p>
+					{@render channelList(onlineChannels)}
+				</div>
+
+				<div>
+					<p class="font-mono text-[11px] tracking-wide uppercase mb-4 text-black/50">{m.find_us_git()}</p>
+					{@render channelList(gitChannels)}
 				</div>
 
 				<div>

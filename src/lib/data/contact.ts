@@ -19,22 +19,31 @@ export const contactIntro = {
 	lead: 'Jsme tam, kde jsou naši lidé.'
 };
 
-export const onlineChannels: ContactChannel[] = [
+export const signalGroup: ContactChannel = {
+	label: 'Signal',
+	value: 'signal.heterarchy.fyi',
+	href: 'https://signal.heterarchy.fyi',
+	external: true,
+};
+
+export const onlineChannels: ContactChannel[] = [signalGroup];
+
+export const gitChannels: ContactChannel[] = [
 	{
-		label: 'Git: Forgejo',
+		label: 'Forgejo',
 		value: forgejoOrg.replace('https://', ''),
 		href: forgejoOrg,
 		external: true
 	},
 	{
-		label: 'Git: Radicle',
+		label: 'Radicle',
 		value: radicleOrg.replace('https://radicle.network/nodes/', ''),
 		href: radicleOrg,
 		external: true,
 		mirror: true
 	},
 	{
-		label: 'Git: GitHub',
+		label: 'GitHub',
 		value: githubOrg.replace('https://', ''),
 		href: githubOrg,
 		external: true,
