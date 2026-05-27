@@ -9,9 +9,27 @@
 
 	let { data }: { data: PageData } = $props();
 
-	function collectionTitle(id: string): string {
-		return data.collections.find((c) => c.id === id)?.title ?? id;
-	}
+	const PAGE_SIZE = 20;
+	const totalCount = data.talks.length;
+	let visibleCount = $state(PAGE_SIZE);
+	let sentinel = $state<HTMLElement | null>(null);
+
+	const visibleTalks = $derived(data.talks.slice(0, visibleCount));
+	const hasMore = $derived(visibleCount < totalCount);
+
+	$effect(() => {
+		if (!sentinel) return;
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting) {
+					visibleCount = Math.min(visibleCount + PAGE_SIZE, totalCount);
+				}
+			},
+			{ rootMargin: '600px' }
+		);
+		observer.observe(sentinel);
+		return () => observer.disconnect();
+	});
 
 	function speakerNames(speakers: string[]): string {
 		return speakers.map((s) => parseSpeaker(s).name).join(', ');
@@ -40,19 +58,19 @@
 
 		{#if data.talks.length > 0}
 			<section>
-				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{#each data.talks as talk (talk.id)}
+				<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+					{#each visibleTalks as talk (talk.id)}
 						<a
 							href={localizeUrl(`/talks/${talk.id}`)}
-							class="group block border-b border-r border-line p-5 no-underline lg:p-6"
+							class="group block border-b border-r border-line p-6 no-underline lg:p-8"
 						>
 							<article>
 								{#if talkThumbnailUrl(talk)}
-									<div class="relative mb-4 aspect-video w-full overflow-hidden border border-line bg-bg-muted">
+									<div class="relative mb-5 aspect-video w-full overflow-hidden border border-line bg-bg-muted">
 										<img
 											src={talkThumbnailUrl(talk)!}
 											srcset={talkThumbnailSrcset(talk)}
-											sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+											sizes="(min-width: 1536px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
 											alt={talk.title}
 											class="h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-85"
 											loading="lazy"
@@ -65,24 +83,29 @@
 										{/if}
 									</div>
 								{:else}
-									<div class="mb-4 aspect-video w-full border border-line bg-bg-muted" aria-hidden="true"></div>
+									<div class="mb-5 aspect-video w-full border border-line bg-bg-muted" aria-hidden="true"></div>
 								{/if}
 
-								<p class="mb-1.5 font-mono text-[10px] uppercase tracking-widest text-black/35">
+								<h2 class="mb-2 font-mono text-[15px] leading-snug text-black underline decoration-transparent underline-offset-[3px] transition-colors group-hover:decoration-current">
+									{talk.title}
+								</h2>
+
+								<p class="font-mono text-[10px] uppercase tracking-widest text-black/35">
 									{talk.date}
 									{#if talk.speakers?.length}
 										· {speakerNames(talk.speakers)}
 									{/if}
 								</p>
-
-								<h2 class="font-mono text-[14px] leading-snug text-black underline decoration-transparent underline-offset-[3px] transition-colors group-hover:decoration-current">
-									{talk.title}
-								</h2>
 							</article>
 						</a>
 					{/each}
 				</div>
-				<p class="px-8 py-6 font-mono text-[11px] text-black/35 lg:px-10">{m.talks_count({ count: String(data.talks.length) })}</p>
+				{#if hasMore}
+					<div bind:this={sentinel} class="h-1" aria-hidden="true"></div>
+				{/if}
+				<p class="px-8 py-6 font-mono text-[11px] text-black/35 lg:px-10">
+					{m.talks_count({ count: String(data.talks.length) })}
+				</p>
 			</section>
 		{/if}
 

@@ -1,10 +1,12 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
-	import { localizeUrl } from '$lib/i18n';
+	import { localizeUrl, getLocale } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import { parseSpeaker, talkYoutubeEmbedUrl } from '$lib/data/talks';
+	import { peopleById, personAvatarUrl, imageSrcset } from '$lib/data/people';
 	import { datasetConfigs } from '$lib/data/datasets';
+	import { ExternalLink, User } from 'lucide-svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -14,9 +16,14 @@
 	const speakers = $derived(data.talk.speakers.map(parseSpeaker));
 	const embedUrl = $derived(talkYoutubeEmbedUrl(data.talk));
 
-	function descriptionParagraphs(text: string): string[] {
-		return text.split(/\n\n+/).filter(Boolean);
+	const SPEAKERS_PREVIEW = 3;
+	let showAllSpeakers = $state(false);
+	const visibleSpeakers = $derived(showAllSpeakers ? speakers : speakers.slice(0, SPEAKERS_PREVIEW));
+
+	function formatDate(date: string): string {
+		return new Date(date).toLocaleDateString(getLocale(), { day: 'numeric', month: 'long', year: 'numeric' });
 	}
+
 </script>
 
 <svelte:head>
@@ -28,74 +35,156 @@
 	<Header />
 
 	<main>
-		<section class="cell-roomy border-b border-line">
-			<a href={localizeUrl('/talks')} class="link-arrow mb-8 inline-block text-[12px]">{m.talks_detail_back()}</a>
-
-			<p class="label mb-2">{m.talks_detail_label()}</p>
-
-			<h1 class="mb-4 font-mono text-[22px] leading-tight tracking-[-0.01em] sm:text-[28px]">
-				{data.talk.title}
-			</h1>
-
-			<p class="mb-6 font-mono text-[12px] text-black/45">
-				{data.talk.date}
-				{#if speakers.length > 0}
-					·
-					{#each speakers as speaker, i}
-						{#if speaker.personId}
-							<a href={localizeUrl(`/people/${speaker.personId}`)} class="text-black/55 no-underline hover:underline">{speaker.name}</a>
-						{:else}
-							<span>{speaker.name}</span>
-						{/if}{#if i < speakers.length - 1}, {/if}
-					{/each}
+		<!-- Title + meta -->
+		<section class="px-8 pt-8 pb-0 lg:px-10 lg:pt-10">
+			<p class="label mb-4 flex items-baseline gap-[0.5em]">
+				<a href={localizeUrl('/talks')} class="no-underline hover:underline">{m.talks_detail_label()}</a>
+				{#if data.talk.source}
+					<span class="text-black/30">/</span>
+					<span>{data.talk.source.toUpperCase()}</span>
 				{/if}
-				{#if data.talk.video?.duration}
-					· {data.talk.video.duration}
+				{#if data.collection}
+					<span class="text-black/30">/</span>
+					<span>{data.collection.title}</span>
 				{/if}
 			</p>
 
-			{#if embedUrl}
-				<div class="mb-8 w-full max-w-3xl">
-					<div class="relative aspect-video w-full bg-black">
-						<iframe
-							src={embedUrl}
-							title={data.talk.title}
-							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-							allowfullscreen
-							class="absolute inset-0 h-full w-full border-0"
-							loading="lazy"
-						></iframe>
-					</div>
-					<a
-						href={data.talk.video.url}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="link-external mt-2 inline-block font-mono text-[11px] text-black/40"
-					>{m.talks_detail_watch()}</a>
-				</div>
-			{/if}
+			<h1 class="mb-4 font-mono text-[20px] leading-tight tracking-[-0.01em] sm:text-[26px]">
+				{data.talk.title}
+			</h1>
 
-			{#if data.talk.description}
-				<div class="max-w-2xl space-y-4">
-					{#each descriptionParagraphs(data.talk.description) as para}
-						<p class="text-[15px] leading-[1.7] text-black/75">{para}</p>
-					{/each}
-				</div>
-			{/if}
+			<div class="mb-5 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[13px] text-black/55">
+				{#each visibleSpeakers as speaker}
+					{@const person = speaker.personId ? peopleById.get(speaker.personId) : null}
+					{@const avatarUrl = person ? personAvatarUrl(person) : null}
+					{#if speaker.personId}
+						<a href={localizeUrl(`/people/${speaker.personId}`)} class="group inline-flex items-center gap-2 text-inherit no-underline hover:text-black">
+							{#if avatarUrl}
+								<img
+									src={avatarUrl}
+									srcset={imageSrcset(person!.avatarVersions)}
+									sizes="32px"
+									alt={speaker.name}
+									width={32} height={32}
+									class="size-8 border border-line object-cover"
+								/>
+							{:else}
+								<span class="inline-flex size-8 shrink-0 items-center justify-center border border-line bg-black/5">
+									<User size={14} strokeWidth={1.5} class="text-black/40" />
+								</span>
+							{/if}
+							<span class="group-hover:underline">{speaker.name}</span>
+						</a>
+					{:else}
+						<span class="inline-flex items-center gap-2">
+							<span class="inline-flex size-8 shrink-0 items-center justify-center border border-line bg-black/5">
+								<User size={14} strokeWidth={1.5} class="text-black/40" />
+							</span>
+							{speaker.name}
+						</span>
+					{/if}
+				{/each}
+				{#if !showAllSpeakers && speakers.length > SPEAKERS_PREVIEW}
+					<button
+						onclick={() => showAllSpeakers = true}
+						class="font-mono text-[11px] text-black/40 hover:text-black/70"
+					>+{speakers.length - SPEAKERS_PREVIEW} more</button>
+				{/if}
+				{#if data.talk.date}
+					{#if speakers.length > 0}<span class="text-black/35">·</span>{/if}
+					<span>{formatDate(data.talk.date)}</span>
+				{/if}
+				{#if data.talk.video?.duration}
+					<span class="text-black/35">·</span>
+					<span class="text-black/40">{data.talk.video.duration}</span>
+				{/if}
+			</div>
+
 		</section>
 
-		<section class="cell-roomy border-b border-line">
-			<div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+		{#if embedUrl}
+			<div class="px-4 py-4 lg:px-6 lg:py-5">
+				<div class="relative aspect-video w-full bg-black">
+					<iframe
+						src={embedUrl}
+						title={data.talk.title}
+						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+						allowfullscreen
+						class="absolute inset-0 h-full w-full border-0"
+						loading="eager"
+					></iframe>
+				</div>
+			</div>
+		{/if}
+
+		<!-- 2-col: description + sidebar -->
+		<div class="grid lg:grid-cols-[1fr_minmax(300px,380px)]">
+			<section class="border-b border-line px-8 py-7 lg:px-10 lg:py-8">
+				{#if data.descriptionHtml}
+					<div class="max-w-2xl text-[15px] leading-[1.7] text-black/75
+						[&_p]:mb-4 [&_p:last-child]:mb-0
+						[&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-line [&_a:hover]:decoration-black/60
+						[&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-5
+						[&_ol]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5
+						[&_li]:mb-1
+						[&_strong]:font-semibold
+						[&_em]:italic">
+						{@html data.descriptionHtml}
+					</div>
+				{/if}
+			</section>
+
+			<aside class="cell-right">
+				{#if data.talk.video}
+					<div class="mb-8">
+						<a
+							href={data.talk.video.url}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="inline-flex items-center gap-2 font-mono text-[13px] no-underline hover:underline"
+						>
+							<ExternalLink size={13} strokeWidth={1.5} class="shrink-0 text-black/40" />
+							{m.talks_detail_watch()}
+						</a>
+						{#if data.talk.video.videoId}
+							<p class="mt-2 font-mono text-[11px] text-black/35">ID: {data.talk.video.videoId}</p>
+						{/if}
+					</div>
+				{/if}
+
 				{#if speakers.length > 0}
-					<div>
+					<div class="mb-8">
 						<p class="label mb-3">{m.talks_detail_speakers()}</p>
-						<ul class="space-y-1">
+						<ul class="space-y-2">
 							{#each speakers as speaker}
-								<li class="font-mono text-[13px]">
+								{@const person = speaker.personId ? peopleById.get(speaker.personId) : null}
+								{@const avatarUrl = person ? personAvatarUrl(person) : null}
+								<li>
 									{#if speaker.personId}
-										<a href={localizeUrl(`/people/${speaker.personId}`)} class="text-black no-underline hover:underline">{speaker.name}</a>
+										<a href={localizeUrl(`/people/${speaker.personId}`)} class="group inline-flex items-center gap-2 no-underline hover:text-black">
+											{#if avatarUrl}
+												<img
+													src={avatarUrl}
+													srcset={imageSrcset(person!.avatarVersions)}
+													sizes="32px"
+													alt={speaker.name}
+													width={32} height={32}
+													class="size-8 border border-line object-cover"
+												/>
+											{:else}
+												<span class="inline-flex size-8 shrink-0 items-center justify-center border border-line bg-black/5">
+													<User size={14} strokeWidth={1.5} class="text-black/40" />
+												</span>
+											{/if}
+											<span class="font-mono text-[13px] group-hover:underline">{speaker.name}</span>
+										</a>
 									{:else}
-										<span>{speaker.name}</span>
+										<span class="inline-flex items-center gap-2">
+											<span class="inline-flex size-8 shrink-0 items-center justify-center border border-line bg-black/5">
+												<User size={14} strokeWidth={1.5} class="text-black/40" />
+											</span>
+											<span class="font-mono text-[13px]">{speaker.name}</span>
+										</span>
 									{/if}
 								</li>
 							{/each}
@@ -103,27 +192,21 @@
 					</div>
 				{/if}
 
-				{#if data.collection}
-					<div>
-						<p class="label mb-3">{m.talks_detail_collection()}</p>
-						<p class="font-mono text-[13px]">{data.collection.title}</p>
-						{#if data.collection.count}
-							<p class="mt-1 font-mono text-[11px] text-black/40">{m.talks_count({ count: String(data.collection.count) })}</p>
-						{/if}
-					</div>
-				{/if}
-
-				<div>
-					<p class="label mb-3">Dataset</p>
-					<a
-						href={talksRepository}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="link-external font-mono text-[13px]"
-					>git</a>
+	<div class="mb-8">
+					<p class="label mb-3">{data.talk.date}</p>
+					{#if data.talk.language}
+						<p class="font-mono text-[11px] uppercase tracking-widest text-black/40">{data.talk.language}</p>
+					{/if}
 				</div>
-			</div>
-		</section>
+
+				<a
+					href={talksRepository}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="link-external font-mono text-[11px] text-black/35"
+				>git</a>
+			</aside>
+		</div>
 	</main>
 
 	<Footer />

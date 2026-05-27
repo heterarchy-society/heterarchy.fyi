@@ -46,13 +46,14 @@ try {
   const TALKS_BASE = 'https://talks.data.heterarchy.fyi';
   const rawTalks = await fetchJson(`${TALKS_BASE}/`);
 
-  function talkThumbnailVersions(filename, assets) {
+  function talkThumbnailVersions(collection, filename, assets) {
     if (!filename) return null;
     const versions = assets?.[filename]?.image?.versions;
     if (!versions) return null;
+    const dir = filename.includes('/') ? filename.replace(/[^/]+$/, '') : '';
     const result = {};
     for (const [w, v] of Object.entries(versions)) {
-      result[w] = `${TALKS_BASE}/thumbnails/${v.src}`;
+      result[w] = `${TALKS_BASE}/talks/${collection}/${dir}${v.src}`;
     }
     return result;
   }
@@ -62,8 +63,8 @@ try {
     talks: (rawTalks.talks ?? []).map(({ _assets, ...talk }) => {
       const item = { ...talk };
       if (talk.thumbnail) {
-        item.thumbnailUrl = `${TALKS_BASE}/${talk.thumbnail}`;
-        const v = talkThumbnailVersions(talk.thumbnail, _assets);
+        item.thumbnailUrl = `${TALKS_BASE}/talks/${talk.collection}/${talk.thumbnail}`;
+        const v = talkThumbnailVersions(talk.collection, talk.thumbnail, _assets);
         if (v) item.thumbnailVersions = v;
       }
       return item;

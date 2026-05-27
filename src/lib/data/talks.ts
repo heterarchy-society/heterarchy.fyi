@@ -45,6 +45,15 @@ export const talks: Talk[] = (talksData as { talks: Talk[] }).talks;
 export const talksById = new Map(talks.map((t) => [t.id, t]));
 export const talkCollections: TalkCollection[] = (talksData as { collections: TalkCollection[] }).collections ?? [];
 
+export function getTalksByPersonId(personId: string): Talk[] {
+	return talks.filter((t) =>
+		(t.speakers ?? []).some((s) => {
+			const ref = parseSpeaker(s);
+			return ref.personId === personId;
+		})
+	);
+}
+
 export function latestTalksRevision(): { hash: string; date: string } | null {
 	return (talksData as any).meta?.talks?.latestCommit ?? (talksData as any).meta?.commit ?? null;
 }

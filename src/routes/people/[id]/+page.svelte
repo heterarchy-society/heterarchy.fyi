@@ -2,6 +2,7 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import LibraryBookCard from '$lib/components/library/LibraryBookCard.svelte';
+	import TalkCard from '$lib/components/talks/TalkCard.svelte';
 	import { localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
@@ -56,6 +57,7 @@
 		<section class="cell-roomy">
 			<a href={localizeUrl('/people')} class="link-arrow mb-8 inline-block text-[12px]">{m.people_detail_back()}</a>
 
+			<!-- Avatar + basic info -->
 			<div class="grid gap-10 lg:grid-cols-[minmax(180px,260px)_1fr] lg:gap-14">
 				<div class="mx-auto w-full max-w-65 lg:mx-0">
 					{#if activeAvatar}
@@ -116,37 +118,10 @@
 						</div>
 					{/if}
 
-					{#if data.books.length > 0}
-						<div class="mt-8 max-w-3xl">
-							<p class="label mb-4">{m.books_label()}</p>
-							<div class="grid gap-5 sm:grid-cols-2">
-								{#each data.books as book (book.id)}
-									<LibraryBookCard {book} compact />
-								{/each}
-							</div>
-						</div>
-					{/if}
-
-					{#if data.writings.length > 0}
-						<div class="mt-8 max-w-3xl">
-							<p class="label mb-4">{m.writings_page_label()}</p>
-							<ul class="divide-y divide-line">
-								{#each data.writings as writing (writing.id)}
-									<li>
-										<a href={localizeUrl(`/writings/${writing.id}`)} class="group flex items-baseline justify-between gap-4 py-3 no-underline">
-											<span class="font-mono text-[13px] text-black group-hover:underline">{writing.title}</span>
-											<span class="shrink-0 font-mono text-[11px] text-black/35">{writing.year ?? ''}</span>
-										</a>
-									</li>
-								{/each}
-							</ul>
-						</div>
-					{/if}
-
 					{#if person.refs}
 						<div class="mt-8">
 							<p class="label mb-3">{m.people_detail_refs()}</p>
-							<ul class="flex flex-col gap-3">
+							<ul class="flex flex-wrap gap-x-4 gap-y-2">
 								{#each Object.entries(person.refs) as [kind, value]}
 									<li>
 										<a href={refHref(kind, value)} class="link-external font-mono text-[13px]" target="_blank" rel="noopener noreferrer">
@@ -170,6 +145,49 @@
 					</p>
 				</div>
 			</div>
+
+			<!-- Dataset references -->
+			{#if data.books.length > 0 || data.writings.length > 0 || data.talks.length > 0}
+				<div class="mt-12 border-t border-line pt-10">
+					{#if data.books.length > 0}
+						<div class="mb-10">
+							<p class="label mb-4">{m.books_label()}</p>
+							<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+								{#each data.books as book (book.id)}
+									<LibraryBookCard {book} compact />
+								{/each}
+							</div>
+						</div>
+					{/if}
+
+					{#if data.writings.length > 0}
+						<div class="mb-10">
+							<p class="label mb-4">{m.writings_page_label()}</p>
+							<ul class="max-w-3xl divide-y divide-line">
+								{#each data.writings as writing (writing.id)}
+									<li>
+										<a href={localizeUrl(`/writings/${writing.id}`)} class="group flex items-baseline justify-between gap-4 py-3 no-underline">
+											<span class="font-mono text-[13px] text-black group-hover:underline">{writing.title}</span>
+											<span class="shrink-0 font-mono text-[11px] text-black/35">{writing.year ?? ''}</span>
+										</a>
+									</li>
+								{/each}
+							</ul>
+						</div>
+					{/if}
+
+					{#if data.talks.length > 0}
+						<div class="mb-10">
+							<p class="label mb-4">{m.talks_page_label()}</p>
+							<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+								{#each data.talks as talk (talk.id)}
+									<TalkCard {talk} />
+								{/each}
+							</div>
+						</div>
+					{/if}
+				</div>
+			{/if}
 		</section>
 	</main>
 

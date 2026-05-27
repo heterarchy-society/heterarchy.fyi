@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import { bookAuthorRefs, libraryBooks } from '$lib/data/library';
 import { peopleById, personAvatarUrl, personAvatarAltUrls, imageSrcset } from '$lib/data/people';
 import { getWritingsByPersonId } from '$lib/data/writings';
+import { getTalksByPersonId } from '$lib/data/talks';
 import { datasetConfigs } from '$lib/data/datasets';
 import type { PageLoad } from './$types';
 
@@ -24,6 +25,7 @@ export function load({ params }: Parameters<PageLoad>[0]) {
 		},
 		books: libraryBooks.filter((book) => bookAuthorRefs(book).some((author) => author.personId === person.id)),
 		writings: getWritingsByPersonId(person.id),
+		talks: getTalksByPersonId(person.id),
 		repository: peopleRepository,
 	};
 }
