@@ -1,5 +1,6 @@
 import { people, personAvatarUrl } from '$lib/data/people';
 import { libraryBooks } from '$lib/data/books';
+import { talks, parseSpeaker } from '$lib/data/talks';
 import glossaryData from '$lib/data/glossary.json';
 import writingsData from '$lib/data/writings.json';
 import { firstParagraph } from '$lib/text';
@@ -15,6 +16,7 @@ const pagesByLocale: Record<string, { id: string; title: string; subtitle: strin
 		{ id: 'writings',  title: 'Writings',  subtitle: 'Articles and papers',               url: '/writings' },
 		{ id: 'people',    title: 'People',    subtitle: 'People around parallel societies',  url: '/people' },
 		{ id: 'events',    title: 'Events',    subtitle: 'Meetups and gatherings',            url: '/events' },
+		{ id: 'talks',     title: 'Talks',     subtitle: 'Conference talks and lectures',     url: '/talks' },
 		{ id: 'join',      title: 'Join',      subtitle: 'Get involved',                      url: '/join' },
 		{ id: 'find-us',   title: 'Find Us',   subtitle: 'Where to find us',                  url: '/find-us' },
 		{ id: 'about',     title: 'About',     subtitle: 'About Heterarchy',                  url: '/about' },
@@ -27,6 +29,7 @@ const pagesByLocale: Record<string, { id: string; title: string; subtitle: strin
 		{ id: 'writings',  title: 'Texty',          subtitle: 'Články a eseje',                     url: '/writings' },
 		{ id: 'people',    title: 'Lidé',           subtitle: 'Lidé kolem paralelních společností', url: '/people' },
 		{ id: 'events',    title: 'Události',       subtitle: 'Setkání a akce',                     url: '/events' },
+		{ id: 'talks',     title: 'Přednášky',      subtitle: 'Konferenční přednášky',              url: '/talks' },
 		{ id: 'join',      title: 'Zapojit se',     subtitle: 'Jak se zapojit',                     url: '/join' },
 		{ id: 'find-us',   title: 'Najdete nás',    subtitle: 'Kde nás najdete',                    url: '/find-us' },
 		{ id: 'about',     title: 'O nás',          subtitle: 'O projektu Heterarchy',              url: '/about' },
@@ -88,6 +91,20 @@ export function buildSearchIndex(locale: string) {
 			subtitle: [authorsText, book.year].filter(Boolean).join(' · ') || undefined,
 			url: `/books/${book.id}`,
 			thumbnail: book.coverVersions?.['400w'] ?? book.coverVersions?.['200w'] ?? book.coverUrl,
+		});
+	}
+
+	// Talks (no translations)
+	for (const talk of talks) {
+		const speakerNames = (talk.speakers ?? []).map((s) => parseSpeaker(s).name).join(', ');
+		entries.push({
+			id: talk.id,
+			type: 'talk',
+			title: talk.title,
+			subtitle: [speakerNames, talk.date].filter(Boolean).join(' · ') || undefined,
+			description: talk.description?.split(/\n\n+/)[0] || undefined,
+			url: `/talks/${talk.id}`,
+			thumbnail: talk.thumbnailVersions?.['400w'] ?? talk.thumbnailUrl ?? undefined,
 		});
 	}
 

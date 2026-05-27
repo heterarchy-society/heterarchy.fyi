@@ -60,5 +60,14 @@ export const datasetConfigs: DatasetConfig[] = [
 		github: 'https://github.com/heterarchy-society/people',
 		radicle: radicleUrl('rad:z65FF84dMSHS7KcTTJ3PHxktg1Ma'),
 		collections: [{ name: 'people', changelogPath: '/people/changelog' }]
+	},
+	{
+		id: 'talks',
+		path: '/talks',
+		endpoint: 'https://talks.data.heterarchy.fyi/',
+		endpointLabel: 'https://talks.data.heterarchy.fyi/',
+		repository: 'https://git.heterarchy.fyi/heterarchy-society/talks',
+		github: 'https://github.com/heterarchy-society/talks',
+		collections: [{ name: 'talks', changelogPath: '/talks/changelog' }]
 	}
 ];

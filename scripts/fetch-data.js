@@ -41,6 +41,41 @@ const writings = await fetchJson('https://writings.data.heterarchy.fyi/');
 writeFileSync(`${DATA}/writings.json`, JSON.stringify(writings, null, 2) + '\n');
 console.log(`✓ Writings: ${writings.writings.length} writings → src/lib/data/writings.json`);
 
+// Talks
+try {
+  const TALKS_BASE = 'https://talks.data.heterarchy.fyi';
+  const rawTalks = await fetchJson(`${TALKS_BASE}/`);
+
+  function talkThumbnailVersions(filename, assets) {
+    if (!filename) return null;
+    const versions = assets?.[filename]?.image?.versions;
+    if (!versions) return null;
+    const result = {};
+    for (const [w, v] of Object.entries(versions)) {
+      result[w] = `${TALKS_BASE}/thumbnails/${v.src}`;
+    }
+    return result;
+  }
+
+  const talks = {
+    ...rawTalks,
+    talks: (rawTalks.talks ?? []).map(({ _assets, ...talk }) => {
+      const item = { ...talk };
+      if (talk.thumbnail) {
+        item.thumbnailUrl = `${TALKS_BASE}/${talk.thumbnail}`;
+        const v = talkThumbnailVersions(talk.thumbnail, _assets);
+        if (v) item.thumbnailVersions = v;
+      }
+      return item;
+    }),
+  };
+
+  writeFileSync(`${DATA}/talks.json`, JSON.stringify(talks, null, 2) + '\n');
+  console.log(`✓ Talks: ${talks.talks?.length ?? 0} talks → src/lib/data/talks.json`);
+} catch (error) {
+  console.warn(`⚠ Talks dataset not fetched yet: ${error.message}`);
+}
+
 // People
 try {
   const PEOPLE_BASE = 'https://people.data.heterarchy.fyi';
