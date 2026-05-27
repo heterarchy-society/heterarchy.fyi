@@ -15,7 +15,7 @@ export type Talk = {
 	language: string;
 	description: string;
 	video: TalkVideo;
-	speakers: string[];
+	speakers?: string[];
 	thumbnail: string;
 	thumbnailUrl?: string;
 	thumbnailVersions?: Record<string, string>;
@@ -23,6 +23,8 @@ export type Talk = {
 	event: string;
 	project: string;
 	source: string;
+	archiveSrc?: string;
+	archiveDuration?: number;
 };
 
 export type TalkCollection = {

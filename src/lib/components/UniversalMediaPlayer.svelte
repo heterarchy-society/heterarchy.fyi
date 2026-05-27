@@ -1,12 +1,69 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { fly } from 'svelte/transition';
-	import { Check, ChevronDown, ChevronUp, Download, Highlighter, Link, Pause, Play, Volume2, VolumeX, X } from 'lucide-svelte';
+	import { Check, ChevronDown, ChevronUp, CornerUpLeft, Download, Highlighter, Link, Pause, PictureInPicture2, Play, Volume2, VolumeX, X } from 'lucide-svelte';
 	import { mediaPlayer } from '$lib/media/player.svelte';
 	import { decodePeaks, drawWaveform as drawWaveformCanvas, hoverTimeFromPointer, seekTimeFromPointer } from '$lib/media/waveform';
+	import { loadYouTubeAPI } from '$lib/media/youtube';
 	import * as m from '$lib/paraglide/messages';
 
-	let audioEl: HTMLAudioElement | undefined = $state();
+	let mediaEl: HTMLVideoElement | undefined = $state();
+	let videoDefaultEl: HTMLDivElement | undefined = $state();
+	let ytDefaultEl: HTMLDivElement | undefined = $state();
+	let miniVideoEl: HTMLDivElement | undefined = $state();
+	let ytInstance: any = null;
+	let ytCurrentVideoId: string | null = null;
+
+	onMount(() => {
+		if (videoDefaultEl) mediaPlayer.setVideoDefaultContainer(videoDefaultEl);
+		if (ytDefaultEl) mediaPlayer.setYTDefaultContainer(ytDefaultEl);
+	});
+
+	$effect(() => {
+		const videoId = mediaPlayer.track?.youtubeVideoId ?? null;
+		if (!videoId || !ytDefaultEl) return;
+
+		if (ytInstance) {
+			if (ytCurrentVideoId !== videoId) {
+				ytCurrentVideoId = videoId;
+				ytInstance.cueVideoById(videoId);
+			}
+			return;
+		}
+
+		loadYouTubeAPI().then(() => {
+			if (!ytDefaultEl) return;
+			const YT = (window as any).YT;
+			const inner = document.createElement('div');
+			ytDefaultEl.appendChild(inner);
+
+			const player = new YT.Player(inner, {
+				videoId,
+				width: '100%',
+				height: '100%',
+				playerVars: { autoplay: 0, rel: 0, modestbranding: 1 },
+				events: {
+					onReady: () => {
+						ytInstance = player;
+						ytCurrentVideoId = videoId;
+						mediaPlayer.connectYouTubePlayer(player);
+					},
+					onStateChange: (e: any) => {
+						const S = YT.PlayerState;
+						if (e.data === S.PLAYING) {
+							mediaPlayer.playing = true;
+							mediaPlayer.startYTSync();
+						} else if (e.data === S.PAUSED || e.data === S.ENDED) {
+							mediaPlayer.playing = false;
+							mediaPlayer.stopYTSync();
+						}
+					},
+				},
+			});
+		});
+	});
 	let waveCanvas: HTMLCanvasElement | undefined = $state();
 	let waveformHoverTime: number | null = $state(null);
 	let linearHoverTime: number | null = $state(null);
@@ -45,7 +102,7 @@
 	}
 
 	function syncTime() {
-		mediaPlayer.currentTime = audioEl?.currentTime ?? 0;
+		mediaPlayer.currentTime = mediaEl?.currentTime ?? 0;
 		if (mediaPlayer.playing) raf = requestAnimationFrame(syncTime);
 	}
 
@@ -57,7 +114,7 @@
 	function stopTracking() {
 		if (raf !== null) cancelAnimationFrame(raf);
 		raf = null;
-		mediaPlayer.currentTime = audioEl?.currentTime ?? mediaPlayer.currentTime;
+		mediaPlayer.currentTime = mediaEl?.currentTime ?? mediaPlayer.currentTime;
 	}
 
 	const peaks = $derived(mediaPlayer.track?.peaks ? decodePeaks(mediaPlayer.track.peaks) : null);
@@ -100,14 +157,24 @@
 	}
 
 	$effect(() => {
-		if (!audioEl) return;
-		mediaPlayer.setAudio(audioEl);
+		if (!mediaEl) return;
+		mediaPlayer.setMediaEl(mediaEl);
+
+		const enterPiP = () => { mediaPlayer.pictureInPicture = true; };
+		const leavePiP = () => { mediaPlayer.pictureInPicture = false; };
+		mediaEl.addEventListener('enterpictureinpicture', enterPiP);
+		mediaEl.addEventListener('leavepictureinpicture', leavePiP);
+
+		return () => {
+			mediaEl?.removeEventListener('enterpictureinpicture', enterPiP);
+			mediaEl?.removeEventListener('leavepictureinpicture', leavePiP);
+		};
 	});
 
 	$effect(() => {
-		if (!audioEl || !mediaPlayer.track) return;
-		if (audioEl.src !== mediaPlayer.track.src) {
-			audioEl.src = mediaPlayer.track.src;
+		if (!mediaEl || !mediaPlayer.track?.src || mediaPlayer.track.youtubeVideoId) return;
+		if (mediaEl.src !== mediaPlayer.track.src) {
+			mediaEl.src = mediaPlayer.track.src;
 		}
 	});
 
@@ -138,43 +205,117 @@
 	});
 
 	const progress = $derived(mediaPlayer.duration > 0 ? Math.min(1, mediaPlayer.currentTime / mediaPlayer.duration) : 0);
+	const isOnTrackPage = $derived(mediaPlayer.track?.href ? isTrackPage(page.url.pathname, mediaPlayer.track.href) : false);
+	const isNativeVideoTrack = $derived(Boolean(mediaPlayer.track?.isVideo && !mediaPlayer.track.youtubeVideoId));
+	const showMiniPlayer = $derived(Boolean(mediaPlayer.track && !(mediaPlayer.track.isVideo && isOnTrackPage)));
+	const showDetachedVideo = $derived(Boolean(
+		mediaPlayer.minimized &&
+		!isOnTrackPage &&
+		isNativeVideoTrack &&
+		mediaPlayer.mediaElReady &&
+		!mediaPlayer.pictureInPicture
+	));
+	const showMiniRowPlayback = $derived(!showDetachedVideo);
+
+	function isTrackPage(pathname: string, href: string): boolean {
+		const path = pathname.replace(/\/$/, '');
+		const target = href.replace(/\/$/, '');
+		return path === target || path.endsWith(target);
+	}
+
+	$effect(() => {
+		if (!showDetachedVideo || !miniVideoEl) return;
+
+		const node = mediaPlayer.mediaEl;
+		if (!node) return;
+
+		miniVideoEl.appendChild(node);
+
+		return () => {
+			mediaPlayer.videoDefaultContainer?.appendChild(node);
+		};
+	});
 </script>
 
-<!-- svelte-ignore a11y_media_has_caption -->
-<audio
-	bind:this={audioEl}
-	onplay={() => { mediaPlayer.playing = true; startTracking(); }}
-	onpause={() => { mediaPlayer.playing = false; stopTracking(); }}
-	ontimeupdate={() => { mediaPlayer.currentTime = audioEl?.currentTime ?? 0; }}
-	onloadedmetadata={() => {
-		if (!audioEl) return;
-		mediaPlayer.duration = audioEl.duration;
-		if (mediaPlayer.currentTime > 0) audioEl.currentTime = mediaPlayer.currentTime;
-	}}
-	onprogress={() => { if (audioEl?.buffered.length) mediaPlayer.bufferedTime = audioEl.buffered.end(audioEl.buffered.length - 1); }}
-	onended={() => { stopTracking(); mediaPlayer.ended(); }}
-></audio>
+<!-- Persistent video container — off-screen so the element survives navigation -->
+<div bind:this={videoDefaultEl} style="position:fixed; width:1px; height:1px; top:0; left:-2px; overflow:hidden; pointer-events:none;" aria-hidden="true">
+	<!-- svelte-ignore a11y_media_has_caption -->
+	<video
+		bind:this={mediaEl}
+		style="width:100%;height:100%;display:block;"
+		onplay={() => { mediaPlayer.playing = true; startTracking(); }}
+		onpause={() => { mediaPlayer.playing = false; stopTracking(); }}
+		ontimeupdate={() => { mediaPlayer.currentTime = mediaEl?.currentTime ?? 0; }}
+		onloadedmetadata={() => {
+			if (!mediaEl) return;
+			mediaPlayer.duration = mediaEl.duration;
+			if (mediaPlayer.currentTime > 0) mediaEl.currentTime = mediaPlayer.currentTime;
+		}}
+		onprogress={() => { if (mediaEl?.buffered.length) mediaPlayer.bufferedTime = mediaEl.buffered.end(mediaEl.buffered.length - 1); }}
+		onended={() => { stopTracking(); mediaPlayer.ended(); }}
+	></video>
+</div>
 
-{#if mediaPlayer.track}
+{#if showMiniPlayer && mediaPlayer.track}
 	<div
 		transition:fly={{ y: 80, duration: 220 }}
-		class="mini-shell fixed inset-x-0 bottom-0 z-50 flex flex-col-reverse overflow-hidden sm:inset-x-auto sm:bottom-5 sm:right-5 sm:flex-col {!mediaPlayer.minimized ? 'sm:hidden' : ''}"
+		class="mini-shell fixed inset-x-0 bottom-0 z-50 flex overflow-hidden sm:inset-x-auto sm:bottom-5 sm:right-5 sm:w-[440px] sm:max-w-[calc(100vw-2.5rem)] sm:flex-col {showDetachedVideo ? 'flex-col' : 'flex-col-reverse'} {!mediaPlayer.minimized ? 'sm:hidden' : ''}"
 	>
-		<div class="flex items-center gap-2 px-4 py-3 sm:px-3 sm:py-2.5">
-			<button
-				type="button"
-				onclick={() => mediaPlayer.toggle()}
-				class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-black/20 text-black/70 transition-colors hover:border-black/50 hover:text-black sm:h-7 sm:w-7"
-				aria-label={mediaPlayer.playing ? m.audio_pause() : m.audio_play()}
-			>
-				{#if mediaPlayer.playing}
-					<Pause size={14} fill="currentColor" strokeWidth={0} class="sm:hidden" />
-					<Pause size={12} fill="currentColor" strokeWidth={0} class="hidden sm:block" />
-				{:else}
-					<Play size={14} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" class="sm:hidden" />
-					<Play size={12} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" class="hidden sm:block" />
+		{#if showDetachedVideo}
+			<div transition:fly={{ y: 28, duration: 260 }} class="mini-video-frame">
+				<div bind:this={miniVideoEl} class="h-full w-full"></div>
+				{#if mediaPlayer.track?.href}
+					<a
+						href={mediaPlayer.track.href}
+						class="mini-video-return"
+						aria-label="Return to video"
+						title="Return to video"
+					>
+						<CornerUpLeft size={15} strokeWidth={1.9} />
+					</a>
 				{/if}
-			</button>
+				<button
+					type="button"
+					onclick={() => mediaPlayer.clear()}
+					class="mini-video-close"
+					aria-label={m.audio_close_player()}
+					title={m.audio_close_player()}
+				>
+					<X size={16} strokeWidth={1.9} />
+				</button>
+				<button
+					type="button"
+					onclick={() => mediaPlayer.toggle()}
+					class="mini-video-toggle"
+					aria-label={mediaPlayer.playing ? m.audio_pause() : m.audio_play()}
+					title={mediaPlayer.playing ? m.audio_pause() : m.audio_play()}
+				>
+					{#if mediaPlayer.playing}
+						<Pause size={22} fill="currentColor" strokeWidth={0} />
+					{:else}
+						<Play size={24} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" />
+					{/if}
+				</button>
+			</div>
+		{/if}
+
+		<div class="flex items-center gap-2 px-4 py-3 sm:px-3 sm:py-2.5">
+			{#if showMiniRowPlayback}
+				<button
+					type="button"
+					onclick={() => mediaPlayer.toggle()}
+					class="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-black/20 text-black/70 transition-colors hover:border-black/50 hover:text-black sm:h-7 sm:w-7"
+					aria-label={mediaPlayer.playing ? m.audio_pause() : m.audio_play()}
+				>
+					{#if mediaPlayer.playing}
+						<Pause size={14} fill="currentColor" strokeWidth={0} class="sm:hidden" />
+						<Pause size={12} fill="currentColor" strokeWidth={0} class="hidden sm:block" />
+					{:else}
+						<Play size={14} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" class="sm:hidden" />
+						<Play size={12} fill="currentColor" strokeWidth={0} style="transform: translateX(1px)" class="hidden sm:block" />
+					{/if}
+				</button>
+			{/if}
 
 			{#if mediaPlayer.track.href}
 				<a
@@ -213,16 +354,31 @@
 				{/if}
 			</button>
 
-			<button
-				type="button"
-				onclick={() => { mediaPlayer.minimized = false; }}
-				class="hidden h-9 w-9 shrink-0 cursor-pointer items-center justify-center text-black/25 transition-colors hover:text-black/60 sm:flex sm:h-6 sm:w-6"
-				aria-label={m.audio_expand_player()}
-				title={m.audio_expand_player()}
-			>
-				<ChevronUp size={16} strokeWidth={1.8} class="sm:hidden" />
-				<ChevronUp size={14} strokeWidth={1.8} class="hidden sm:block" />
-			</button>
+			{#if isNativeVideoTrack}
+				<button
+					type="button"
+					onclick={() => { void mediaPlayer.togglePictureInPicture(); }}
+					class="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center transition-colors sm:h-6 sm:w-6 {mediaPlayer.pictureInPicture ? 'text-black/70 hover:text-black' : 'text-black/25 hover:text-black/60'}"
+					aria-label={mediaPlayer.pictureInPicture ? 'Exit picture-in-picture' : 'Enter picture-in-picture'}
+					title={mediaPlayer.pictureInPicture ? 'Exit picture-in-picture' : 'Enter picture-in-picture'}
+				>
+					<PictureInPicture2 size={16} strokeWidth={1.8} class="sm:hidden" />
+					<PictureInPicture2 size={14} strokeWidth={1.8} class="hidden sm:block" />
+				</button>
+			{/if}
+
+			{#if !showDetachedVideo && !isNativeVideoTrack}
+				<button
+					type="button"
+					onclick={() => { mediaPlayer.minimized = false; }}
+					class="hidden h-9 w-9 shrink-0 cursor-pointer items-center justify-center text-black/25 transition-colors hover:text-black/60 sm:flex sm:h-6 sm:w-6"
+					aria-label={m.audio_expand_player()}
+					title={m.audio_expand_player()}
+				>
+					<ChevronUp size={16} strokeWidth={1.8} class="sm:hidden" />
+					<ChevronUp size={14} strokeWidth={1.8} class="hidden sm:block" />
+				</button>
+			{/if}
 
 			<button
 				type="button"
@@ -252,7 +408,7 @@
 	</div>
 {/if}
 
-{#if mediaPlayer.track && !mediaPlayer.minimized}
+{#if mediaPlayer.track && !mediaPlayer.minimized && !isNativeVideoTrack}
 	<div transition:fly={{ y: 80, duration: 280 }} class="media-player-shell fixed inset-x-0 bottom-0 z-50 hidden px-4 py-3 backdrop-blur-md sm:block">
 		<div class="mx-auto flex max-w-5xl items-center gap-4">
 			<button
@@ -408,15 +564,17 @@
 							{formatTime(mediaPlayer.currentTime)}<span class="text-black/20"> / </span>{mediaPlayer.track.duration ?? formatTime(mediaPlayer.duration)}
 						{/if}
 					</button>
-					<button
-						type="button"
-						onclick={downloadAudio}
-						class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
-						aria-label={m.audio_download()}
-						title={m.audio_download()}
-					>
-						<Download size={15} strokeWidth={1.8} />
-					</button>
+					{#if !mediaPlayer.track?.youtubeVideoId}
+						<button
+							type="button"
+							onclick={downloadAudio}
+							class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center text-black/20 transition-colors hover:text-black/55"
+							aria-label={m.audio_download()}
+							title={m.audio_download()}
+						>
+							<Download size={15} strokeWidth={1.8} />
+						</button>
+					{/if}
 					<button
 						type="button"
 						onclick={() => { mediaPlayer.minimized = true; }}
@@ -442,6 +600,9 @@
 	</div>
 {/if}
 
+<!-- Persistent YT container — off-screen but rendered so YouTube keeps playing -->
+<div bind:this={ytDefaultEl} style="position:fixed; width:1px; height:1px; top:0; left:-2px; overflow:hidden; pointer-events:none;" aria-hidden="true"></div>
+
 <style>
 	.mini-shell {
 		border-top: 1px solid var(--theme-player-border);
@@ -457,6 +618,89 @@
 				0 4px 24px var(--theme-player-shadow),
 				0 1px 4px var(--theme-player-shadow);
 		}
+	}
+
+	.mini-video-frame {
+		position: relative;
+		aspect-ratio: 16 / 9;
+		width: 100%;
+		overflow: hidden;
+		border-bottom: 1px solid var(--theme-player-border);
+		background: #000;
+	}
+
+	.mini-video-frame :global(video) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		background: #000;
+		object-fit: contain;
+	}
+
+	.mini-video-return,
+	.mini-video-close,
+	.mini-video-toggle {
+		position: absolute;
+		z-index: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: rgba(255, 255, 255, 0.88);
+		background: rgba(0, 0, 0, 0.42);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		opacity: 0;
+		pointer-events: none;
+		transition:
+			color 160ms ease,
+			background 160ms ease,
+			opacity 160ms ease,
+			transform 160ms ease;
+	}
+
+	.mini-video-frame:hover .mini-video-return,
+	.mini-video-frame:hover .mini-video-close,
+	.mini-video-frame:hover .mini-video-toggle,
+	.mini-video-frame:focus-within .mini-video-return,
+	.mini-video-frame:focus-within .mini-video-close,
+	.mini-video-frame:focus-within .mini-video-toggle {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	.mini-video-return,
+	.mini-video-close {
+		top: 10px;
+		width: 34px;
+		height: 34px;
+	}
+
+	.mini-video-return {
+		left: 10px;
+	}
+
+	.mini-video-close {
+		right: 10px;
+	}
+
+	.mini-video-toggle {
+		top: 50%;
+		left: 50%;
+		width: 58px;
+		height: 58px;
+		border: 1px solid rgba(255, 255, 255, 0.24);
+		border-radius: 999px;
+		transform: translate(-50%, -50%);
+	}
+
+	.mini-video-return:hover,
+	.mini-video-toggle:hover {
+		color: #fff;
+		background: rgba(0, 0, 0, 0.62);
+	}
+
+	.mini-video-toggle:hover {
+		transform: translate(-50%, -50%) scale(1.04);
 	}
 
 	.media-player-shell {

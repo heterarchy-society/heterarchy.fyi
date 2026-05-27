@@ -15,4 +15,11 @@ declare module '*.md?raw' {
 	export default content;
 }
 
+declare namespace svelteHTML {
+	interface IntrinsicElements {
+		'video-player': Record<string, unknown>;
+		'video-skin': Record<string, unknown>;
+	}
+}
+
 export {};

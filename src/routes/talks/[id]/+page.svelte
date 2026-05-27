@@ -3,18 +3,62 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import { localizeUrl, getLocale } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
-	import { parseSpeaker, talkYoutubeEmbedUrl } from '$lib/data/talks';
+	import { onMount } from 'svelte';
+	import { parseSpeaker } from '$lib/data/talks';
+	import { mediaPlayer } from '$lib/media/player.svelte';
 	import { peopleById, personAvatarUrl, imageSrcset } from '$lib/data/people';
 	import { datasetConfigs } from '$lib/data/datasets';
 	import { ExternalLink, User } from 'lucide-svelte';
+	import VideoPlayer from '$lib/components/talks/VideoPlayer.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
 	const talksRepository = datasetConfigs.find((d) => d.id === 'talks')!.repository;
 
-	const speakers = $derived(data.talk.speakers.map(parseSpeaker));
-	const embedUrl = $derived(talkYoutubeEmbedUrl(data.talk));
+	const speakers = $derived((data.talk.speakers ?? []).map(parseSpeaker));
+
+	let ytSlot: HTMLDivElement | undefined = $state();
+
+	onMount(() => {
+		if (!data.talk.video?.videoId) return;
+
+		const base = {
+			id: data.talk.id,
+			title: data.talk.title,
+			subtitle: (data.talk.speakers ?? []).map((s) => parseSpeaker(s).name).join(', ') || undefined,
+			href: `/talks/${data.talk.id}`,
+			duration: data.talk.video.duration,
+		};
+
+		if (data.talk.archiveSrc) {
+			void mediaPlayer.play({
+				...base,
+				src: data.talk.archiveSrc,
+				durationSeconds: data.talk.archiveDuration,
+				isVideo: true,
+			}).catch(() => {});
+		} else {
+			mediaPlayer.load({
+				...base,
+				youtubeVideoId: data.talk.video.videoId,
+			});
+		}
+	});
+
+	// Portal: move the YT iframe into the page slot for YouTube-only talks
+	$effect(() => {
+		if (!mediaPlayer.ytPlayerReady || !ytSlot) return;
+		const iframe = mediaPlayer.ytPlayer?.getIframe?.();
+		if (!iframe) return;
+		ytSlot.appendChild(iframe);
+
+		return () => {
+			const wasPlaying = mediaPlayer.playing;
+			mediaPlayer.ytDefaultContainer?.appendChild(iframe);
+			if (wasPlaying) setTimeout(() => mediaPlayer.ytPlayer?.playVideo?.(), 50);
+		};
+	});
 
 	const SPEAKERS_PREVIEW = 3;
 	let showAllSpeakers = $state(false);
@@ -102,17 +146,14 @@
 
 		</section>
 
-		{#if embedUrl}
+		{#if data.talk.video?.videoId}
 			<div class="px-4 py-4 lg:px-6 lg:py-5">
 				<div class="relative aspect-video w-full bg-black">
-					<iframe
-						src={embedUrl}
-						title={data.talk.title}
-						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-						allowfullscreen
-						class="absolute inset-0 h-full w-full border-0"
-						loading="eager"
-					></iframe>
+					{#if data.talk.archiveSrc}
+						<VideoPlayer />
+					{:else}
+						<div bind:this={ytSlot} class="absolute inset-0 h-full w-full"></div>
+					{/if}
 				</div>
 			</div>
 		{/if}

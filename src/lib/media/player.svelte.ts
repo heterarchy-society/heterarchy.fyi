@@ -6,11 +6,13 @@ export type MediaTrack = {
 	subtitle?: string;
 	album?: string;
 	href?: string;
-	src: string;
+	src?: string;
 	duration?: string | null;
 	durationSeconds?: number | null;
 	peaks?: string | null;
 	followableText?: boolean;
+	youtubeVideoId?: string;
+	isVideo?: boolean;
 };
 
 const STORAGE_KEY = 'heterarchy:player';
@@ -28,14 +30,21 @@ class MediaPlayerState {
 	textFollowRequest = $state(0);
 	playlist = $state<MediaTrack[]>([]);
 	playlistIndex = $state(-1);
-	audio: HTMLAudioElement | null = null;
+	mediaEl: HTMLVideoElement | null = null;
+	mediaElReady = $state(false);
+	pictureInPicture = $state(false);
+	videoDefaultContainer: HTMLElement | null = null;
+	ytPlayer: any = null;
+	ytPlayerReady = $state(false);
+	ytDefaultContainer: HTMLElement | null = null;
+	private ytSyncRaf: number | null = null;
 	private currentTimePersistTimer: number | null = null;
 	private lastCurrentTimePersistAt = 0;
+	private playOnMediaReady = false;
 
 	constructor() {
 		this.restore();
 
-		// Save whenever track/volume/speed/minimized change (not currentTime — too frequent)
 		$effect.root(() => {
 			$effect(() => {
 				void this.track;
@@ -75,7 +84,7 @@ class MediaPlayerState {
 
 	persist() {
 		if (typeof localStorage === 'undefined') return;
-		if (!this.track) {
+		if (!this.track || this.track.youtubeVideoId) {
 			localStorage.removeItem(STORAGE_KEY);
 			return;
 		}
@@ -86,6 +95,61 @@ class MediaPlayerState {
 			speed: this.speed,
 			minimized: this.minimized,
 		}));
+	}
+
+	setMediaEl(el: HTMLVideoElement) {
+		this.mediaEl = el;
+		el.playbackRate = this.speed;
+		el.volume = this.volume;
+		if (this.track?.src && el.src !== this.track.src) el.src = this.track.src;
+		this.mediaElReady = true;
+		this.pictureInPicture = typeof document !== 'undefined' && document.pictureInPictureElement === el;
+		this.setupMediaSessionHandlers();
+		if (this.playOnMediaReady) {
+			this.playOnMediaReady = false;
+			void this.play().catch(() => {});
+		}
+	}
+
+	setVideoDefaultContainer(el: HTMLElement) {
+		this.videoDefaultContainer = el;
+	}
+
+	setYTDefaultContainer(el: HTMLElement) {
+		this.ytDefaultContainer = el;
+	}
+
+	connectYouTubePlayer(player: any) {
+		this.ytPlayer = player;
+		this.ytPlayer.setVolume?.(this.volume * 100);
+		this.ytPlayer.setPlaybackRate?.(this.speed);
+		this.ytPlayerReady = true;
+		this.startYTSync();
+	}
+
+	disconnectYouTubePlayer() {
+		this.stopYTSync();
+		this.ytPlayer = null;
+		this.ytPlayerReady = false;
+	}
+
+	startYTSync() {
+		this.stopYTSync();
+		const sync = () => {
+			if (!this.ytPlayer) return;
+			this.currentTime = this.ytPlayer.getCurrentTime?.() ?? 0;
+			const dur = this.ytPlayer.getDuration?.() ?? 0;
+			if (dur > 0) this.duration = dur;
+			this.ytSyncRaf = requestAnimationFrame(sync);
+		};
+		this.ytSyncRaf = requestAnimationFrame(sync);
+	}
+
+	stopYTSync() {
+		if (this.ytSyncRaf !== null) {
+			cancelAnimationFrame(this.ytSyncRaf);
+			this.ytSyncRaf = null;
+		}
 	}
 
 	private persistCurrentTimeThrottled() {
@@ -104,14 +168,6 @@ class MediaPlayerState {
 			this.lastCurrentTimePersistAt = Date.now();
 			this.persist();
 		}, 1000 - elapsed);
-	}
-
-	setAudio(audio: HTMLAudioElement) {
-		this.audio = audio;
-		audio.playbackRate = this.speed;
-		audio.volume = this.volume;
-		if (this.track && audio.src !== this.track.src) audio.src = this.track.src;
-		this.setupMediaSessionHandlers();
 	}
 
 	private syncMediaSession() {
@@ -144,23 +200,36 @@ class MediaPlayerState {
 		this.track = track;
 		if (track.durationSeconds) this.duration = track.durationSeconds;
 		this.syncMediaSession();
-		if (!this.audio) return;
-		if (!sameTrack || this.audio.src !== track.src) {
-			this.audio.src = track.src;
-			this.currentTime = 0;
+		if (!track.youtubeVideoId && this.mediaEl) {
+			if (!sameTrack || (track.src && this.mediaEl.src !== track.src)) {
+				if (track.src) this.mediaEl.src = track.src;
+				this.currentTime = 0;
+			}
+			this.mediaEl.playbackRate = this.speed;
+			this.mediaEl.volume = this.volume;
 		}
-		this.audio.playbackRate = this.speed;
-		this.audio.volume = this.volume;
 	}
 
 	async play(track?: MediaTrack) {
 		if (track) this.load(track);
-		if (!this.audio) return;
-		await this.audio.play();
+		if (this.track?.youtubeVideoId) {
+			this.ytPlayer?.playVideo();
+			return;
+		}
+		if (!this.mediaEl) {
+			this.playOnMediaReady = true;
+			return;
+		}
+		await this.mediaEl.play();
 	}
 
 	pause() {
-		this.audio?.pause();
+		if (this.track?.youtubeVideoId) {
+			this.ytPlayer?.pauseVideo();
+			this.persist();
+			return;
+		}
+		this.mediaEl?.pause();
 		this.persist();
 	}
 
@@ -171,6 +240,18 @@ class MediaPlayerState {
 		}
 		if (this.playing) this.pause();
 		else void this.play(track);
+	}
+
+	async togglePictureInPicture() {
+		if (!this.mediaEl || !this.track?.isVideo || this.track.youtubeVideoId) return;
+		if (!document.pictureInPictureEnabled) return;
+
+		if (document.pictureInPictureElement === this.mediaEl) {
+			await document.exitPictureInPicture();
+			return;
+		}
+
+		await this.mediaEl.requestPictureInPicture();
 	}
 
 	playFromPlaylist(tracks: MediaTrack[], index = 0) {
@@ -192,7 +273,7 @@ class MediaPlayerState {
 	ended() {
 		this.playing = false;
 		this.currentTime = 0;
-		if (this.audio) this.audio.currentTime = 0;
+		if (this.mediaEl) this.mediaEl.currentTime = 0;
 		const next = this.playlistIndex + 1;
 		if (next < this.playlist.length) {
 			this.playlistIndex = next;
@@ -205,9 +286,15 @@ class MediaPlayerState {
 	}
 
 	seek(seconds: number) {
-		if (!this.audio) return;
-		this.audio.currentTime = Math.max(0, seconds);
-		this.currentTime = this.audio.currentTime;
+		const t = Math.max(0, seconds);
+		if (this.track?.youtubeVideoId && this.ytPlayer) {
+			this.ytPlayer.seekTo(t, true);
+			this.currentTime = t;
+			return;
+		}
+		if (!this.mediaEl) return;
+		this.mediaEl.currentTime = t;
+		this.currentTime = this.mediaEl.currentTime;
 	}
 
 	reset() {
@@ -217,6 +304,9 @@ class MediaPlayerState {
 	clear() {
 		this.pause();
 		this.seek(0);
+		this.stopYTSync();
+		this.ytPlayer = null;
+		this.ytPlayerReady = false;
 		this.track = null;
 		this.syncMediaSession();
 		this.currentTime = 0;
@@ -224,19 +314,23 @@ class MediaPlayerState {
 		this.bufferedTime = 0;
 		this.playing = false;
 		this.minimized = true;
-		if (this.audio) this.audio.removeAttribute('src');
+		this.playOnMediaReady = false;
+		this.pictureInPicture = false;
+		if (this.mediaEl) this.mediaEl.removeAttribute('src');
 	}
 
 	setSpeed(rate: number) {
 		this.speed = rate;
-		if (this.audio) this.audio.playbackRate = rate;
+		if (this.mediaEl) this.mediaEl.playbackRate = rate;
+		this.ytPlayer?.setPlaybackRate?.(rate);
 	}
 
 	setVolume(value: number) {
 		const volume = Math.min(1, Math.max(0, value));
 		this.volume = volume;
 		if (volume > 0) this.lastAudibleVolume = volume;
-		if (this.audio) this.audio.volume = volume;
+		if (this.mediaEl) this.mediaEl.volume = volume;
+		this.ytPlayer?.setVolume?.(volume * 100);
 	}
 
 	toggleMute() {

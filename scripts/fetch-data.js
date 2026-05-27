@@ -41,10 +41,19 @@ const writings = await fetchJson('https://writings.data.heterarchy.fyi/');
 writeFileSync(`${DATA}/writings.json`, JSON.stringify(writings, null, 2) + '\n');
 console.log(`✓ Writings: ${writings.writings.length} writings → src/lib/data/writings.json`);
 
-// Talks
+// Talks + Archive
 try {
   const TALKS_BASE = 'https://talks.data.heterarchy.fyi';
-  const rawTalks = await fetchJson(`${TALKS_BASE}/`);
+  const ARCHIVE_BASE = 'https://archive.pp0.co';
+
+  const [rawTalks, archiveData] = await Promise.all([
+    fetchJson(`${TALKS_BASE}/`),
+    fetchJson(`${ARCHIVE_BASE}/index.json`).catch(() => null),
+  ]);
+
+  const archiveById = archiveData
+    ? new Map(archiveData.videos.map((v) => [v.id, v]))
+    : new Map();
 
   function talkThumbnailVersions(collection, filename, assets) {
     if (!filename) return null;
@@ -67,12 +76,18 @@ try {
         const v = talkThumbnailVersions(talk.collection, talk.thumbnail, _assets);
         if (v) item.thumbnailVersions = v;
       }
+      const archive = talk.video?.videoId ? archiveById.get(talk.video.videoId) : null;
+      if (archive) {
+        item.archiveSrc = `${ARCHIVE_BASE}${archive.source.path}`;
+        item.archiveDuration = parseFloat(archive.duration);
+      }
       return item;
     }),
   };
 
+  const archiveMatched = talks.talks.filter((t) => t.archiveSrc).length;
   writeFileSync(`${DATA}/talks.json`, JSON.stringify(talks, null, 2) + '\n');
-  console.log(`✓ Talks: ${talks.talks?.length ?? 0} talks → src/lib/data/talks.json`);
+  console.log(`✓ Talks: ${talks.talks?.length ?? 0} talks (${archiveMatched} with archive source) → src/lib/data/talks.json`);
 } catch (error) {
   console.warn(`⚠ Talks dataset not fetched yet: ${error.message}`);
 }

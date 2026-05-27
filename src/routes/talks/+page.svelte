@@ -10,7 +10,7 @@
 	let { data }: { data: PageData } = $props();
 
 	const PAGE_SIZE = 20;
-	const totalCount = data.talks.length;
+	const totalCount = $derived(data.talks.length);
 	let visibleCount = $state(PAGE_SIZE);
 	let sentinel = $state<HTMLElement | null>(null);
 
