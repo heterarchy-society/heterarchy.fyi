@@ -41,6 +41,9 @@ class MediaPlayerState {
 	private currentTimePersistTimer: number | null = null;
 	private lastCurrentTimePersistAt = 0;
 	private playOnMediaReady = false;
+	private playOnYTReady = false;
+	private ytPortalShouldResume = false;
+	private ytPortalResumeTime: number | null = null;
 
 	constructor() {
 		this.restore();
@@ -127,6 +130,28 @@ class MediaPlayerState {
 		this.startYTSync();
 	}
 
+	consumeYouTubePlayRequest() {
+		const shouldPlay = this.playOnYTReady;
+		this.playOnYTReady = false;
+		return shouldPlay;
+	}
+
+	requestYouTubePortalResume() {
+		if (this.track?.youtubeVideoId && this.playing) {
+			this.ytPortalShouldResume = true;
+			this.ytPortalResumeTime = this.ytPlayer?.getCurrentTime?.() ?? this.currentTime;
+		}
+	}
+
+	consumeYouTubePortalResume() {
+		const shouldResume = this.ytPortalShouldResume
+			? { time: this.ytPortalResumeTime ?? this.currentTime }
+			: null;
+		this.ytPortalShouldResume = false;
+		this.ytPortalResumeTime = null;
+		return shouldResume;
+	}
+
 	disconnectYouTubePlayer() {
 		this.stopYTSync();
 		this.ytPlayer = null;
@@ -198,6 +223,7 @@ class MediaPlayerState {
 	load(track: MediaTrack) {
 		const sameTrack = this.track?.id === track.id;
 		this.track = track;
+		if (track.isVideo) this.minimized = true;
 		if (track.durationSeconds) this.duration = track.durationSeconds;
 		this.syncMediaSession();
 		if (!track.youtubeVideoId && this.mediaEl) {
@@ -211,9 +237,14 @@ class MediaPlayerState {
 	}
 
 	async play(track?: MediaTrack) {
+		const sameTrack = track ? this.isTrack(track.id) : true;
 		if (track) this.load(track);
 		if (this.track?.youtubeVideoId) {
-			this.ytPlayer?.playVideo();
+			this.playOnYTReady = true;
+			if (this.ytPlayer && sameTrack) {
+				this.playOnYTReady = false;
+				this.ytPlayer.playVideo?.();
+			}
 			return;
 		}
 		if (!this.mediaEl) {
@@ -315,6 +346,9 @@ class MediaPlayerState {
 		this.playing = false;
 		this.minimized = true;
 		this.playOnMediaReady = false;
+		this.playOnYTReady = false;
+		this.ytPortalShouldResume = false;
+		this.ytPortalResumeTime = null;
 		this.pictureInPicture = false;
 		if (this.mediaEl) this.mediaEl.removeAttribute('src');
 	}

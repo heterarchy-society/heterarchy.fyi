@@ -3,12 +3,12 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import { localizeUrl, getLocale } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
-	import { onMount } from 'svelte';
-	import { parseSpeaker } from '$lib/data/talks';
+	import { untrack } from 'svelte';
+	import { parseSpeaker, talkThumbnailUrl, talkThumbnailSrcset } from '$lib/data/talks';
 	import { mediaPlayer } from '$lib/media/player.svelte';
 	import { peopleById, personAvatarUrl, imageSrcset } from '$lib/data/people';
 	import { datasetConfigs } from '$lib/data/datasets';
-	import { ExternalLink, User } from 'lucide-svelte';
+	import { ExternalLink, User, Play } from 'lucide-svelte';
 	import VideoPlayer from '$lib/components/talks/VideoPlayer.svelte';
 	import type { PageData } from './$types';
 
@@ -18,47 +18,54 @@
 
 	const speakers = $derived((data.talk.speakers ?? []).map(parseSpeaker));
 
-	let ytSlot: HTMLDivElement | undefined = $state();
+	$effect(() => {
+		if (!data.talk.archiveSrc || !data.talk.video?.videoId) return;
 
-	onMount(() => {
-		if (!data.talk.video?.videoId) return;
-
-		const base = {
+		const track = {
 			id: data.talk.id,
 			title: data.talk.title,
 			subtitle: (data.talk.speakers ?? []).map((s) => parseSpeaker(s).name).join(', ') || undefined,
 			href: `/talks/${data.talk.id}`,
 			duration: data.talk.video.duration,
+			src: data.talk.archiveSrc,
+			durationSeconds: data.talk.archiveDuration,
+			isVideo: true,
 		};
 
-		if (data.talk.archiveSrc) {
-			void mediaPlayer.play({
-				...base,
-				src: data.talk.archiveSrc,
-				durationSeconds: data.talk.archiveDuration,
-				isVideo: true,
-			}).catch(() => {});
-		} else {
-			mediaPlayer.load({
-				...base,
-				youtubeVideoId: data.talk.video.videoId,
-			});
-		}
+		untrack(() => {
+			if (!mediaPlayer.playing) {
+				void mediaPlayer.play(track).catch(() => {});
+			}
+		});
 	});
 
-	// Portal: move the YT iframe into the page slot for YouTube-only talks
+	const isThisTalkActive = $derived(mediaPlayer.track?.id === data.talk.id);
+
+	let ytPlaying = $state(false);
 	$effect(() => {
-		if (!mediaPlayer.ytPlayerReady || !ytSlot) return;
-		const iframe = mediaPlayer.ytPlayer?.getIframe?.();
-		if (!iframe) return;
-		ytSlot.appendChild(iframe);
-
-		return () => {
-			const wasPlaying = mediaPlayer.playing;
-			mediaPlayer.ytDefaultContainer?.appendChild(iframe);
-			if (wasPlaying) setTimeout(() => mediaPlayer.ytPlayer?.playVideo?.(), 50);
-		};
+		data.talk.id;
+		const isYouTube = !data.talk.archiveSrc && !!data.talk.video?.videoId;
+		ytPlaying = isYouTube && untrack(() => !mediaPlayer.playing);
 	});
+
+	function playYouTube() {
+		mediaPlayer.clear();
+		ytPlaying = true;
+	}
+
+	function playTalk() {
+		if (!data.talk.archiveSrc || !data.talk.video?.videoId) return;
+		void mediaPlayer.play({
+			id: data.talk.id,
+			title: data.talk.title,
+			subtitle: speakers.map((s) => s.name).join(', ') || undefined,
+			href: `/talks/${data.talk.id}`,
+			duration: data.talk.video.duration,
+			src: data.talk.archiveSrc,
+			durationSeconds: data.talk.archiveDuration,
+			isVideo: true,
+		}).catch(() => {});
+	}
 
 	const SPEAKERS_PREVIEW = 3;
 	let showAllSpeakers = $state(false);
@@ -66,6 +73,18 @@
 
 	function formatDate(date: string): string {
 		return new Date(date).toLocaleDateString(getLocale(), { day: 'numeric', month: 'long', year: 'numeric' });
+	}
+
+	// Converts a colon-separated duration ("40:31", "1:22:01") to "40m31s" / "1h22m01s".
+	function formatDuration(duration: string): string {
+		const parts = duration.split(':').map((p) => parseInt(p, 10));
+		if (parts.some(Number.isNaN)) return duration;
+		const [h, m, s] = parts.length === 3 ? parts : [0, ...parts];
+		const out = [];
+		if (h) out.push(`${h}h`);
+		if (h || m) out.push(`${h ? String(m).padStart(2, '0') : m}m`);
+		out.push(`${h || m ? String(s).padStart(2, '0') : s}s`);
+		return out.join('');
 	}
 
 </script>
@@ -140,7 +159,7 @@
 				{/if}
 				{#if data.talk.video?.duration}
 					<span class="text-black/35">·</span>
-					<span class="text-black/40">{data.talk.video.duration}</span>
+					<span class="text-black/40">{formatDuration(data.talk.video.duration)}</span>
 				{/if}
 			</div>
 
@@ -148,11 +167,61 @@
 
 		{#if data.talk.video?.videoId}
 			<div class="px-4 py-4 lg:px-6 lg:py-5">
-				<div class="relative aspect-video w-full bg-black">
+				<div class="relative aspect-video w-full overflow-hidden bg-bg-muted">
 					{#if data.talk.archiveSrc}
-						<VideoPlayer />
-					{:else}
-						<div bind:this={ytSlot} class="absolute inset-0 h-full w-full"></div>
+						{#if isThisTalkActive}
+							<VideoPlayer />
+						{:else}
+							{#if talkThumbnailUrl(data.talk)}
+								<img
+									src={talkThumbnailUrl(data.talk)!}
+									srcset={talkThumbnailSrcset(data.talk)}
+									sizes="100vw"
+									alt=""
+									aria-hidden="true"
+									class="absolute inset-0 h-full w-full object-cover"
+								/>
+							{/if}
+							<button
+								onclick={playTalk}
+								class="group absolute inset-0 flex cursor-pointer items-center justify-center bg-black/20 hover:bg-black/30 transition-colors"
+								aria-label="Play"
+							>
+								<span class="flex size-16 items-center justify-center rounded-full bg-white/90 shadow-lg transition-transform duration-200 group-hover:scale-110 group-hover:shadow-xl">
+									<Play size={28} class="translate-x-0.5 text-black" />
+								</span>
+							</button>
+						{/if}
+					{:else if data.talk.video?.videoId}
+						{#if ytPlaying}
+							<iframe
+								src="https://www.youtube-nocookie.com/embed/{data.talk.video.videoId}?autoplay=1&rel=0&modestbranding=1&enablejsapi=1"
+								title={data.talk.title}
+								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen
+								class="absolute inset-0 h-full w-full border-0"
+							></iframe>
+						{:else}
+							{#if talkThumbnailUrl(data.talk)}
+								<img
+									src={talkThumbnailUrl(data.talk)!}
+									srcset={talkThumbnailSrcset(data.talk)}
+									sizes="100vw"
+									alt=""
+									aria-hidden="true"
+									class="absolute inset-0 h-full w-full object-cover"
+								/>
+							{/if}
+							<button
+								onclick={playYouTube}
+								class="group absolute inset-0 flex cursor-pointer items-center justify-center bg-black/20 hover:bg-black/30 transition-colors"
+								aria-label="Play"
+							>
+								<span class="flex size-16 items-center justify-center rounded-full bg-white/90 shadow-lg transition-transform duration-200 group-hover:scale-110 group-hover:shadow-xl">
+									<Play size={28} class="translate-x-0.5 text-black" />
+								</span>
+							</button>
+						{/if}
 					{/if}
 				</div>
 			</div>

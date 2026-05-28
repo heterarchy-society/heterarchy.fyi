@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { fly } from 'svelte/transition';
@@ -26,9 +26,18 @@
 		if (!videoId || !ytDefaultEl) return;
 
 		if (ytInstance) {
+			if (!mediaPlayer.ytPlayerReady) {
+				mediaPlayer.connectYouTubePlayer(ytInstance);
+			}
 			if (ytCurrentVideoId !== videoId) {
 				ytCurrentVideoId = videoId;
-				ytInstance.cueVideoById(videoId);
+				if (mediaPlayer.consumeYouTubePlayRequest()) {
+					ytInstance.loadVideoById(videoId);
+				} else {
+					ytInstance.cueVideoById(videoId);
+				}
+			} else if (mediaPlayer.consumeYouTubePlayRequest()) {
+				ytInstance.playVideo?.();
 			}
 			return;
 		}
@@ -49,6 +58,9 @@
 						ytInstance = player;
 						ytCurrentVideoId = videoId;
 						mediaPlayer.connectYouTubePlayer(player);
+						if (mediaPlayer.consumeYouTubePlayRequest()) {
+							player.playVideo?.();
+						}
 					},
 					onStateChange: (e: any) => {
 						const S = YT.PlayerState;
@@ -206,13 +218,14 @@
 
 	const progress = $derived(mediaPlayer.duration > 0 ? Math.min(1, mediaPlayer.currentTime / mediaPlayer.duration) : 0);
 	const isOnTrackPage = $derived(mediaPlayer.track?.href ? isTrackPage(page.url.pathname, mediaPlayer.track.href) : false);
+	const isVideoTrack = $derived(Boolean(mediaPlayer.track?.isVideo));
 	const isNativeVideoTrack = $derived(Boolean(mediaPlayer.track?.isVideo && !mediaPlayer.track.youtubeVideoId));
 	const showMiniPlayer = $derived(Boolean(mediaPlayer.track && !(mediaPlayer.track.isVideo && isOnTrackPage)));
 	const showDetachedVideo = $derived(Boolean(
 		mediaPlayer.minimized &&
 		!isOnTrackPage &&
-		isNativeVideoTrack &&
-		mediaPlayer.mediaElReady &&
+		isVideoTrack &&
+		(mediaPlayer.track?.youtubeVideoId ? mediaPlayer.ytPlayerReady : mediaPlayer.mediaElReady) &&
 		!mediaPlayer.pictureInPicture
 	));
 	const showMiniRowPlayback = $derived(!showDetachedVideo);
@@ -223,16 +236,49 @@
 		return path === target || path.endsWith(target);
 	}
 
+	function restoreYouTubePlayback(time: number) {
+		const player = mediaPlayer.ytPlayer;
+		if (!player) return;
+
+		const resume = () => {
+			player.seekTo?.(Math.max(0, time), true);
+			player.playVideo?.();
+		};
+
+		setTimeout(resume, 80);
+		setTimeout(resume, 300);
+	}
+
 	$effect(() => {
 		if (!showDetachedVideo || !miniVideoEl) return;
 
-		const node = mediaPlayer.mediaEl;
+		const isYouTube = Boolean(mediaPlayer.track?.youtubeVideoId);
+		const node = mediaPlayer.track?.youtubeVideoId
+			? mediaPlayer.ytPlayer?.getIframe?.()
+			: mediaPlayer.mediaEl;
 		if (!node) return;
 
+		const youTubeResume = isYouTube ? mediaPlayer.consumeYouTubePortalResume() : null;
+		const shouldResumeYouTube = youTubeResume || (isYouTube && untrack(() => mediaPlayer.playing)
+			? { time: untrack(() => mediaPlayer.currentTime) }
+			: null);
 		miniVideoEl.appendChild(node);
+		if (shouldResumeYouTube) {
+			restoreYouTubePlayback(shouldResumeYouTube.time);
+		}
 
 		return () => {
-			mediaPlayer.videoDefaultContainer?.appendChild(node);
+			const youTubeResumeOnCleanup = isYouTube ? mediaPlayer.consumeYouTubePortalResume() : null;
+			const shouldResumeYouTubeOnCleanup = youTubeResumeOnCleanup || (isYouTube && untrack(() => mediaPlayer.playing)
+				? { time: untrack(() => mediaPlayer.currentTime) }
+				: null);
+			const fallback = mediaPlayer.track?.youtubeVideoId
+				? mediaPlayer.ytDefaultContainer
+				: mediaPlayer.videoDefaultContainer;
+			fallback?.appendChild(node);
+			if (shouldResumeYouTubeOnCleanup) {
+				restoreYouTubePlayback(shouldResumeYouTubeOnCleanup.time);
+			}
 		};
 	});
 </script>
@@ -259,7 +305,7 @@
 {#if showMiniPlayer && mediaPlayer.track}
 	<div
 		transition:fly={{ y: 80, duration: 220 }}
-		class="mini-shell fixed inset-x-0 bottom-0 z-50 flex overflow-hidden sm:inset-x-auto sm:bottom-5 sm:right-5 sm:w-[440px] sm:max-w-[calc(100vw-2.5rem)] sm:flex-col {showDetachedVideo ? 'flex-col' : 'flex-col-reverse'} {!mediaPlayer.minimized ? 'sm:hidden' : ''}"
+		class="mini-shell fixed inset-x-0 bottom-0 z-50 flex overflow-hidden sm:inset-x-auto sm:bottom-5 sm:right-5 sm:w-[440px] sm:max-w-[calc(100vw-2.5rem)] sm:flex-col {showDetachedVideo ? 'flex-col' : 'flex-col-reverse'} {!mediaPlayer.minimized && !isVideoTrack ? 'sm:hidden' : ''}"
 	>
 		{#if showDetachedVideo}
 			<div transition:fly={{ y: 28, duration: 260 }} class="mini-video-frame">
@@ -367,7 +413,7 @@
 				</button>
 			{/if}
 
-			{#if !showDetachedVideo && !isNativeVideoTrack}
+			{#if !showDetachedVideo && !isVideoTrack}
 				<button
 					type="button"
 					onclick={() => { mediaPlayer.minimized = false; }}
@@ -408,7 +454,7 @@
 	</div>
 {/if}
 
-{#if mediaPlayer.track && !mediaPlayer.minimized && !isNativeVideoTrack}
+{#if mediaPlayer.track && !mediaPlayer.minimized && !isVideoTrack}
 	<div transition:fly={{ y: 80, duration: 280 }} class="media-player-shell fixed inset-x-0 bottom-0 z-50 hidden px-4 py-3 backdrop-blur-md sm:block">
 		<div class="mx-auto flex max-w-5xl items-center gap-4">
 			<button
@@ -629,11 +675,13 @@
 		background: #000;
 	}
 
-	.mini-video-frame :global(video) {
+	.mini-video-frame :global(video),
+	.mini-video-frame :global(iframe) {
 		display: block;
 		width: 100%;
 		height: 100%;
 		background: #000;
+		border: 0;
 		object-fit: contain;
 	}
 
@@ -645,6 +693,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		cursor: pointer;
 		color: rgba(255, 255, 255, 0.88);
 		background: rgba(0, 0, 0, 0.42);
 		backdrop-filter: blur(10px);
@@ -694,6 +743,7 @@
 	}
 
 	.mini-video-return:hover,
+	.mini-video-close:hover,
 	.mini-video-toggle:hover {
 		color: #fff;
 		background: rgba(0, 0, 0, 0.62);
