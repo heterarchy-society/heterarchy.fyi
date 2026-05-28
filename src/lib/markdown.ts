@@ -21,6 +21,23 @@ function isExternalHref(href: string): boolean {
 	return /^https?:\/\//i.test(href);
 }
 
+function cleanUrl(href: string): string | null {
+	let encoded: string;
+	try {
+		encoded = encodeURI(href).replace(/%25/g, '%');
+	} catch {
+		return null;
+	}
+	if (/^[a-z][a-z\d+\-.]*:/i.test(encoded)) {
+		try {
+			new URL(encoded);
+		} catch {
+			return null;
+		}
+	}
+	return encoded;
+}
+
 function renderFootnotes(source: string): string {
 	const footnotes = new Map<string, string>();
 	const withoutDefinitions = source.replace(
@@ -54,7 +71,9 @@ function renderFootnotes(source: string): string {
 
 renderer.link = function ({ href, title, tokens }: Tokens.Link): string {
 	const text = this.parser.parseInline(tokens);
-	const safeHref = escapeHtml(href);
+	const cleaned = cleanUrl(href);
+	if (cleaned === null) return text;
+	const safeHref = escapeHtml(cleaned);
 	const safeTitle = title ? ` title="${escapeHtml(title)}"` : '';
 	if (!isExternalHref(href)) {
 		return `<a href="${safeHref}"${safeTitle}>${text}</a>`;
