@@ -47,8 +47,9 @@
 		data.talks.length > 0
 	);
 
-	const imageUrl = $derived(event.heroImageUrl ?? event.cardImageUrl);
-	const imageSrcset = $derived(event.heroImageSrcset ?? event.cardImageSrcset);
+	const isBanner = $derived(event.heroImageType === 'banner');
+	const sideImageUrl = $derived(isBanner ? event.cardImageUrl : (event.heroImageUrl ?? event.cardImageUrl));
+	const sideImageSrcset = $derived(isBanner ? event.cardImageSrcset : (event.heroImageSrcset ?? event.cardImageSrcset));
 </script>
 
 <svelte:head>
@@ -66,21 +67,20 @@
 	<Header />
 
 	<main>
-		<section class="cell-roomy border-b border-line">
+		<section class="border-b border-line">
+<div class="cell-roomy">
 			<div
 				class="grid gap-10 lg:gap-14"
-				class:lg:grid-cols-[minmax(180px,240px)_1fr]={!!imageUrl}
+				class:lg:grid-cols-[minmax(180px,240px)_1fr]={!!sideImageUrl}
 			>
-				{#if imageUrl}
+				{#if sideImageUrl}
 					<div class="mx-auto w-full max-w-60 lg:mx-0">
 						<img
-							src={imageUrl}
-							srcset={imageSrcset}
+							src={sideImageUrl}
+							srcset={sideImageSrcset}
 							sizes="(min-width: 1024px) 240px, 60vw"
 							alt={event.name}
-							width={240}
-							height={240}
-							class="aspect-square w-full border border-line object-cover"
+							class="w-full border border-line"
 						/>
 					</div>
 				{/if}
@@ -141,6 +141,7 @@
 						</a>
 					{/if}
 				</div>
+			</div>
 			</div>
 		</section>
 

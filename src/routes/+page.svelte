@@ -101,7 +101,7 @@
 		</div>
 		<div class="cell lg:col-span-1">
 			<LibraryLinks books={libraryPreview} />
-			<div class="-mx-8 mt-8 border-t border-line px-8 pt-8 lg:-mx-10 lg:px-10">
+			<div class="-mx-8 mt-8 border-t border-line px-8 pt-8">
 				<Partners />
 			</div>
 		</div>

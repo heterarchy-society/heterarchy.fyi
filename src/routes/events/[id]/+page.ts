@@ -41,6 +41,7 @@ export const load: PageLoad = ({ params, data }) => {
 			cardImageSrcset: cardImg ? eventImageSrcset(event, cardImg) : undefined,
 			heroImageUrl: heroImg ? eventImageUrl(event, heroImg) : null,
 			heroImageSrcset: heroImg ? eventImageSrcset(event, heroImg) : undefined,
+			heroImageType: heroImg?.type ?? null,
 		},
 		speakers: (event.speakers ?? []).map(resolveSpeaker),
 		talks: getTalksByEventId(event.id),

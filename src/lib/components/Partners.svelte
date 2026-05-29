@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { partners } from '$lib/data/partners';
+	import * as m from '$lib/paraglide/messages';
 </script>
 
 <section>
-	<p class="label">Přátelé</p>
+	<p class="label">{m.partners_label()}</p>
 
 	<ul class="mt-4 flex flex-col gap-2">
 		{#each partners as partner}
