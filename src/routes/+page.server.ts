@@ -49,13 +49,19 @@ function renderExcerpt(term: GlossaryTerm, termsById: Map<string, GlossaryTerm>,
 	return renderMarkdownInline(markdown);
 }
 
+function dailyIndex(len: number): number {
+	const d = new Date();
+	const seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+	return seed % len;
+}
+
 function randomGlossaryItem(locale: string) {
 	const terms = (glossaryData as { terms: GlossaryTerm[] }).terms;
 	const termsById = new Map(terms.map((term) => [term.id, term]));
 	const pool = terms.filter((term) => renderExcerpt(term, termsById, locale));
 	if (!pool.length) return null;
 
-	const term = pool[Math.floor(Math.random() * pool.length)];
+	const term = pool[dailyIndex(pool.length)];
 
 	return {
 		id: term.id,

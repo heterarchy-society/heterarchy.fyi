@@ -8,6 +8,7 @@ type Writing = {
 	year: number | null;
 	type: string;
 	glossary: string[];
+	description?: string;
 };
 
 const writings: Writing[] = (writingsData as { writings: Writing[] }).writings;
@@ -50,4 +51,16 @@ export function writingAuthorRefs(authors: string[]): WritingAuthorRef[] {
 
 export function writingAuthorText(authors: string[]): string {
 	return writingAuthorRefs(authors).map((a) => a.person?.name ?? a.name).join(', ');
+}
+
+export function writingExcerpt(writing: Writing): string | null {
+	if (!writing.description) return null;
+	const firstParagraph = writing.description.split(/\n\n/)[0];
+	return firstParagraph
+		.replace(/\[\[([^\]|]+)\|[^\]]+\]\]/g, '$1')
+		.replace(/\[\[([^\]]+)\]\]/g, '$1')
+		.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+		.replace(/[*_`#>]/g, '')
+		.replace(/\s+/g, ' ')
+		.trim();
 }

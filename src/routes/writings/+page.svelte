@@ -6,7 +6,8 @@
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 	import { Headphones } from 'lucide-svelte';
-	import { writingAuthorText } from '$lib/data/writings';
+	import { writingAuthorRefs } from '$lib/data/writings';
+	import { personAvatarUrl } from '$lib/data/people';
 
 	let { data }: { data: PageData } = $props();
 
@@ -49,14 +50,23 @@
 		{#if data.writings.length > 0}
 			<section>
 				{#each data.writings as writing (writing.id)}
+					{@const authors = writingAuthorRefs(writing.authors)}
 					<a href={localizeUrl(`/writings/${writing.id}`)} class="group block border-b border-line px-8 py-8 no-underline lg:px-10">
 						<div class="max-w-2xl">
-							<p class="mb-2 flex items-center gap-0 font-mono text-[11px] uppercase tracking-widest text-black/35">
-								<span>{writingAuthorText(writing.authors)}{#if writing.year} · {writing.year}{/if}{#if wordCount(writing) !== null} · {fmtWords(wordCount(writing)!)}W{/if}</span>
+							<div class="mb-2 flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-black/35">
+								{#each authors as author}
+									{#if author.person}
+										{@const avatarUrl = personAvatarUrl(author.person)}
+										{#if avatarUrl}
+											<img src={avatarUrl} alt={author.person.name} width={18} height={18} class="size-[18px] shrink-0 border border-line object-cover" />
+										{/if}
+									{/if}
+								{/each}
+								<span>{authors.map(a => a.person?.name ?? a.name).join(', ')}{#if writing.year} · {writing.year}{/if}{#if wordCount(writing) !== null} · {fmtWords(wordCount(writing)!)}W{/if}</span>
 								{#if writing.audio?.length}
-									<span class="ml-[0.45em] flex items-center gap-1"> · <Headphones size={11} strokeWidth={1.8} class="ml-[0.45em]" />{#if writing.audio[0].duration}<span class="ml-1">{writing.audio[0].duration}</span>{/if}</span>
+									<span class="flex items-center gap-1"> · <Headphones size={11} strokeWidth={1.8} />{#if writing.audio[0].duration}<span class="ml-1">{writing.audio[0].duration}</span>{/if}</span>
 								{/if}
-							</p>
+							</div>
 							<h2 class="mb-3 font-mono text-[20px] leading-snug text-black underline decoration-transparent underline-offset-4 transition-colors group-hover:decoration-current">{writing.title}</h2>
 							{#if writing.description}
 								<p class="text-[14px] leading-[1.65] text-black/60">
