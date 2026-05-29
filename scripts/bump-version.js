@@ -39,9 +39,8 @@ if (summarizer.status !== 0) {
 
 // Read generated changelog for commit message body
 const changelogPath = resolve(ROOT, `changelog/v${next}.md`);
-const changelogBody = !dry && existsSync(changelogPath)
-	? '\n\n' + readFileSync(changelogPath, 'utf8').trim()
-	: '';
+const changelogBody =
+	!dry && existsSync(changelogPath) ? readFileSync(changelogPath, 'utf8').trim() : '';
 
 // Bump package.json
 console.log(`  package.json  → v${next}`);
@@ -51,14 +50,17 @@ if (!dry) {
 }
 
 // Stage and commit
-const message = `chore: bump version to v${next}${changelogBody}`;
-console.log(`  commit: ${message.split('\n')[0]}`);
+const subject = `chore: bump version to v${next}`;
+console.log(`  commit: ${subject}`);
+if (changelogBody) console.log(`  body:   changelog/v${next}.md`);
 console.log(`  tag:    v${next}`);
 
 if (!dry) {
 	execSync(`git add package.json`, { cwd: ROOT });
 	if (existsSync(changelogPath)) execSync(`git add changelog/v${next}.md`, { cwd: ROOT });
-	execSync(`git commit -m ${JSON.stringify(message)}`, { cwd: ROOT, stdio: 'inherit' });
+	const commitArgs = ['commit', '-m', subject];
+	if (changelogBody) commitArgs.push('-m', changelogBody);
+	execSync('git', [...commitArgs], { cwd: ROOT, stdio: 'inherit' });
 	execSync(`git tag v${next}`, { cwd: ROOT });
 	console.log(`\n✓ v${next} tagged`);
 	console.log(`  push with: git push && git push --tags`);
