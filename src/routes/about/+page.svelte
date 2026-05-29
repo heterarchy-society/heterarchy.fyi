@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import Manifesto from '$lib/components/about/Manifesto.svelte';
 	import { localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
@@ -35,6 +36,8 @@
 	<title>{m.about_meta_title()}</title>
 	<meta name="description" content={m.about_meta_desc()} />
 </svelte:head>
+
+<Seo title={m.about_meta_title()} description={m.about_meta_desc()} />
 
 <div class="min-h-screen w-full">
 	<Header />

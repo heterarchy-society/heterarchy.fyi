@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import LatestRevision from '$lib/components/LatestRevision.svelte';
 	import { localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
@@ -22,6 +23,8 @@
 	<title>{m.people_page_label()} — The Heterarchy Society</title>
 	<meta name="description" content={m.people_page_lead()} />
 </svelte:head>
+
+<Seo title="{m.people_page_label()} — The Heterarchy Society" description={m.people_page_lead()} />
 
 <div class="min-h-screen w-full">
 	<Header />

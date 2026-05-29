@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import { onlineChannels, gitChannels, offlineVenues, contactMeta } from '$lib/data/contact';
 	import * as m from '$lib/paraglide/messages';
 </script>
@@ -9,6 +10,8 @@
 	<title>{m.find_us_label()} — The Heterarchy Society</title>
 	<meta name="description" content={contactMeta.description} />
 </svelte:head>
+
+<Seo title="{m.find_us_label()} — The Heterarchy Society" description={contactMeta.description} />
 
 <div class="min-h-screen w-full">
 	<Header />

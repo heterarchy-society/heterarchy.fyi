@@ -3,6 +3,7 @@
 	import { localizeUrl } from '$lib/i18n';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import LibraryBookCard from '$lib/components/library/LibraryBookCard.svelte';
 	import { libraryBooks } from '$lib/data/library';
 	import LatestRevision from '$lib/components/LatestRevision.svelte';
@@ -16,6 +17,8 @@
 	<title>{m.books_page_label()} — The Heterarchy Society</title>
 	<meta name="description" content={m.books_page_lead()} />
 </svelte:head>
+
+<Seo title="{m.books_page_label()} — The Heterarchy Society" description={m.books_page_lead()} />
 
 <div class="min-h-screen w-full">
 	<Header />

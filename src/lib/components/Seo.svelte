@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { getLocale } from '$lib/i18n';
+	import { siteMeta } from '$lib/data/placeholder';
 
 	let {
 		title,
@@ -14,7 +16,7 @@
 	} = $props();
 
 	const url = $derived(`${page.url.origin}${page.url.pathname}`);
-	const siteName = 'The Heterarchy Society';
+	const locale = $derived(getLocale());
 </script>
 
 <svelte:head>
@@ -22,7 +24,8 @@
 	<meta property="og:description" content={description} />
 	<meta property="og:type" content={type} />
 	<meta property="og:url" content={url} />
-	<meta property="og:site_name" content={siteName} />
+	<meta property="og:site_name" content={siteMeta.title} />
+	<meta property="og:locale" content={locale} />
 	{#if image}
 		<meta property="og:image" content={image} />
 	{/if}

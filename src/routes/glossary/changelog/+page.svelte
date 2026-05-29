@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import CollectionChangelog from '$lib/components/CollectionChangelog.svelte';
 	import { getLocale, localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
@@ -35,6 +36,8 @@
 <svelte:head>
 	<title>{m.glossary_changelog_page_title()} — The Heterarchy Society</title>
 </svelte:head>
+
+<Seo title="{m.glossary_changelog_page_title()} — The Heterarchy Society" description={m.glossary_lead()} />
 
 <div class="min-h-screen w-full">
 	<Header />

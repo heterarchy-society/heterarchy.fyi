@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { Shuffle } from 'lucide-svelte';
 	import Header from '$lib/components/Header.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import LatestRevision from '$lib/components/LatestRevision.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { getLocale, localizeUrl } from '$lib/i18n';
@@ -168,6 +169,8 @@
 	<title>{m.glossary_label()} — The Heterarchy Society</title>
 	<meta name="description" content={m.glossary_lead()} />
 </svelte:head>
+
+<Seo title="{m.glossary_label()} — The Heterarchy Society" description={m.glossary_lead()} />
 
 <div class="min-h-screen w-full">
 	<Header />

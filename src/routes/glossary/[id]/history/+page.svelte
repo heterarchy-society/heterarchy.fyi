@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import DiffViewer from '$lib/components/DiffViewer.svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
@@ -52,6 +53,8 @@
 <svelte:head>
 	<title>{m.glossary_history_label()} · {data.term.name} — The Heterarchy Society</title>
 </svelte:head>
+
+<Seo title="{m.glossary_history_label()} · {data.term.name} — The Heterarchy Society" description={data.term.name} />
 
 <div class="min-h-screen w-full">
 	<Header />

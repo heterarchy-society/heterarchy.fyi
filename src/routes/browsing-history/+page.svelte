@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import { getLocale, localizeUrl } from '$lib/i18n';
 	import { timeAgo } from '$lib/time';
 	import {
@@ -130,6 +131,8 @@
 	<title>{m.history_page_title()}</title>
 	<meta name="description" content={m.history_lead()} />
 </svelte:head>
+
+<Seo title={m.history_page_title()} description={m.history_lead()} />
 
 <div class="min-h-screen w-full">
 	<Header />
