@@ -213,33 +213,41 @@ export function formatEventDateRangeLong(event: Event, locale = 'en'): string {
 	return `${startLong} – ${endLong}`;
 }
 
+function dateFormatParts(d: Date, locale: string, options: Intl.DateTimeFormatOptions): Record<string, string> {
+	return Object.fromEntries(
+		new Intl.DateTimeFormat(locale, options)
+			.formatToParts(d)
+			.filter((p) => p.type !== 'literal')
+			.map((p) => [p.type, p.value])
+	);
+}
+
 /** Long range for upcoming lists — weekday + month, no year. */
 export function formatEventDateRangeUpcoming(event: Event, locale = 'en'): string {
 	const end = eventEndDate(event);
 	const startD = new Date(event.date + 'T12:00:00');
 	if (isNaN(startD.getTime())) return event.date;
 
-	const dayMonth = (d: Date, withWeekday = false) =>
-		d.toLocaleDateString(
-			locale,
-			withWeekday
-				? { weekday: 'long', day: 'numeric', month: 'long' }
-				: { day: 'numeric', month: 'long' }
-		);
-
-	if (!end || end === event.date) return dayMonth(startD, true);
-
-	const endD = new Date(end + 'T12:00:00');
-	if (isNaN(endD.getTime())) return dayMonth(startD, true);
-
-	if (event.date.slice(0, 7) === end.slice(0, 7)) {
-		const dayStart = startD.toLocaleDateString(locale, { weekday: 'long', day: 'numeric' });
-		const dayEnd = endD.toLocaleDateString(locale, { day: 'numeric' });
-		const month = endD.toLocaleDateString(locale, { month: 'long' });
-		return `${dayStart} – ${dayEnd} ${month}`;
+	if (!end || end === event.date) {
+		const p = dateFormatParts(startD, locale, { weekday: 'long', day: 'numeric', month: 'long' });
+		return `${p.weekday}, ${p.day} ${p.month}`;
 	}
 
-	return `${dayMonth(startD, true)} – ${dayMonth(endD)}`;
+	const endD = new Date(end + 'T12:00:00');
+	if (isNaN(endD.getTime())) {
+		const p = dateFormatParts(startD, locale, { weekday: 'long', day: 'numeric', month: 'long' });
+		return `${p.weekday}, ${p.day} ${p.month}`;
+	}
+
+	if (event.date.slice(0, 7) === end.slice(0, 7)) {
+		const start = dateFormatParts(startD, locale, { weekday: 'long', day: 'numeric' });
+		const endPart = dateFormatParts(endD, locale, { day: 'numeric', month: 'long' });
+		return `${start.weekday}, ${start.day} – ${endPart.day} ${endPart.month}`;
+	}
+
+	const start = dateFormatParts(startD, locale, { weekday: 'long', day: 'numeric', month: 'long' });
+	const endPart = dateFormatParts(endD, locale, { weekday: 'long', day: 'numeric', month: 'long' });
+	return `${start.weekday}, ${start.day} ${start.month} – ${endPart.weekday}, ${endPart.day} ${endPart.month}`;
 }
 
 export function formatEventTimeRange(event: Event, locale = 'en'): string | null {
