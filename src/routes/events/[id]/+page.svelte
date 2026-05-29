@@ -4,7 +4,7 @@
 	import TalkCard from '$lib/components/talks/TalkCard.svelte';
 	import Seo from '$lib/components/Seo.svelte';
 	import { localizeUrl } from '$lib/i18n';
-	import { eventPrimaryHref, isUpcomingEvent } from '$lib/data/events';
+	import { eventPrimaryHref, isUpcomingEvent, eventEndDate } from '$lib/data/events';
 	import EventDaysLeft from '$lib/components/events/EventDaysLeft.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
@@ -50,6 +50,18 @@
 	const isBanner = $derived(event.heroImageType === 'banner');
 	const sideImageUrl = $derived(isBanner ? event.cardImageUrl : (event.heroImageUrl ?? event.cardImageUrl));
 	const sideImageSrcset = $derived(isBanner ? event.cardImageSrcset : (event.heroImageSrcset ?? event.cardImageSrcset));
+
+	const timeAgo = $derived((): string | null => {
+		if (isUpcomingEvent(event)) return null;
+		const end = eventEndDate(event) ?? event.date;
+		const days = Math.floor((Date.now() - new Date(end + 'T12:00:00').getTime()) / 86400000);
+		if (days < 1) return null;
+		if (days < 30) return `${days} day${days === 1 ? '' : 's'} ago`;
+		const months = Math.floor(days / 30.44);
+		if (months < 12) return `${months} month${months === 1 ? '' : 's'} ago`;
+		const years = Math.floor(days / 365.25);
+		return `${years} year${years === 1 ? '' : 's'} ago`;
+	});
 </script>
 
 <svelte:head>
@@ -93,8 +105,9 @@
 					<p class="mb-2 font-mono text-[13px] leading-snug text-black/50">
 						{event.dateLabelLong}
 						{#if isUpcomingEvent(event)}
-							{' '}
-							<EventDaysLeft {event} />
+							{' '}<EventDaysLeft {event} />
+						{:else if timeAgo()}
+							<span class="text-black/35">({timeAgo()})</span>
 						{/if}
 					</p>
 					<h1 class="book-detail-title mb-4 max-w-2xl">{event.name}</h1>
