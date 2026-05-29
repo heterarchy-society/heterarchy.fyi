@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import LibraryBookCard from '$lib/components/library/LibraryBookCard.svelte';
 	import TalkCard from '$lib/components/talks/TalkCard.svelte';
 	import { localizeUrl } from '$lib/i18n';
@@ -57,6 +58,12 @@
 	<title>{person.name} — {m.people_page_label()}</title>
 	<meta name="description" content={person.description ?? m.people_page_lead()} />
 </svelte:head>
+
+<Seo
+	title="{person.name} — {m.people_page_label()}"
+	description={person.caption ?? person.description ?? m.people_page_lead()}
+	image={person.avatarUrl}
+/>
 
 <div class="min-h-screen w-full">
 	<Header />

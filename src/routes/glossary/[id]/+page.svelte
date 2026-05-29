@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import LibraryBookCard from '$lib/components/library/LibraryBookCard.svelte';
 	import { renderMarkdown } from '$lib/markdown';
 	import { writingAuthorText } from '$lib/data/writings';
@@ -84,6 +85,11 @@
 	<title>{activeName} — {m.glossary_label()} — The Heterarchy Society</title>
 	<meta name="description" content={activeDescription.slice(0, 160).replace(/\[\[.*?\]\]/g, '')} />
 </svelte:head>
+
+<Seo
+	title="{activeName} — {m.glossary_label()} — The Heterarchy Society"
+	description={activeDescription.slice(0, 160).replace(/\[\[.*?\]\]/g, '')}
+/>
 
 <div class="min-h-screen w-full">
 	<Header />

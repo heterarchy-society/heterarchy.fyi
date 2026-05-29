@@ -3,6 +3,7 @@
 	import { getLocale, localizeUrl } from '$lib/i18n';
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import LibraryBookAuthors from '$lib/components/library/LibraryBookAuthors.svelte';
 	import LibraryBookMeta from '$lib/components/library/LibraryBookMeta.svelte';
 	import * as m from '$lib/paraglide/messages';
@@ -34,6 +35,12 @@
 	<title>{book.title} — {m.books_page_title()}</title>
 	<meta name="description" content={book.description} />
 </svelte:head>
+
+<Seo
+	title="{book.title} — {m.books_page_title()}"
+	description={book.description ?? ''}
+	image={book.coverUrl}
+/>
 
 <div class="min-h-screen w-full">
 	<Header />

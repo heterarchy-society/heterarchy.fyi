@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import { browser } from '$app/environment';
 	import { replaceState } from '$app/navigation';
 	import { renderMarkdown } from '$lib/markdown';
@@ -576,6 +577,12 @@
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" crossorigin="anonymous" />
 	{/if}
 </svelte:head>
+
+<Seo
+	title="{writing.title} — {m.writings_page_title()}"
+	description={data.descriptionHtml?.replace(/<[^>]+>/g, '').slice(0, 160) ?? ''}
+	type="article"
+/>
 
 <div class="min-h-screen w-full">
 	<Header />

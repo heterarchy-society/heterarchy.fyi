@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import { localizeUrl, getLocale } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import { untrack } from 'svelte';
@@ -93,6 +94,12 @@
 	<title>{data.talk.title} — The Heterarchy Society</title>
 	<meta name="description" content={data.talk.description?.split(/\n\n+/)[0] ?? ''} />
 </svelte:head>
+
+<Seo
+	title="{data.talk.title} — The Heterarchy Society"
+	description={data.talk.description?.split(/\n\n+/)[0] ?? ''}
+	image={talkThumbnailUrl(data.talk)}
+/>
 
 <div class="min-h-screen w-full">
 	<Header />

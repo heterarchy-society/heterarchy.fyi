@@ -2,6 +2,7 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import TalkCard from '$lib/components/talks/TalkCard.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import { localizeUrl } from '$lib/i18n';
 	import { eventPrimaryHref, isUpcomingEvent } from '$lib/data/events';
 	import EventDaysLeft from '$lib/components/events/EventDaysLeft.svelte';
@@ -54,6 +55,12 @@
 	<title>{event.name} — {m.events_label()}</title>
 	<meta name="description" content={event.caption ?? event.description?.slice(0, 160) ?? m.events_page_lead()} />
 </svelte:head>
+
+<Seo
+	title="{event.name} — {m.events_label()}"
+	description={event.caption ?? event.description?.slice(0, 160) ?? m.events_page_lead()}
+	image={event.heroImageUrl ?? event.cardImageUrl}
+/>
 
 <div class="min-h-screen w-full">
 	<Header />

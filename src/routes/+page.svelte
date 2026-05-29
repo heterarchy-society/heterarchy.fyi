@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import Seo from '$lib/components/Seo.svelte';
 	import Hero from '$lib/components/Hero.svelte';
 	import GameOfLife from '$lib/components/GameOfLife.svelte';
 	import FeaturedEvent from '$lib/components/FeaturedEvent.svelte';
@@ -21,6 +22,8 @@
 	<title>{siteMeta.title}</title>
 	<meta name="description" content={m.site_description()} />
 </svelte:head>
+
+<Seo title={siteMeta.title} description={m.site_description()} />
 
 <div class="min-h-screen w-full">
 	<Header />
