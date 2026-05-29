@@ -12,6 +12,7 @@ const csPathMap: Record<string, string> = {
 	'/open-data': '/otevrena-data',
 	'/writings': '/texty',
 	'/people': '/lide',
+	'/talks': '/prednasky',
 };
 
 type UrlPattern = { pattern: string; localized: ['en' | 'cs', string][] };

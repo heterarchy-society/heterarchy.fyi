@@ -45,6 +45,7 @@ const config = {
 				'/cs/texty',
 				'/cs/texty/changelog',
 				'/cs/glosar',
+				'/cs/prednasky',
 				'/cs/udalosti',
 				'/cs/zapojit-se',
 				'/cs/najdete-nas',
