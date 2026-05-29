@@ -26,10 +26,18 @@ export const load: PageServerLoad = ({ params }) => {
 	}
 
 	const slug = (term.translations?.cs?.slug as string | undefined) ?? null;
+
+	// Re-resolve any links that were null when the data was built but now exist.
+	const resolvedLinks = (term.resolvedLinks ?? []).map((link) => {
+		if (link.target) return link;
+		const found = findGlossaryTerm(link.key ?? '');
+		return found ? { ...link, target: found.id } : link;
+	});
+
 	const backlinks = getGlossaryBacklinks(term.id);
 	const relatedTermIds = new Set<string>();
 
-	for (const link of term.resolvedLinks ?? []) {
+	for (const link of resolvedLinks) {
 		if (link.target) relatedTermIds.add(link.target);
 	}
 	for (const backlink of backlinks) {
@@ -37,7 +45,7 @@ export const load: PageServerLoad = ({ params }) => {
 	}
 
 	return {
-		term,
+		term: { ...term, resolvedLinks },
 		backlinks,
 		books: getBooksByGlossaryTerm(term.id),
 		writings: getWritingsByGlossaryTerm(term.id),

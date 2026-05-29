@@ -55,7 +55,9 @@
 
 	const html = $derived(renderMarkdown(processDescription(activeDescription, data.term.resolvedLinks ?? [])));
 	const seeAlso = $derived(
-		(data.term.resolvedLinks ?? []).filter((link: any): link is { target: string; key: string } => Boolean(link.target))
+		(data.term.resolvedLinks ?? [])
+			.filter((link: any): link is { target: string; key: string } => Boolean(link.target))
+			.filter((link, i, arr) => arr.findIndex((l) => l.target === link.target) === i)
 	);
 	const lastEdit = $derived((data.term as any).history?.[0]?.date ?? null);
 	const historyCount = $derived((data.term as any).history?.length ?? 0);
