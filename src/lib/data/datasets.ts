@@ -68,6 +68,7 @@ export const datasetConfigs: DatasetConfig[] = [
 		endpointLabel: 'https://talks.data.heterarchy.fyi/',
 		repository: 'https://git.heterarchy.fyi/heterarchy-society/talks',
 		github: 'https://github.com/heterarchy-society/talks',
+		radicle: radicleUrl('rad:zXp8EHRiBQDniknWnvWHgBJwZxw6'),
 		collections: [{ name: 'talks', changelogPath: '/talks/changelog' }]
 	},
 	{
@@ -77,6 +78,7 @@ export const datasetConfigs: DatasetConfig[] = [
 		endpointLabel: 'https://events.data.heterarchy.fyi/',
 		repository: 'https://git.heterarchy.fyi/heterarchy-society/events',
 		github: 'https://github.com/heterarchy-society/events',
+		radicle: radicleUrl('rad:zddF9a1ZJwqAsMBhAFBySjjLKupW'),
 		collections: [{ name: 'events', changelogPath: '/events/changelog' }]
 	}
 ];
