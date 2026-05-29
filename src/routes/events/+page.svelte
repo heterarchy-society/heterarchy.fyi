@@ -76,35 +76,40 @@
 						{@const blurb = event.caption ?? (event.description ? event.description.slice(0, 180).trimEnd() + (event.description.length > 180 ? '…' : '') : null)}
 						<a
 							href={localizeUrl(`/events/${event.id}`)}
-							class="group flex items-start gap-6 px-8 py-6 no-underline sm:gap-8 lg:px-10"
+							class="group block px-8 py-6 no-underline lg:px-10"
 						>
-							{#if event.cardImageUrl}
-								<img
-									src={event.cardImageUrl}
-									srcset={event.cardImageSrcset}
-									sizes="(min-width: 640px) 160px, 120px"
-									alt=""
-									width={160}
-									height={160}
-									class="size-[120px] shrink-0 border border-line object-cover sm:size-[160px]"
-									loading="lazy"
-									decoding="async"
-								/>
-							{/if}
-							<div class="min-w-0 flex-1">
-								<p class="mb-1 font-mono text-[13px] font-medium text-black/60">
-									{formatFullDate(event.date)}
-								</p>
-								<h2 class="font-mono text-[19px] leading-snug text-black underline decoration-transparent underline-offset-4 transition-colors group-hover:decoration-current sm:text-[21px]">
-									{event.name}
-								</h2>
-								{#if event.locationLabel}
-									<p class="mt-1 font-mono text-[12px] text-black/40">{event.locationLabel}</p>
+							<div class="flex items-start gap-6 sm:gap-8">
+								{#if event.cardImageUrl}
+									<img
+										src={event.cardImageUrl}
+										srcset={event.cardImageSrcset}
+										sizes="(min-width: 640px) 160px, 120px"
+										alt=""
+										width={160}
+										height={160}
+										class="size-[120px] shrink-0 border border-line object-cover sm:size-[160px]"
+										loading="lazy"
+										decoding="async"
+									/>
 								{/if}
-								{#if blurb}
-									<p class="mt-3 max-w-xl text-[14px] leading-[1.6] text-black/55">{blurb}</p>
-								{/if}
+								<div class="min-w-0 flex-1">
+									<p class="mb-1 font-mono text-[13px] font-medium text-black/60">
+										{formatFullDate(event.date)}
+									</p>
+									<h2 class="font-mono text-[19px] leading-snug text-black underline decoration-transparent underline-offset-4 transition-colors group-hover:decoration-current sm:text-[21px]">
+										{event.name}
+									</h2>
+									{#if event.locationLabel}
+										<p class="mt-1 font-mono text-[12px] text-black/40">{event.locationLabel}</p>
+									{/if}
+									{#if blurb}
+										<p class="mt-3 hidden max-w-xl text-[14px] leading-[1.6] text-black/55 sm:block">{blurb}</p>
+									{/if}
+								</div>
 							</div>
+							{#if blurb}
+								<p class="mt-4 max-w-2xl text-[14px] leading-[1.6] text-black/55 sm:hidden">{blurb}</p>
+							{/if}
 						</a>
 					{/each}
 				</div>
