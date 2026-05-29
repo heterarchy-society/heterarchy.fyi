@@ -41,8 +41,6 @@
 
 	<main>
 		<section class="cell-roomy border-b border-line">
-			<a href={booksHref} class="link-arrow mb-8 inline-block text-[12px]">{m.books_detail_back()}</a>
-
 			<div class="grid gap-10 lg:grid-cols-[minmax(200px,280px)_1fr] lg:gap-14">
 				<div class="mx-auto w-full max-w-70 lg:mx-0">
 					<div class="overflow-hidden border border-line bg-bg-muted">
@@ -60,7 +58,7 @@
 				</div>
 
 				<div class="min-w-0">
-					<p class="label mb-4">{m.books_detail_label()}</p>
+					<a href={booksHref} class="label mb-4 inline-block no-underline hover:underline">{m.books_detail_label()}</a>
 
 					{#if book.year}
 						<p class="mb-2 font-mono text-[11px] text-black/50">{book.year}</p>

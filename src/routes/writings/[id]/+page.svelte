@@ -586,9 +586,8 @@
 			<!-- Header -->
 			<header class="cell-roomy border-b border-line">
 				<div class="mx-auto max-w-2xl">
-				<a href={localizeUrl('/writings')} class="link-arrow mb-8 inline-block text-[12px]">{m.writings_detail_back()}</a>
-					{#if writing.type}
-						<p class="label mb-4">{writing.type}</p>
+				{#if writing.type}
+						<a href={localizeUrl('/writings')} class="label mb-4 inline-block no-underline hover:underline">{writing.type}</a>
 					{/if}
 					<h1 class="page-lead mb-4 font-mono">{writing.title.replace(/-/g, '‑')}</h1>
 					<div class="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[13px] text-black/55">
