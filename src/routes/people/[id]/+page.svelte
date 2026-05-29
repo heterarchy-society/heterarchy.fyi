@@ -13,19 +13,25 @@
 
 	function refHref(kind: string, value: string): string {
 		if (/^https?:\/\//.test(value)) return value;
+		if (kind === 'bsky') return `https://bsky.app/profile/${value}`;
 		if (kind === 'twitter') return `https://x.com/${value}`;
 		if (kind === 'github') return `https://github.com/${value}`;
 		if (kind === 'nostr') return `https://njump.me/${value}`;
 		if (kind === 'pubky') return `https://pubky.app/profile/${value}`;
+		if (kind === 'wikipedia') return `https://en.wikipedia.org/wiki/${value}`;
 		return value;
 	}
 
 	function refLabel(kind: string, value: string): string {
-		if (kind === 'web') return m.people_ref_web();
+		if (kind === 'web') {
+			try { return new URL(value).hostname.replace(/^www\./, ''); } catch { return m.people_ref_web(); }
+		}
+		if (kind === 'bsky') return `@${value}`;
 		if (kind === 'twitter') return `@${value}`;
 		if (kind === 'github') return `github:${value}`;
 		if (kind === 'nostr') return m.people_ref_nostr();
 		if (kind === 'pubky') return 'pubky';
+		if (kind === 'wikipedia') return 'Wikipedia';
 		return kind;
 	}
 

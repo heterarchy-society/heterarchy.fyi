@@ -31,6 +31,7 @@
 		class:mb-5={large && !compact}
 		class:w-24={compact}
 		class:shrink-0={compact}
+		class:self-start={compact}
 	>
 		<img
 			src={coverSrc}
@@ -39,7 +40,7 @@
 			alt={m.books_detail_cover_alt({ title: book.title })}
 			width={compact ? 96 : large ? 320 : 240}
 			height={compact ? 144 : large ? 480 : 360}
-			class="aspect-2/3 w-full object-cover"
+			class="block aspect-2/3 w-full object-cover"
 			onerror={() => (coverFailed = true)}
 		/>
 	</div>

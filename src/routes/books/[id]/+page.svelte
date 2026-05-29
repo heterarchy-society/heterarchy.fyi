@@ -50,7 +50,7 @@
 							alt={m.books_detail_cover_alt({ title: book.title })}
 							width={280}
 							height={420}
-							class="aspect-2/3 w-full object-cover"
+							class="block aspect-2/3 w-full object-cover"
 							onerror={() => (coverFailed = true)}
 						/>
 					</div>
