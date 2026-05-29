@@ -1,4 +1,5 @@
 import { people, personAvatarUrl } from '$lib/data/people';
+import { events, enrichEventForList } from '$lib/data/events';
 import { libraryBooks } from '$lib/data/books';
 import { talks, parseSpeaker } from '$lib/data/talks';
 import glossaryData from '$lib/data/glossary.json';
@@ -91,6 +92,20 @@ export function buildSearchIndex(locale: string) {
 			subtitle: [authorsText, book.year].filter(Boolean).join(' · ') || undefined,
 			url: `/books/${book.id}`,
 			thumbnail: book.coverVersions?.['400w'] ?? book.coverVersions?.['200w'] ?? book.coverUrl,
+		});
+	}
+
+	// Events (no translations)
+	for (const event of events) {
+		const item = enrichEventForList(event, locale);
+		entries.push({
+			id: event.id,
+			type: 'event',
+			title: event.name,
+			subtitle: [item.dateLabel, item.locationLabel, event.project].filter(Boolean).join(' · ') || undefined,
+			description: (event.caption ?? event.description?.split(/\n\n+/)[0]?.slice(0, 200)) || undefined,
+			url: `/events/${event.id}`,
+			thumbnail: item.cardImageSrcset?.split(', ')[0]?.split(' ')[0] ?? item.cardImageUrl ?? undefined,
 		});
 	}
 

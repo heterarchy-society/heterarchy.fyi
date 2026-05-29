@@ -129,3 +129,39 @@ try {
 } catch (error) {
   console.warn(`⚠ People dataset not fetched yet: ${error.message}`);
 }
+
+// Events
+try {
+  const EVENTS_BASE = 'https://events.data.heterarchy.fyi';
+  const rawEvents = await fetchJson(`${EVENTS_BASE}/index.json`);
+
+  function eventImageVersions(eventId, filename, assets) {
+    const versions = assets?.[filename]?.image?.versions;
+    if (!versions) return null;
+    const result = {};
+    for (const [w, v] of Object.entries(versions)) {
+      result[w] = `${EVENTS_BASE}/events/${eventId}/${v.src}`;
+    }
+    return result;
+  }
+
+  const events = {
+    ...rawEvents,
+    events: (rawEvents.events ?? []).map(({ _assets, ...event }) => {
+      const item = { ...event };
+      if (event.imgs?.length && _assets) {
+        item.imgVersions = {};
+        for (const img of event.imgs) {
+          const v = eventImageVersions(event.id, img.path, _assets);
+          if (v) item.imgVersions[img.path] = v;
+        }
+      }
+      return item;
+    }),
+  };
+
+  writeFileSync(`${DATA}/events.json`, JSON.stringify(events, null, 2) + '\n');
+  console.log(`✓ Events: ${events.events?.length ?? 0} events → src/lib/data/events.json`);
+} catch (error) {
+  console.warn(`⚠ Events dataset not fetched yet: ${error.message}`);
+}

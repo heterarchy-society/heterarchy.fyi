@@ -1,56 +1,177 @@
-export type EventItem = {
+import eventsData from './events.json';
+import { peopleById } from './people';
+import type { ImageVersions } from './people';
+import { imageSrcset } from './people';
+
+export type { ImageVersions };
+
+export type EventImageType = 'logo' | 'poster' | 'square' | 'banner';
+
+export type EventImage = {
+	path: string;
+	type: EventImageType;
+};
+
+export type EventPlace = {
+	city: string;
+	country: string;
+	name?: string;
+};
+
+export type EventRefs = {
+	web?: string;
+	luma?: string;
+	meetup?: string;
+	[key: string]: string | undefined;
+};
+
+export type Event = {
+	id: string;
+	name: string;
 	date: string;
-	time: string;
-	title: string;
-	location: string;
-	description: string;
-	href?: string;
-	posterUrl?: string;
-	preparation?: boolean;
+	startTime?: string;
+	endTime?: string;
+	place?: EventPlace;
+	venues?: { name: string }[];
+	major?: boolean;
+	project?: string;
+	days?: number;
+	seq?: number;
+	refs?: EventRefs;
+	imgs?: EventImage[];
+	imgVersions?: Record<string, ImageVersions>;
+	speakers?: string[];
+	organizers?: string[];
+	langs?: string[];
+	caption?: string;
+	description?: string;
+	aftermovie?: string;
+	history?: { hash: string; date: string; author: string; message: string }[];
 };
 
-export const events: EventItem[] = [
-	{
-		date: '20. 5. 2026',
-		time: '17:00–21:00',
-		title: 'AI x svoboda vol. I',
-		location: 'LibertyLoft, Praha',
-		description:
-			'​Každá technologie, která přišla s příslibem osvobození, nakonec posloužila tomu, kdo ji ovládl. S AI to může dopadnout stejně – nebo jinak, pokud budeme dost rychlí a informovaní.',
-		href: 'https://luma.com/tsdo0qej',
-		posterUrl:
-			'https://images.lumacdn.com/cdn-cgi/image/format=auto,fit=cover,dpr=2,background=white,quality=75,width=400,height=400/uploads/x4/c5e5796e-b40a-44eb-890a-462df2a0deba.png'
-	},
-	{
-		date: 'Červen 2026',
-		time: '17:00–21:00',
-		title: 'AI x svoboda vol. II',
-		location: 'Praha',
-		description: 'Druhý díl se připravuje. Dáme vědět.',
-		preparation: true
-	},
-	{
-		date: 'TBD',
-		time: 'TBD',
-		title: 'Unfork',
-		location: 'TBD',
-		description:
-			'Konference pro ty, kdo budují alternativy k tradičním institucím — svobodný software, krypto-anarchismus, kooperativní ekonomika a suverénní infrastruktura.',
-		href: 'https://unfork.now/',
-		preparation: true
+export type ResolvedSpeaker =
+	| { type: 'person'; id: string; name: string }
+	| { type: 'text'; label: string };
+
+export type LatestRevision = {
+	hash: string;
+	date: string;
+};
+
+const EVENTS_BASE = 'https://events.data.heterarchy.fyi';
+
+export const events: Event[] = (eventsData as { events: Event[] }).events;
+export const eventsById = new Map(events.map((event) => [event.id, event]));
+
+export function eventPath(id: string): string {
+	return `/events/${id}`;
+}
+
+export function eventImageUrl(event: Event, img: EventImage): string {
+	return `${EVENTS_BASE}/events/${event.id}/${img.path}`;
+}
+
+export function eventImageSrcset(event: Event, img: EventImage): string | undefined {
+	return imageSrcset(event.imgVersions?.[img.path]);
+}
+
+export function pickCardImage(event: Event): EventImage | undefined {
+	const imgs = event.imgs ?? [];
+	return (
+		imgs.find((i) => i.type === 'square') ??
+		imgs.find((i) => i.type === 'logo') ??
+		imgs[0]
+	);
+}
+
+export function pickHeroImage(event: Event): EventImage | undefined {
+	const imgs = event.imgs ?? [];
+	return (
+		imgs.find((i) => i.type === 'banner') ??
+		imgs.find((i) => i.type === 'poster') ??
+		imgs[0]
+	);
+}
+
+export function resolveSpeaker(s: string): ResolvedSpeaker {
+	const slug = s.toLowerCase().replace(/\s+/g, '-');
+	if (peopleById.has(slug)) {
+		return { type: 'person', id: slug, name: peopleById.get(slug)!.name };
 	}
-];
+	if (peopleById.has(s)) {
+		return { type: 'person', id: s, name: peopleById.get(s)!.name };
+	}
+	return { type: 'text', label: s };
+}
 
-export const featuredEvent = events[0];
+export function formatEventDate(date: string, locale = 'en'): string {
+	const d = new Date(date + 'T12:00:00');
+	if (isNaN(d.getTime())) return date;
+	return d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+}
 
-/** Všechny události pro sidebar na homepage. */
-export const upcomingEvents = events;
+export function formatEventTimeRange(event: Event, locale = 'en'): string | null {
+	if (!event.startTime) return null;
+	const start = new Date(event.startTime);
+	if (isNaN(start.getTime())) return null;
+	const opts: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' };
+	const startStr = start.toLocaleTimeString(locale, opts);
+	if (!event.endTime) return startStr;
+	const end = new Date(event.endTime);
+	if (isNaN(end.getTime())) return startStr;
+	return `${startStr}–${end.toLocaleTimeString(locale, opts)}`;
+}
 
-export const eventsIntro = {
-	lead: 'Diskuse, workshopy a setkání'
+export function formatEventPlace(place: EventPlace | undefined, locale = 'en'): string | null {
+	if (!place) return null;
+	let country = place.country.toUpperCase();
+	try {
+		country = new Intl.DisplayNames([locale], { type: 'region' }).of(country) ?? country;
+	} catch {
+		/* keep code */
+	}
+	return `${place.city}, ${country}`;
+}
+
+export function formatEventLocation(event: Event, locale = 'en'): string | null {
+	const place = formatEventPlace(event.place, locale);
+	if (place && event.venues?.length) {
+		return `${event.venues[0].name}, ${place}`;
+	}
+	if (place) return place;
+	if (event.venues?.length) return event.venues.map((v) => v.name).join(' · ');
+	return null;
+}
+
+export function eventPrimaryHref(event: Event): string | undefined {
+	return event.refs?.web ?? (event.refs?.luma ? `https://lu.ma/${event.refs.luma}` : undefined);
+}
+
+export function latestEventsRevision(): LatestRevision | null {
+	return eventsData.meta?.events?.latestCommit ?? eventsData.meta?.commit ?? null;
+}
+
+export function getFeaturedEvent(): Event | undefined {
+	const sorted = [...events].sort((a, b) => b.date.localeCompare(a.date));
+	return sorted.find((e) => e.major) ?? sorted[0];
+}
+
+export const featuredEvent = getFeaturedEvent();
+
+export type EventListItem = Event & {
+	cardImageUrl: string | null;
+	cardImageSrcset: string | undefined;
+	locationLabel: string | null;
+	dateLabel: string;
 };
 
-export const eventsMeta = {
-	title: 'Události — The Heterarchy Society',
-	description: 'Nadcházející setkání The Heterarchy Society — diskuse, workshopy a setkání.'
-};
+export function enrichEventForList(event: Event, locale = 'en'): EventListItem {
+	const cardImg = pickCardImage(event);
+	return {
+		...event,
+		cardImageUrl: cardImg ? eventImageUrl(event, cardImg) : null,
+		cardImageSrcset: cardImg ? eventImageSrcset(event, cardImg) : undefined,
+		locationLabel: formatEventLocation(event, locale),
+		dateLabel: formatEventDate(event.date, locale),
+	};
+}

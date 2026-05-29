@@ -56,6 +56,13 @@ export function getTalksByPersonId(personId: string): Talk[] {
 	);
 }
 
+export function getTalksByEventId(eventId: string): Talk[] {
+	const collectionIds = new Set(
+		talkCollections.filter((c) => c.event === eventId).map((c) => c.id)
+	);
+	return talks.filter((t) => t.event === eventId || collectionIds.has(t.collection));
+}
+
 export function latestTalksRevision(): { hash: string; date: string } | null {
 	return (talksData as any).meta?.talks?.latestCommit ?? (talksData as any).meta?.commit ?? null;
 }

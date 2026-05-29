@@ -6,7 +6,6 @@
 	import FeaturedEvent from '$lib/components/FeaturedEvent.svelte';
 	import LibraryLinks from '$lib/components/LibraryLinks.svelte';
 	import Partners from '$lib/components/Partners.svelte';
-	import { featuredEvent } from '$lib/data/events';
 	import { localizeUrl } from '$lib/i18n';
 	import { libraryPreview } from '$lib/data/library';
 	import { siteMeta } from '$lib/data/placeholder';
@@ -34,7 +33,7 @@
 		</div>
 
 		<div id="udalosti" class="cell lg:col-span-2 lg:border-r lg:border-line">
-			<FeaturedEvent event={featuredEvent} />
+			<FeaturedEvent />
 		</div>
 		<div class="cell lg:col-span-1">
 			{#if data.glossaryItem}

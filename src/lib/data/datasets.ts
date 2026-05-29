@@ -69,5 +69,14 @@ export const datasetConfigs: DatasetConfig[] = [
 		repository: 'https://git.heterarchy.fyi/heterarchy-society/talks',
 		github: 'https://github.com/heterarchy-society/talks',
 		collections: [{ name: 'talks', changelogPath: '/talks/changelog' }]
+	},
+	{
+		id: 'events',
+		path: '/events',
+		endpoint: 'https://events.data.heterarchy.fyi/events-index.json',
+		endpointLabel: 'https://events.data.heterarchy.fyi/',
+		repository: 'https://git.heterarchy.fyi/heterarchy-society/events',
+		github: 'https://github.com/heterarchy-society/events',
+		collections: [{ name: 'events', changelogPath: '/events/changelog' }]
 	}
 ];

@@ -24,6 +24,7 @@
 		if (id === 'writings') return m.writings_page_label();
 		if (id === 'people') return m.people_label();
 		if (id === 'talks') return m.talks_page_label();
+		if (id === 'events') return m.events_label();
 		return id;
 	}
 
@@ -33,6 +34,7 @@
 		if (id === 'writings') return m.data_writings_desc();
 		if (id === 'people') return m.data_people_desc();
 		if (id === 'talks') return m.data_talks_desc();
+		if (id === 'events') return m.data_events_desc();
 		return '';
 	}
 

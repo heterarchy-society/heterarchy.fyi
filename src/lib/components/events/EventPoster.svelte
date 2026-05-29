@@ -1,38 +1,44 @@
 <script lang="ts">
-	import type { EventItem } from '$lib/data/events';
+	import type { EventListItem } from '$lib/data/events';
 
 	const PLACEHOLDER = '/event-placeholder.svg';
 
 	let {
 		event,
 		size = 168,
+		href = undefined,
 		linked = true
 	}: {
-		event: EventItem;
+		event: EventListItem;
 		size?: number;
+		href?: string | null;
 		linked?: boolean;
 	} = $props();
 
-	const src = $derived(event.posterUrl ?? PLACEHOLDER);
-	const isPlaceholder = $derived(!event.posterUrl);
-	const hasLink = $derived(linked && Boolean(event.href));
-	const isExternal = $derived(Boolean(event.href?.startsWith('http')));
+	const src = $derived(event.cardImageUrl ?? PLACEHOLDER);
+	const isPlaceholder = $derived(!event.cardImageUrl);
+	const linkHref = $derived(linked ? (href ?? undefined) : undefined);
+	const isExternal = $derived(Boolean(linkHref?.startsWith('http')));
 </script>
 
 {#snippet poster()}
 	<img
 		{src}
-		alt={isPlaceholder ? '' : event.title}
+		srcset={event.cardImageSrcset}
+		sizes="{size}px"
+		alt={isPlaceholder ? '' : event.name}
 		width={size}
 		height={size}
 		class="aspect-square object-cover"
 		style="width: {size}px; height: {size}px"
+		loading="lazy"
+		decoding="async"
 	/>
 {/snippet}
 
-{#if hasLink}
+{#if linkHref}
 	<a
-		href={event.href}
+		href={linkHref}
 		class="block shrink-0 border border-line"
 		target={isExternal ? '_blank' : undefined}
 		rel={isExternal ? 'noopener noreferrer' : undefined}
