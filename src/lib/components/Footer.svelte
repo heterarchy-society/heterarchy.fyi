@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { dev, version } from '$app/environment';
-	import { Pause, Play } from 'lucide-svelte';
+	import { History, Pause, Play } from 'lucide-svelte';
 	import { buildInfo } from '$lib/data/build-info';
 	import { siteMeta } from '$lib/data/placeholder';
 	import { getLocale, localizeUrl } from '$lib/i18n';
@@ -41,24 +41,11 @@
 			<span aria-hidden="true">·</span>
 			<a href={localizeUrl('/find-us')} class="no-underline hover:underline">{m.footer_where_to_find()}</a>
 			<span aria-hidden="true">·</span>
-			<a href={localizeUrl('/join')} class="no-underline hover:underline">{m.footer_join()}</a>
-			<span aria-hidden="true">·</span>
 			<a href={localizeUrl('/open-data')} class="no-underline hover:underline">{m.footer_data()}</a>
 			<span aria-hidden="true">·</span>
-			<a href={localizeUrl('/browsing-history')} class="no-underline hover:underline">{m.footer_history()}</a>
-			<span aria-hidden="true">·</span>
-			<button
-				type="button"
-				onclick={() => mediaPlayer.togglePlaylist(ambientPlaylist)}
-				class="flex h-5 w-5 cursor-pointer items-center justify-center text-black/35 transition-colors hover:text-black"
-				aria-label={isAmbientPlaying ? m.ambient_pause() : m.ambient_play()}
-			>
-				{#if isAmbientPlaying}
-					<Pause size={13} strokeWidth={1.7} />
-				{:else}
-					<Play size={13} strokeWidth={1.7} style="transform: translateX(1px)" />
-				{/if}
-			</button>
+			<a href={localizeUrl('/browsing-history')} class="flex items-center text-black/35 transition-colors hover:text-black" aria-label={m.footer_history()}>
+				<History size={13} strokeWidth={1.7} />
+			</a>
 		</nav>
 
 		<!-- version (desktop only) -->
