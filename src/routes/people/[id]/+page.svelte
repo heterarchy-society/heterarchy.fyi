@@ -57,8 +57,6 @@
 
 	<main>
 		<section class="cell-roomy">
-			<a href={localizeUrl('/people')} class="link-arrow mb-8 inline-block text-[12px]">{m.people_detail_back()}</a>
-
 			<!-- Avatar + basic info -->
 			<div class="grid gap-10 lg:grid-cols-[minmax(180px,260px)_1fr] lg:gap-14">
 				<div class="mx-auto w-full max-w-65 lg:mx-0">
@@ -93,7 +91,7 @@
 				</div>
 
 				<div class="min-w-0">
-					<p class="label mb-4">{m.people_detail_label()}</p>
+					<a href={localizeUrl('/people')} class="label mb-4 inline-block no-underline hover:underline">{m.people_detail_label()}</a>
 					<h1 class="book-detail-title mb-4 max-w-2xl">{person.name}</h1>
 
 					{#if bornLabel || diedLabel}
