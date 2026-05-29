@@ -3,6 +3,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import AppVersionWatcher from '$lib/components/AppVersionWatcher.svelte';
 	import NavigationProgress from '$lib/components/NavigationProgress.svelte';
+	import PageHistoryTracker from '$lib/components/PageHistoryTracker.svelte';
 	import SearchModal from '$lib/components/SearchModal.svelte';
 	import UniversalMediaPlayer from '$lib/components/UniversalMediaPlayer.svelte';
 	import { page } from '$app/state';
@@ -24,6 +25,7 @@
 
 <div class="min-h-screen bg-bg">
 	<AppVersionWatcher />
+	<PageHistoryTracker />
 	<NavigationProgress />
 	<SearchModal />
 	{@render children()}

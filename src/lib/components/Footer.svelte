@@ -45,6 +45,8 @@
 			<span aria-hidden="true">·</span>
 			<a href={localizeUrl('/open-data')} class="no-underline hover:underline">{m.footer_data()}</a>
 			<span aria-hidden="true">·</span>
+			<a href={localizeUrl('/browsing-history')} class="no-underline hover:underline">{m.footer_history()}</a>
+			<span aria-hidden="true">·</span>
 			<button
 				type="button"
 				onclick={() => mediaPlayer.togglePlaylist(ambientPlaylist)}
