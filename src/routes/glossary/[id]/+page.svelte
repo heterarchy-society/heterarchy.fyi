@@ -95,8 +95,10 @@
 						{activeName}<!--
 					-->{#if showCs && cs.name.toLowerCase() !== data.term.name.toLowerCase()}&nbsp;<span class="text-black/35">({data.term.name})</span>{/if}
 					</h1>
-					{#if activeType}
-						<p class="mb-8 font-mono text-[11px] uppercase tracking-widest text-black/40">{activeType}</p>
+					{#if activeType || (data.term as any).year}
+						<p class="mb-8 font-mono text-[11px] uppercase tracking-widest text-black/40">
+							{#if activeType}{activeType}{/if}{#if activeType && (data.term as any).year}&nbsp;·&nbsp;{/if}{#if (data.term as any).year}{(data.term as any).year}{/if}
+						</p>
 					{/if}
 
 					<div class="max-w-[80ch] text-[15px] leading-[1.7] text-black/80
