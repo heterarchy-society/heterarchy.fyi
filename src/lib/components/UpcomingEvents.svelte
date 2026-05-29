@@ -8,7 +8,7 @@
 </script>
 
 {#snippet eventRow(event: EventListItem, linked: boolean)}
-	<span class="pt-px leading-snug">{event.dateLabel}</span>
+	<span class="pt-px leading-snug">{event.dateLabelUpcoming}</span>
 	<div class="min-w-0">
 		<p class="font-mono leading-snug" class:group-hover:underline={linked}>
 			{event.name}

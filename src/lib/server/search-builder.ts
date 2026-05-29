@@ -103,7 +103,7 @@ export function buildSearchIndex(locale: string) {
 			type: 'event',
 			title: event.name,
 			subtitle: [item.dateLabel, item.locationLabel, event.project].filter(Boolean).join(' · ') || undefined,
-			description: (event.caption ?? event.description?.split(/\n\n+/)[0]?.slice(0, 200)) || undefined,
+			description: item.excerpt || undefined,
 			url: `/events/${event.id}`,
 			thumbnail:
 				item.cardImageUrl ??

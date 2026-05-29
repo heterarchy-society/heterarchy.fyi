@@ -42,7 +42,7 @@
 					<li class="flex items-center gap-2.5">
 						<Calendar size={13} strokeWidth={1.25} />
 						<span>
-							{event.dateLabelLong}
+							{event.dateLabelUpcoming}
 							{' '}
 							<EventDaysLeft {event} />
 						</span>
@@ -55,20 +55,14 @@
 					{/if}
 				</ul>
 
-				{#if event.caption}
-					<p class="hidden max-w-sm text-[14px] leading-[1.55] text-black/60 sm:block">{event.caption}</p>
-				{:else if event.description}
-					<p class="hidden max-w-sm text-[14px] leading-[1.55] text-black/60 sm:block">
-						{event.description.slice(0, 200)}{event.description.length > 200 ? '…' : ''}
-					</p>
+				{#if event.excerpt}
+					<p class="hidden max-w-sm text-[14px] leading-[1.55] text-black/60 sm:block">{event.excerpt}</p>
 				{/if}
 			</div>
 		</div>
 
-		{#if event.caption || event.description}
-			<p class="mt-4 text-[14px] leading-[1.55] text-black/60 sm:hidden">
-				{event.caption ?? event.description?.slice(0, 200)}
-			</p>
+		{#if event.excerpt}
+			<p class="mt-4 text-[14px] leading-[1.55] text-black/60 sm:hidden">{event.excerpt}</p>
 		{/if}
 
 	</section>

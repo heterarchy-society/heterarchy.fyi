@@ -1,5 +1,6 @@
 import eventsData from './events.json';
 import { peopleById } from './people';
+import { firstParagraph } from '$lib/text';
 import type { ImageVersions } from './people';
 import { imageSrcset } from './people';
 
@@ -212,6 +213,35 @@ export function formatEventDateRangeLong(event: Event, locale = 'en'): string {
 	return `${startLong} – ${endLong}`;
 }
 
+/** Long range for upcoming lists — weekday + month, no year. */
+export function formatEventDateRangeUpcoming(event: Event, locale = 'en'): string {
+	const end = eventEndDate(event);
+	const startD = new Date(event.date + 'T12:00:00');
+	if (isNaN(startD.getTime())) return event.date;
+
+	const dayMonth = (d: Date, withWeekday = false) =>
+		d.toLocaleDateString(
+			locale,
+			withWeekday
+				? { weekday: 'long', day: 'numeric', month: 'long' }
+				: { day: 'numeric', month: 'long' }
+		);
+
+	if (!end || end === event.date) return dayMonth(startD, true);
+
+	const endD = new Date(end + 'T12:00:00');
+	if (isNaN(endD.getTime())) return dayMonth(startD, true);
+
+	if (event.date.slice(0, 7) === end.slice(0, 7)) {
+		const dayStart = startD.toLocaleDateString(locale, { weekday: 'long', day: 'numeric' });
+		const dayEnd = endD.toLocaleDateString(locale, { day: 'numeric' });
+		const month = endD.toLocaleDateString(locale, { month: 'long' });
+		return `${dayStart} – ${dayEnd} ${month}`;
+	}
+
+	return `${dayMonth(startD, true)} – ${dayMonth(endD)}`;
+}
+
 export function formatEventTimeRange(event: Event, locale = 'en'): string | null {
 	if (!event.startTime) return null;
 	const start = new Date(event.startTime);
@@ -296,10 +326,15 @@ export type EventListItem = Event & {
 	dateLabel: string;
 	dateLabelCompact: string;
 	dateLabelLong: string;
+	/** Upcoming display — long range without year. */
+	dateLabelUpcoming: string;
+	/** Caption, or first paragraph of description (markdown stripped). */
+	excerpt: string | null;
 };
 
 export function enrichEventForList(event: Event, locale = 'en'): EventListItem {
 	const cardImg = pickCardImage(event);
+	const excerpt = (event.caption ?? firstParagraph(event.description)) || null;
 	return {
 		...event,
 		cardImageUrl: cardImg ? eventImageUrl(event, cardImg) : null,
@@ -308,5 +343,7 @@ export function enrichEventForList(event: Event, locale = 'en'): EventListItem {
 		dateLabel: formatEventDateRange(event, locale),
 		dateLabelCompact: formatEventDateRangeCompact(event, locale),
 		dateLabelLong: formatEventDateRangeLong(event, locale),
+		dateLabelUpcoming: formatEventDateRangeUpcoming(event, locale),
+		excerpt,
 	};
 }

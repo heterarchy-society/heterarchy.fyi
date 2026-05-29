@@ -62,7 +62,7 @@
 			{:else}
 				<div class="divide-y divide-line">
 					{#each data.upcoming as event (event.id)}
-						{@const blurb = event.caption ?? (event.description ? event.description.slice(0, 180).trimEnd() + (event.description.length > 180 ? '…' : '') : null)}
+						{@const blurb = event.excerpt}
 						<a
 							href={localizeUrl(`/events/${event.id}`)}
 							class="group block px-8 py-6 no-underline lg:px-10"
@@ -83,7 +83,7 @@
 								{/if}
 								<div class="min-w-0 flex-1">
 									<p class="mb-1 font-mono text-[13px] font-medium text-black/60">
-										{event.dateLabelLong}
+										{event.dateLabelUpcoming}
 										{' '}
 										<EventDaysLeft {event} />
 									</p>
