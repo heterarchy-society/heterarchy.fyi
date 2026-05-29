@@ -36,24 +36,22 @@ function getContributors(): Contributor[] {
 }
 
 function displayName(term: any, locale: string): string {
-	return locale === 'cs' ? (term.translations?.cs?.name ?? term.name) : term.name;
+	return term.translations?.[locale]?.name ?? term.name;
 }
 
 function displayType(term: any, locale: string): string | null {
-	return locale === 'cs' ? (term.translations?.cs?.type ?? term.type ?? null) : (term.type ?? null);
+	return term.translations?.[locale]?.type ?? term.type ?? null;
 }
 
 function termPath(term: any, locale: string): string {
-	const id = locale === 'cs' ? (term.translations?.cs?.slug ?? term.id) : term.id;
+	const id = term.translations?.[locale]?.slug ?? term.id;
 	return localizeUrl(`/glossary/${id}`);
 }
 
 function renderSpotlightExcerpt(term: any, termsById: Map<string, any>, locale: string): string {
-	const translated = locale === 'cs' ? term.translations?.cs : null;
+	const translated = term.translations?.[locale] ?? null;
 	const excerpt =
-		locale === 'cs'
-			? (translated?.excerpt ?? translated?.description?.split('\n\n')[0] ?? term.excerpt ?? term.description?.split('\n\n')[0])
-			: (term.excerpt ?? term.description?.split('\n\n')[0]);
+		translated?.excerpt ?? translated?.description?.split('\n\n')[0] ?? term.excerpt ?? term.description?.split('\n\n')[0];
 	if (!excerpt) return '';
 
 	const resolved = new Map<string, string>();
@@ -74,7 +72,7 @@ function renderSpotlightExcerpt(term: any, termsById: Map<string, any>, locale: 
 }
 
 function randomFallbackSpotlight(terms: any[], termsById: Map<string, any>, locale: string) {
-	const pool = terms.filter((term) => term.description || term.translations?.cs?.description);
+	const pool = terms.filter((term) => term.description || Object.values(term.translations ?? {}).some((t: any) => t?.description));
 	if (!pool.length) return null;
 	const term = pool[Math.floor(Math.random() * pool.length)];
 
@@ -107,7 +105,7 @@ function buildSections(terms: any[], locale: string) {
 		buckets.get(letter)!.push({
 			id: term.id,
 			name,
-			originalName: locale === 'cs' && name !== term.name ? term.name : null,
+			originalName: name !== term.name ? term.name : null,
 			type: displayType(term, locale),
 			href: termPath(term, locale)
 		});

@@ -8,18 +8,18 @@
 	import { localizeUrl, getLocale } from '$lib/i18n';
 	import { datasetUrl, knownCollections } from '$lib/data/routes';
 	import * as m from '$lib/paraglide/messages';
+	import { baseLocale } from '$lib/paraglide/runtime';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
-	const cs = $derived((data.term as any).translations?.cs ?? null);
-	const hasCs = $derived(!!(cs?.name && cs?.description));
-	// Use app locale: show Czech content only when app is in Czech AND translation exists
-	const showCs = $derived(getLocale() === 'cs' && hasCs);
+	const translation = $derived((data.term as any).translations?.[getLocale()] ?? null);
+	const hasTranslation = $derived(!!(translation?.name && translation?.description));
+	const showTranslation = $derived(hasTranslation);
 
-	const activeName = $derived(showCs ? cs.name : data.term.name);
-	const activeType = $derived(showCs && cs?.type ? cs.type : data.term.type);
-	const activeDescription = $derived(showCs ? cs.description : data.term.description);
+	const activeName = $derived(showTranslation ? translation.name : data.term.name);
+	const activeType = $derived(showTranslation && translation?.type ? translation.type : data.term.type);
+	const activeDescription = $derived(showTranslation ? translation.description : data.term.description);
 	const relatedTermsById = $derived(new Map(data.relatedTerms.map((term) => [term.id, term])));
 
 	function slugForId(id: string): string {
@@ -59,6 +59,10 @@
 			.filter((link: any): link is { target: string; key: string } => Boolean(link.target))
 			.filter((link, i, arr) => arr.findIndex((l) => l.target === link.target) === i)
 	);
+	const BACKLINKS_PREVIEW = 5;
+	let showAllBacklinks = $state(false);
+	const visibleBacklinks = $derived(showAllBacklinks ? data.backlinks : data.backlinks.slice(0, BACKLINKS_PREVIEW));
+
 	const lastEdit = $derived((data.term as any).history?.[0]?.date ?? null);
 	const historyCount = $derived((data.term as any).history?.length ?? 0);
 	const bookRows = $derived(
@@ -93,7 +97,7 @@
 					<a href={glossaryHref} class="label mb-4 inline-block hover:underline">{m.glossary_label()}</a>
 					<h1 class="page-lead mb-2 font-mono">
 						{activeName}<!--
-					-->{#if showCs && cs.name.toLowerCase() !== data.term.name.toLowerCase()}&nbsp;<span class="text-black/35">({data.term.name})</span>{/if}
+					-->{#if showTranslation && translation.name.toLowerCase() !== data.term.name.toLowerCase()}&nbsp;<span class="text-black/35">({data.term.name})</span>{/if}
 					</h1>
 					{#if activeType || (data.term as any).year}
 						<p class="mb-8 font-mono text-[11px] uppercase tracking-widest text-black/40">
@@ -108,11 +112,11 @@
 						{@html html}
 					</div>
 
-					{#if showCs}
+					{#if showTranslation}
 						<div class="mt-6 border-t border-line pt-4">
-							<p class="font-mono text-[11px] text-black/35">{m.glossary_translated_by({ model: cs.model, date: formatDate(cs.translated_at) })}</p>
+							<p class="font-mono text-[11px] text-black/35">{m.glossary_translated_by({ model: translation.model, date: formatDate(translation.translated_at) })}</p>
 						</div>
-					{:else if getLocale() === 'cs' && !hasCs}
+					{:else if getLocale() !== baseLocale && !hasTranslation}
 						<div class="mt-6 border-t border-line pt-4">
 							<p class="font-mono text-[11px] text-black/35">{m.glossary_not_translated()}</p>
 						</div>
@@ -232,20 +236,22 @@
 						</div>
 					{/if}
 
-					{#if data.backlinks.length > 0}
+					{#if seeAlso.length > 0}
 						<div>
-							<p class="label mb-3">{m.glossary_backlinks()}</p>
+							<p class="label mb-3">{m.glossary_see_also()}</p>
 							<ul class="flex flex-col gap-2">
-								{#each data.backlinks as bl}
-									{@const blCs = (bl as any).translations?.cs}
-									{@const blName = getLocale() === 'cs' && blCs?.name ? blCs.name : bl.name}
-									{@const blType = getLocale() === 'cs' && blCs?.type ? blCs.type : bl.type}
+								{#each seeAlso as link}
+									{@const linkTarget = String(link.target)}
+									{@const linkTerm = relatedTermsById.get(linkTarget)}
+									{@const linkTr = (linkTerm as any)?.translations?.[getLocale()]}
+									{@const linkName = linkTr?.name ?? linkTerm?.name ?? link.key}
+									{@const linkType = linkTr?.type ?? linkTerm?.type}
 									<li>
-										<a href={termHref(bl.id)} class="no-underline hover:underline leading-snug">
-											{blName}
+										<a href={termHref(linkTarget)} class="no-underline hover:underline leading-snug">
+											{linkName}
 										</a>
-										{#if blType}
-											<span class="block text-[10px] text-black/35">{blType}</span>
+										{#if linkType}
+											<span class="block text-[10px] text-black/35">{linkType}</span>
 										{/if}
 									</li>
 								{/each}
@@ -253,22 +259,26 @@
 						</div>
 					{/if}
 
-					{#if seeAlso.length > 0}
+					{#if data.backlinks.length > 0}
 						<div>
-							<p class="label mb-3">{m.glossary_see_also()}</p>
-								<ul class="flex flex-col gap-2">
-									{#each seeAlso as link}
-										{@const linkTarget = String(link.target)}
-										{@const linkTerm = relatedTermsById.get(linkTarget)}
-										{@const linkCsName = (linkTerm as any)?.translations?.cs?.name}
-										{@const linkName = getLocale() === 'cs' && linkCsName ? linkCsName : link.key}
-										<li>
-											<a href={termHref(linkTarget)} class="no-underline hover:underline">
-												{linkName}
-											</a>
-										</li>
+							<p class="label mb-3">{m.glossary_backlinks()}</p>
+							<ul class="flex flex-col gap-2">
+								{#each visibleBacklinks as bl}
+									{@const blTr = (bl as any).translations?.[getLocale()]}
+									{@const blName = blTr?.name ?? bl.name}
+									<li>
+										<a href={termHref(bl.id)} class="no-underline hover:underline leading-snug">
+											{blName}
+										</a>
+									</li>
 								{/each}
 							</ul>
+							{#if data.backlinks.length > BACKLINKS_PREVIEW && !showAllBacklinks}
+								<button
+									onclick={() => showAllBacklinks = true}
+									class="mt-2 cursor-pointer font-mono text-[10px] text-black/40 hover:text-black/70"
+								>+{data.backlinks.length - BACKLINKS_PREVIEW} more</button>
+							{/if}
 						</div>
 					{/if}
 				</aside>

@@ -21,12 +21,11 @@
 	const booksHref = $derived(localizeUrl('/books'));
 
 	function glossaryTermName(term: PageData['glossary'][number]): string {
-		const cs = term.translations?.cs;
-		return getLocale() === 'cs' && cs?.name ? cs.name : term.name;
+		return term.translations?.[getLocale()]?.name ?? term.name;
 	}
 
 	function glossaryTermHref(term: PageData['glossary'][number]): string {
-		const slug = term.translations?.cs?.slug ?? term.id;
+		const slug = term.translations?.[getLocale()]?.slug ?? term.id;
 		return localizeUrl(`/glossary/${slug}`);
 	}
 </script>

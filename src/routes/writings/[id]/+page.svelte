@@ -54,12 +54,11 @@
 	const isPdf = $derived(selectedFormat === 'pdf');
 
 	function glossaryTermName(term: PageData['glossaryTerms'][number]): string {
-		const cs = term.translations?.cs;
-		return getLocale() === 'cs' && cs?.name ? cs.name : term.name;
+		return term.translations?.[getLocale()]?.name ?? term.name;
 	}
 
 	function glossaryTermHref(term: PageData['glossaryTerms'][number]): string {
-		const slug = getLocale() === 'cs' ? (term.translations?.cs?.slug ?? term.id) : term.id;
+		const slug = term.translations?.[getLocale()]?.slug ?? term.id;
 		return localizeUrl(`/glossary/${slug}`);
 	}
 

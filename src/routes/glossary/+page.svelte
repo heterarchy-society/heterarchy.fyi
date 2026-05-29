@@ -35,17 +35,15 @@
 	let expandedChanges = $state(new Set<string>());
 
 	function termName(term: GlossaryTermSummary) {
-		const cs = term.translations?.cs;
-		return getLocale() === 'cs' && cs?.name ? cs.name : term.name;
+		return term.translations?.[getLocale()]?.name ?? term.name;
 	}
 
 	function termType(term: GlossaryTermSummary) {
-		const cs = term.translations?.cs;
-		return getLocale() === 'cs' && cs?.type ? cs.type : (term.type ?? null);
+		return term.translations?.[getLocale()]?.type ?? term.type ?? null;
 	}
 
 	function termHref(term: GlossaryTermSummary) {
-		const slug = getLocale() === 'cs' ? (term.translations?.cs?.slug ?? term.id) : term.id;
+		const slug = term.translations?.[getLocale()]?.slug ?? term.id;
 		return localizeUrl(`/glossary/${slug}`);
 	}
 
@@ -64,11 +62,9 @@
 
 	function renderSpotlightExcerpt(term: any, terms: GlossaryTermSummary[]) {
 		const locale = getLocale();
-		const translated = locale === 'cs' ? term.translations?.cs : null;
+		const translated = term.translations?.[locale] ?? null;
 		const excerpt =
-			locale === 'cs'
-				? (translated?.excerpt ?? translated?.description?.split('\n\n')[0] ?? term.excerpt ?? term.description?.split('\n\n')[0])
-				: (term.excerpt ?? term.description?.split('\n\n')[0]);
+			translated?.excerpt ?? translated?.description?.split('\n\n')[0] ?? term.excerpt ?? term.description?.split('\n\n')[0];
 		if (!excerpt) return '';
 
 		const termsById = new Map(terms.map((item) => [item.id, item]));

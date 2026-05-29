@@ -18,13 +18,12 @@
 	function termName(id: string): string {
 		const term = termForId(id);
 		if (!term) return id;
-		const cs = (term as any).translations?.cs;
-		return getLocale() === 'cs' && cs?.name ? cs.name : term.name;
+		return (term as any).translations?.[getLocale()]?.name ?? term.name;
 	}
 
 	function termHref(id: string): string {
 		const term = termForId(id);
-		const slug = getLocale() === 'cs' ? ((term as any)?.translations?.cs?.slug ?? id) : id;
+		const slug = (term as any)?.translations?.[getLocale()]?.slug ?? id;
 		return localizeUrl(`/glossary/${slug}`);
 	}
 

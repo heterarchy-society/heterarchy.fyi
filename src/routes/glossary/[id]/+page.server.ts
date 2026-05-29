@@ -25,7 +25,7 @@ export const load: PageServerLoad = ({ params }) => {
 		error(404, 'Term not found');
 	}
 
-	const slug = (term.translations?.cs?.slug as string | undefined) ?? null;
+	const csSlug = (term.translations?.cs?.slug as string | undefined) ?? null;
 
 	// Re-resolve any links that were null when the data was built but now exist.
 	const resolvedLinks = (term.resolvedLinks ?? []).map((link) => {
@@ -55,7 +55,7 @@ export const load: PageServerLoad = ({ params }) => {
 		// Alternate URLs for the language switcher
 		altUrls: {
 			en: `/glossary/${term.id}`,
-			cs: `/cs/glosar/${slug ?? term.id}`,
+			cs: `/cs/glosar/${csSlug ?? term.id}`,
 		},
 	};
 };
