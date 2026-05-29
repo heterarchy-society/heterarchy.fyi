@@ -110,6 +110,108 @@ export function formatEventDate(date: string, locale = 'en'): string {
 	return d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
+/** Last calendar day of the event (inclusive when `days` is set). */
+export function eventEndDate(event: Event): string | undefined {
+	const days = event.days != null ? Number(event.days) : NaN;
+	let endFromDays: string | undefined;
+	if (!Number.isNaN(days) && days > 1) {
+		const end = new Date(event.date + 'T12:00:00');
+		end.setDate(end.getDate() + days - 1);
+		endFromDays = end.toLocaleDateString('en-CA');
+	}
+	const endFromTime = event.endTime?.match(/^(\d{4}-\d{2}-\d{2})/)?.[1];
+	const candidates = [endFromDays, endFromTime && endFromTime > event.date ? endFromTime : undefined].filter(
+		Boolean
+	) as string[];
+	if (candidates.length === 0) return undefined;
+	return candidates.sort().at(-1);
+}
+
+export function formatEventDateRange(event: Event, locale = 'en'): string {
+	const end = eventEndDate(event);
+	if (!end || end === event.date) return formatEventDate(event.date, locale);
+
+	const startD = new Date(event.date + 'T12:00:00');
+	const endD = new Date(end + 'T12:00:00');
+	if (isNaN(startD.getTime()) || isNaN(endD.getTime())) return formatEventDate(event.date, locale);
+
+	const sameMonth =
+		event.date.slice(0, 7) === end.slice(0, 7);
+	const sameYear = event.date.slice(0, 4) === end.slice(0, 4);
+
+	if (sameMonth) {
+		const dayStart = startD.toLocaleDateString(locale, { day: 'numeric' });
+		const dayEnd = endD.toLocaleDateString(locale, { day: 'numeric' });
+		const monthYear = endD.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+		return `${dayStart}–${dayEnd} ${monthYear}`;
+	}
+	if (sameYear) {
+		const a = startD.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+		const b = endD.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+		return `${a} – ${b}`;
+	}
+	return `${formatEventDate(event.date, locale)} – ${formatEventDate(end, locale)}`;
+}
+
+/** Short range for compact lists, e.g. "4–6 Oct" or "4 Oct". */
+export function formatEventDateRangeCompact(event: Event, locale = 'en'): string {
+	const end = eventEndDate(event);
+	const startD = new Date(event.date + 'T12:00:00');
+	if (isNaN(startD.getTime())) return event.date;
+
+	if (!end || end === event.date) {
+		return startD.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+	}
+
+	const endD = new Date(end + 'T12:00:00');
+	if (isNaN(endD.getTime())) {
+		return startD.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+	}
+
+	const sameMonth = event.date.slice(0, 7) === end.slice(0, 7);
+	if (sameMonth) {
+		const dayStart = startD.toLocaleDateString(locale, { day: 'numeric' });
+		const month = endD.toLocaleDateString(locale, { month: 'short' });
+		const dayEnd = endD.toLocaleDateString(locale, { day: 'numeric' });
+		return `${dayStart}–${dayEnd} ${month}`;
+	}
+
+	const a = startD.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+	const b = endD.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
+	return `${a} – ${b}`;
+}
+
+/** Long range with weekday on the start day (upcoming section). */
+export function formatEventDateRangeLong(event: Event, locale = 'en'): string {
+	const end = eventEndDate(event);
+	const startD = new Date(event.date + 'T12:00:00');
+	if (isNaN(startD.getTime())) return event.date;
+
+	if (!end || end === event.date) {
+		return startD.toLocaleDateString(locale, {
+			weekday: 'long',
+			day: 'numeric',
+			month: 'long',
+			year: 'numeric',
+		});
+	}
+
+	const endD = new Date(end + 'T12:00:00');
+	const startLong = startD.toLocaleDateString(locale, {
+		weekday: 'long',
+		day: 'numeric',
+		month: 'long',
+		year: 'numeric',
+	});
+	const endLong = endD.toLocaleDateString(locale, {
+		weekday: 'long',
+		day: 'numeric',
+		month: 'long',
+		year: 'numeric',
+	});
+	return `${startLong} – ${endLong}`;
+}
+
 export function formatEventTimeRange(event: Event, locale = 'en'): string | null {
 	if (!event.startTime) return null;
 	const start = new Date(event.startTime);
@@ -151,18 +253,49 @@ export function latestEventsRevision(): LatestRevision | null {
 	return eventsData.meta?.events?.latestCommit ?? eventsData.meta?.commit ?? null;
 }
 
-export function getFeaturedEvent(): Event | undefined {
-	const sorted = [...events].sort((a, b) => b.date.localeCompare(a.date));
-	return sorted.find((e) => e.major) ?? sorted[0];
+/** Local calendar date as YYYY-MM-DD. */
+export function todayYmd(): string {
+	return new Date().toLocaleDateString('en-CA');
 }
 
-export const featuredEvent = getFeaturedEvent();
+export function daysBetween(fromYmd: string, toYmd: string): number {
+	const from = new Date(fromYmd + 'T12:00:00');
+	const to = new Date(toYmd + 'T12:00:00');
+	return Math.round((to.getTime() - from.getTime()) / 86_400_000);
+}
+
+/** Days until start (or until end if already underway). Null when finished. */
+export function eventDaysLeft(event: Event, referenceDate = todayYmd()): number | null {
+	const end = eventEndDate(event) ?? event.date;
+	if (referenceDate > end) return null;
+	if (referenceDate < event.date) return daysBetween(referenceDate, event.date);
+	return daysBetween(referenceDate, end);
+}
+
+export function isUpcomingEvent(event: Event, referenceDate = todayYmd()): boolean {
+	const end = eventEndDate(event) ?? event.date;
+	return end >= referenceDate;
+}
+
+/** Next upcoming event on or after `referenceDate` (default: today, local). */
+export function getFeaturedEvent(referenceDate = todayYmd()): Event | undefined {
+	const upcoming = [...events]
+		.filter((e) => e.date >= referenceDate)
+		.sort((a, b) => {
+			const byDate = a.date.localeCompare(b.date);
+			if (byDate !== 0) return byDate;
+			return (a.startTime ?? '').localeCompare(b.startTime ?? '');
+		});
+	return upcoming[0];
+}
 
 export type EventListItem = Event & {
 	cardImageUrl: string | null;
 	cardImageSrcset: string | undefined;
 	locationLabel: string | null;
 	dateLabel: string;
+	dateLabelCompact: string;
+	dateLabelLong: string;
 };
 
 export function enrichEventForList(event: Event, locale = 'en'): EventListItem {
@@ -172,6 +305,8 @@ export function enrichEventForList(event: Event, locale = 'en'): EventListItem {
 		cardImageUrl: cardImg ? eventImageUrl(event, cardImg) : null,
 		cardImageSrcset: cardImg ? eventImageSrcset(event, cardImg) : undefined,
 		locationLabel: formatEventLocation(event, locale),
-		dateLabel: formatEventDate(event.date, locale),
+		dateLabel: formatEventDateRange(event, locale),
+		dateLabelCompact: formatEventDateRangeCompact(event, locale),
+		dateLabelLong: formatEventDateRangeLong(event, locale),
 	};
 }

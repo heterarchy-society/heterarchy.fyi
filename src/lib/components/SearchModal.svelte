@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { version } from '$app/environment';
-	import { BookOpen, FileText, Globe, Search, Tag, User, X } from 'lucide-svelte';
+	import { BookOpen, Calendar, FileText, Globe, Mic, Search, Tag, User, X } from 'lucide-svelte';
 	import Fuse from 'fuse.js';
 	import { search } from '$lib/search.svelte';
 	import { localizeUrl, getLocale } from '$lib/i18n';
@@ -11,7 +11,7 @@
 
 	type SearchEntry = {
 		id: string;
-		type: 'person' | 'glossary' | 'book' | 'writing' | 'page';
+		type: 'person' | 'glossary' | 'book' | 'writing' | 'page' | 'event' | 'talk';
 		title: string;
 		subtitle?: string;
 		description?: string;
@@ -202,6 +202,10 @@
 											<FileText size={14} strokeWidth={1.5} class="text-black/35" />
 										{:else if entry.type === 'page'}
 											<Globe size={14} strokeWidth={1.5} class="text-black/35" />
+										{:else if entry.type === 'event'}
+											<Calendar size={14} strokeWidth={1.5} class="text-black/35" />
+										{:else if entry.type === 'talk'}
+											<Mic size={14} strokeWidth={1.5} class="text-black/35" />
 										{:else}
 											<User size={14} strokeWidth={1.5} class="text-black/35" />
 										{/if}

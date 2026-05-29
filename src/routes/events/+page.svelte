@@ -3,9 +3,9 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import LatestRevision from '$lib/components/LatestRevision.svelte';
 	import { localizeUrl } from '$lib/i18n';
-	import { getLocale } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 	import { datasetConfigs } from '$lib/data/datasets';
+	import EventDaysLeft from '$lib/components/events/EventDaysLeft.svelte';
 	import type { PageData } from './$types';
 
 	const eventsRepository = datasetConfigs.find((d) => d.id === 'events')!.repository;
@@ -24,17 +24,6 @@
 		return [...map.entries()].map(([year, events]) => ({ year, events }));
 	});
 
-	function formatDayMonth(dateStr: string): string {
-		const d = new Date(dateStr + 'T12:00:00');
-		if (isNaN(d.getTime())) return dateStr;
-		return d.toLocaleDateString(getLocale(), { day: 'numeric', month: 'short' });
-	}
-
-	function formatFullDate(dateStr: string): string {
-		const d = new Date(dateStr + 'T12:00:00');
-		if (isNaN(d.getTime())) return dateStr;
-		return d.toLocaleDateString(getLocale(), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-	}
 </script>
 
 <svelte:head>
@@ -94,7 +83,9 @@
 								{/if}
 								<div class="min-w-0 flex-1">
 									<p class="mb-1 font-mono text-[13px] font-medium text-black/60">
-										{formatFullDate(event.date)}
+										{event.dateLabelLong}
+										{' '}
+										<EventDaysLeft {event} />
 									</p>
 									<h2 class="font-mono text-[19px] leading-snug text-black underline decoration-transparent underline-offset-4 transition-colors group-hover:decoration-current sm:text-[21px]">
 										{event.name}
@@ -130,8 +121,8 @@
 							href={localizeUrl(`/events/${event.id}`)}
 							class="group flex items-center gap-4 px-8 py-3 no-underline sm:gap-6 lg:px-10"
 						>
-							<span class="w-14 shrink-0 font-mono text-[12px] text-black/40 sm:w-16">
-								{formatDayMonth(event.date)}
+							<span class="w-16 shrink-0 font-mono text-[12px] leading-snug text-black/40 sm:w-24">
+								{event.dateLabelCompact}
 							</span>
 							<span class="min-w-0 flex-1 font-mono text-[14px] leading-snug text-black underline decoration-transparent underline-offset-2 transition-colors group-hover:decoration-current sm:text-[15px]">
 								{event.name}

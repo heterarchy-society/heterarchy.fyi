@@ -3,7 +3,8 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import TalkCard from '$lib/components/talks/TalkCard.svelte';
 	import { localizeUrl } from '$lib/i18n';
-	import { eventPrimaryHref } from '$lib/data/events';
+	import { eventPrimaryHref, isUpcomingEvent } from '$lib/data/events';
+	import EventDaysLeft from '$lib/components/events/EventDaysLeft.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
@@ -80,7 +81,13 @@
 						{m.events_detail_back()}
 					</a>
 
-					<p class="mb-2 font-mono text-[13px] text-black/50">{event.dateLabel}</p>
+					<p class="mb-2 font-mono text-[13px] leading-snug text-black/50">
+						{event.dateLabelLong}
+						{#if isUpcomingEvent(event)}
+							{' '}
+							<EventDaysLeft {event} />
+						{/if}
+					</p>
 					<h1 class="book-detail-title mb-4 max-w-2xl">{event.name}</h1>
 
 					{#if event.caption}
@@ -99,9 +106,6 @@
 						{/if}
 						{#if event.project}
 							<li>{event.project}</li>
-						{/if}
-						{#if event.days}
-							<li>{event.days} days</li>
 						{/if}
 						{#if event.langs?.length}
 							<li>{event.langs.join(', ')}</li>
@@ -142,7 +146,9 @@
 				{#if data.descriptionHtml}
 					<div class="mb-10 max-w-2xl">
 						<p class="label mb-4">{m.events_detail_about()}</p>
-						<div class="text-[15px] leading-[1.7] text-black/80">
+						<div
+							class="text-[15px] leading-[1.7] text-black/80 [&_p]:mb-4 [&_p:last-child]:mb-0 [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-line [&_a:hover]:decoration-black/60 [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_strong]:font-semibold [&_em]:italic"
+						>
 							{@html data.descriptionHtml}
 						</div>
 					</div>

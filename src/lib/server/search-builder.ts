@@ -105,7 +105,10 @@ export function buildSearchIndex(locale: string) {
 			subtitle: [item.dateLabel, item.locationLabel, event.project].filter(Boolean).join(' · ') || undefined,
 			description: (event.caption ?? event.description?.split(/\n\n+/)[0]?.slice(0, 200)) || undefined,
 			url: `/events/${event.id}`,
-			thumbnail: item.cardImageSrcset?.split(', ')[0]?.split(' ')[0] ?? item.cardImageUrl ?? undefined,
+			thumbnail:
+				item.cardImageUrl ??
+				item.cardImageSrcset?.split(', ').at(-1)?.trim().split(/\s+/)[0] ??
+				undefined,
 		});
 	}
 

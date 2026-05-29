@@ -33,3 +33,4 @@ src/lib/data/books.json
 src/lib/data/writings.json
 src/lib/data/people.json
 src/lib/data/talks.json
+src/lib/data/events.json

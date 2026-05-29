@@ -7,12 +7,15 @@
 		getFeaturedEvent,
 	} from '$lib/data/events';
 	import EventPoster from '$lib/components/events/EventPoster.svelte';
+	import EventDaysLeft from '$lib/components/events/EventDaysLeft.svelte';
 	import { localizeUrl } from '$lib/i18n';
 	import { getLocale } from '$lib/paraglide/runtime';
 	import * as m from '$lib/paraglide/messages';
 
-	const raw = getFeaturedEvent();
-	const event = $derived(raw ? enrichEventForList(raw, getLocale()) : null);
+	const event = $derived.by(() => {
+		const raw = getFeaturedEvent();
+		return raw ? enrichEventForList(raw, getLocale()) : null;
+	});
 	const detailHref = $derived(event ? localizeUrl(eventPath(event.id)) : null);
 	const externalHref = $derived(event ? eventPrimaryHref(event) : undefined);
 </script>
@@ -38,7 +41,11 @@
 				<ul class="flex flex-col gap-1.5 font-mono text-[12px]">
 					<li class="flex items-center gap-2.5">
 						<Calendar size={13} strokeWidth={1.25} />
-						<span>{event.dateLabel}</span>
+						<span>
+							{event.dateLabelLong}
+							{' '}
+							<EventDaysLeft {event} />
+						</span>
 					</li>
 					{#if event.locationLabel}
 						<li class="flex items-center gap-2.5">
@@ -49,9 +56,9 @@
 				</ul>
 
 				{#if event.caption}
-					<p class="hidden max-w-sm text-[14px] leading-[1.55] sm:block">{event.caption}</p>
+					<p class="hidden max-w-sm text-[14px] leading-[1.55] text-black/60 sm:block">{event.caption}</p>
 				{:else if event.description}
-					<p class="hidden max-w-sm text-[14px] leading-[1.55] sm:block">
+					<p class="hidden max-w-sm text-[14px] leading-[1.55] text-black/60 sm:block">
 						{event.description.slice(0, 200)}{event.description.length > 200 ? '…' : ''}
 					</p>
 				{/if}
@@ -59,7 +66,7 @@
 		</div>
 
 		{#if event.caption || event.description}
-			<p class="mt-4 text-[14px] leading-[1.55] sm:hidden">
+			<p class="mt-4 text-[14px] leading-[1.55] text-black/60 sm:hidden">
 				{event.caption ?? event.description?.slice(0, 200)}
 			</p>
 		{/if}
