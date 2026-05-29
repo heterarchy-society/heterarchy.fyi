@@ -45,6 +45,9 @@
 		!!event.aftermovie ||
 		data.talks.length > 0
 	);
+
+	const imageUrl = $derived(event.heroImageUrl ?? event.cardImageUrl);
+	const imageSrcset = $derived(event.heroImageSrcset ?? event.cardImageSrcset);
 </script>
 
 <svelte:head>
@@ -57,25 +60,24 @@
 
 	<main>
 		<section class="cell-roomy border-b border-line">
-			<div class="grid gap-10 lg:grid-cols-[minmax(180px,240px)_1fr] lg:gap-14">
-				<!-- Image -->
-				<div class="mx-auto w-full max-w-60 lg:mx-0">
-					{#if event.cardImageUrl}
+			<div
+				class="grid gap-10 lg:gap-14"
+				class:lg:grid-cols-[minmax(180px,240px)_1fr]={!!imageUrl}
+			>
+				{#if imageUrl}
+					<div class="mx-auto w-full max-w-60 lg:mx-0">
 						<img
-							src={event.cardImageUrl}
-							srcset={event.cardImageSrcset}
+							src={imageUrl}
+							srcset={imageSrcset}
 							sizes="(min-width: 1024px) 240px, 60vw"
 							alt={event.name}
 							width={240}
 							height={240}
 							class="aspect-square w-full border border-line object-cover"
 						/>
-					{:else}
-						<div class="aspect-square w-full border border-line bg-bg-muted" aria-hidden="true"></div>
-					{/if}
-				</div>
+					</div>
+				{/if}
 
-				<!-- Info -->
 				<div class="min-w-0">
 					<a href={localizeUrl('/events')} class="label mb-4 inline-block no-underline hover:underline">
 						{m.events_detail_back()}
@@ -100,12 +102,6 @@
 						{/if}
 						{#if event.locationLabel}
 							<li>{event.locationLabel}</li>
-						{/if}
-						{#if event.venues?.length}
-							<li>{event.venues.map((v) => v.name).join(' · ')}</li>
-						{/if}
-						{#if event.project}
-							<li>{event.project}</li>
 						{/if}
 						{#if event.langs?.length}
 							<li>{event.langs.join(', ')}</li>
