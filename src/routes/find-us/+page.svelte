@@ -21,12 +21,13 @@
 
 			<div class="flex flex-col gap-12">
 				{#snippet channelList(channels: typeof onlineChannels)}
-					<ul>
+					<ul class="w-fit">
 						{#each channels as channel, i}
+							{@const owners = channel.owners ?? []}
 							<li class:border-b-0={i === channels.length - 1} class="border-b border-line">
 								<a
 									href={channel.href}
-									class="grid gap-1 py-5 no-underline hover:underline sm:grid-cols-[8rem_1fr] sm:items-baseline sm:gap-6"
+									class="grid gap-1 pt-5 no-underline hover:underline sm:grid-cols-[8rem_1fr] sm:items-baseline sm:gap-6 {owners.length ? 'pb-1' : 'pb-5'}"
 									target={channel.external ? '_blank' : undefined}
 									rel={channel.external ? 'noopener noreferrer' : undefined}
 								>
@@ -36,6 +37,23 @@
 										{#if channel.mirror}<span class="rounded border border-line px-1 py-px font-mono text-[9px] text-black/35">mirror</span>{/if}
 									</span>
 								</a>
+								{#if owners.length}
+									<div class="pb-4 sm:grid sm:grid-cols-[8rem_1fr] sm:gap-6">
+										<span></span>
+										<span class="font-mono text-[11px] text-black/40">
+											{channel.ownerRole ?? 'Moderators'}:
+											{#each owners as owner, j}
+												{@const parts = owner.includes('|') ? owner.split('|') : null}
+												{#if j > 0}, {/if}
+												{#if parts}
+													<a href="/people/{parts[0]}" class="hover:text-black no-underline hover:underline">{parts[1]}</a>
+												{:else}
+													{owner}
+												{/if}
+											{/each}
+										</span>
+									</div>
+								{/if}
 							</li>
 						{/each}
 					</ul>

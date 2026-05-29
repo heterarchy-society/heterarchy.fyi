@@ -8,7 +8,7 @@ import type { PageLoad } from './$types';
 
 const peopleRepository = datasetConfigs.find((d) => d.id === 'people')!.repository;
 
-export function load({ params }: Parameters<PageLoad>[0]) {
+export function load({ params, data }: Parameters<PageLoad>[0]) {
 	const person = peopleById.get(params.id);
 
 	if (!person) {
@@ -16,6 +16,7 @@ export function load({ params }: Parameters<PageLoad>[0]) {
 	}
 
 	return {
+		descriptionHtml: data.descriptionHtml,
 		person: {
 			...person,
 			avatarUrl: personAvatarUrl(person),

@@ -16,14 +16,16 @@
 		if (kind === 'twitter') return `https://x.com/${value}`;
 		if (kind === 'github') return `https://github.com/${value}`;
 		if (kind === 'nostr') return `https://njump.me/${value}`;
+		if (kind === 'pubky') return `https://pubky.app/profile/${value}`;
 		return value;
 	}
 
 	function refLabel(kind: string, value: string): string {
 		if (kind === 'web') return m.people_ref_web();
 		if (kind === 'twitter') return `@${value}`;
-		if (kind === 'github') return value;
+		if (kind === 'github') return `github:${value}`;
 		if (kind === 'nostr') return m.people_ref_nostr();
+		if (kind === 'pubky') return 'pubky';
 		return kind;
 	}
 
@@ -111,10 +113,12 @@
 						</p>
 					{/if}
 
-					{#if person.description}
+					{#if data.descriptionHtml}
 						<div class="mt-8 max-w-2xl">
 							<p class="label mb-3">{m.people_detail_about()}</p>
-							<p class="text-[15px] leading-[1.7] text-black/80">{person.description}</p>
+							<div class="text-[15px] leading-[1.7] text-black/80 [&_p]:mb-4 [&_p:last-child]:mb-0 [&_a]:underline [&_a]:underline-offset-2 [&_a]:decoration-line [&_a:hover]:decoration-black/60 [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:mb-4 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_strong]:font-semibold [&_em]:italic">
+								{@html data.descriptionHtml}
+							</div>
 						</div>
 					{/if}
 

@@ -7,6 +7,8 @@ export type ContactChannel = {
 	external?: boolean;
 	logo?: string;
 	mirror?: boolean;
+	owners?: string[]; // each entry: "person-id|Display Name" or plain name
+	ownerRole?: string; // defaults to "Moderators"
 };
 
 export type OfflineVenue = ContactChannel & {
@@ -24,6 +26,7 @@ export const signalGroup: ContactChannel = {
 	value: 'signal.heterarchy.fyi',
 	href: 'https://signal.heterarchy.fyi',
 	external: true,
+	owners: ['tree|tree 木'],
 };
 
 export const onlineChannels: ContactChannel[] = [signalGroup];
@@ -33,21 +36,24 @@ export const gitChannels: ContactChannel[] = [
 		label: 'Forgejo',
 		value: forgejoOrg.replace('https://', ''),
 		href: forgejoOrg,
-		external: true
+		external: true,
+		owners: ['tree|tree 木'],
 	},
 	{
 		label: 'Radicle',
 		value: radicleOrg.replace('https://radicle.network/nodes/', ''),
 		href: radicleOrg,
 		external: true,
-		mirror: true
+		mirror: true,
+		owners: ['tree|tree 木'],
 	},
 	{
 		label: 'GitHub',
 		value: githubOrg.replace('https://', ''),
 		href: githubOrg,
 		external: true,
-		mirror: true
+		mirror: true,
+		owners: ['tree|tree 木'],
 	}
 ];
 
