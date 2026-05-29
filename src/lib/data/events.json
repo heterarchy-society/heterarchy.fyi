@@ -1,10 +1,10 @@
 {
   "meta": {
-    "generated": "2026-05-29T12:30:35.459Z",
+    "generated": "2026-05-29T12:41:52.879Z",
     "version": "1.0.0",
     "commit": {
-      "hash": "83279cde3ca8355ace1e5f25e7aa4d90ca5a103d",
-      "date": "2026-05-29T14:30:28+02:00"
+      "hash": "7e1788fcffe9dfe9fb521c8191286d882733b481",
+      "date": "2026-05-29T14:41:10+02:00"
     },
     "atlas": {
       "version": "1.0.4",
@@ -13,8 +13,8 @@
     "events": {
       "count": 224,
       "latestCommit": {
-        "hash": "83279cde3ca8355ace1e5f25e7aa4d90ca5a103d",
-        "date": "2026-05-29T14:30:28+02:00"
+        "hash": "7e1788fcffe9dfe9fb521c8191286d882733b481",
+        "date": "2026-05-29T14:41:10+02:00"
       }
     }
   },
@@ -7861,6 +7861,10 @@
         {
           "path": "banner.png",
           "type": "banner"
+        },
+        {
+          "path": "square.jpg",
+          "type": "square"
         }
       ],
       "refs": {
@@ -7871,6 +7875,12 @@
       },
       "description": "A gathering of hacktivists, researchers, technologists, whistleblowers, philosophers, lawyers and policy-makers exploring how open protocols and privacy tools become a resilient, shared foundation for digital autonomy, free assembly, and accountability.\n\nThemes: cryptography as civic infrastructure, resistance networks, open protocols and digital autonomy, digital rights and legal defence, privacy for the commons, and AI, power and the surveillance economy.\n\nOrganised by the Web3Privacy Now collective at Funkhaus Berlin.",
       "history": [
+        {
+          "hash": "7e1788fcffe9dfe9fb521c8191286d882733b481",
+          "date": "2026-05-29T14:41:10+02:00",
+          "author": "tree",
+          "message": "Add square image for Neocypherpunk Summit 2026 and update index.yaml to include it"
+        },
         {
           "hash": "83279cde3ca8355ace1e5f25e7aa4d90ca5a103d",
           "date": "2026-05-29T14:30:28+02:00",
@@ -7887,6 +7897,10 @@
         "banner.png": {
           "400w": "https://events.data.heterarchy.fyi/events/neocypherpunk-summit-berlin-2026/banner-400w.webp",
           "800w": "https://events.data.heterarchy.fyi/events/neocypherpunk-summit-berlin-2026/banner-800w.webp"
+        },
+        "square.jpg": {
+          "400w": "https://events.data.heterarchy.fyi/events/neocypherpunk-summit-berlin-2026/square-400w.webp",
+          "800w": "https://events.data.heterarchy.fyi/events/neocypherpunk-summit-berlin-2026/square-800w.webp"
         }
       }
     },
