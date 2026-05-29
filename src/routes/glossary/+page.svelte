@@ -76,10 +76,12 @@
 			}
 		}
 
-		const md = excerpt.replace(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/g, (_: string, display: string, explicit?: string) => {
-			const target = resolved.get((explicit ?? display).toLowerCase());
+		const md = excerpt.replace(/\[\[([^\|\]]+)(?:\|([^\]]+))?\]\]/g, (_: string, targetKey: string, label?: string) => {
+			const key = targetKey.trim();
+			const text = label?.trim() || key;
+			const target = resolved.get(key.toLowerCase()) ?? (termsById.has(key) ? key : null);
 			const targetTerm = target ? termsById.get(target) : null;
-			return targetTerm ? `[${display}](${termHref(targetTerm)})` : display;
+			return targetTerm ? `[${text}](${termHref(targetTerm)})` : text;
 		});
 
 		return renderMarkdownInline(md);

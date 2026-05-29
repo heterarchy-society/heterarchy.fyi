@@ -4,17 +4,17 @@
 	import Hero from '$lib/components/Hero.svelte';
 	import GameOfLife from '$lib/components/GameOfLife.svelte';
 	import FeaturedEvent from '$lib/components/FeaturedEvent.svelte';
-	import UpcomingEvents from '$lib/components/UpcomingEvents.svelte';
 	import LibraryLinks from '$lib/components/LibraryLinks.svelte';
 	import Partners from '$lib/components/Partners.svelte';
-	import { featuredEvent, upcomingEvents } from '$lib/data/events';
+	import { featuredEvent } from '$lib/data/events';
 	import { localizeUrl } from '$lib/i18n';
-
-	const sidebarEvents = upcomingEvents.filter((e) => e.date !== 'TBD');
 	import { libraryPreview } from '$lib/data/library';
 	import { siteMeta } from '$lib/data/placeholder';
 	import { latestWritings, writingAuthorText } from '$lib/data/writings';
 	import * as m from '$lib/paraglide/messages';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
 </script>
 
 <svelte:head>
@@ -37,7 +37,18 @@
 			<FeaturedEvent event={featuredEvent} />
 		</div>
 		<div class="cell lg:col-span-1">
-			<UpcomingEvents events={sidebarEvents} />
+			{#if data.glossaryItem}
+				<div>
+					{#if data.glossaryItem.type}
+						<p class="mb-2 font-mono text-[10px] uppercase tracking-widest text-black/30">{data.glossaryItem.type}</p>
+					{/if}
+					<h2 class="mb-3 font-mono text-[1.1rem] leading-snug">
+						<a href={data.glossaryItem.href} class="hover:underline">{data.glossaryItem.name}</a>
+					</h2>
+					<p class="text-[13px] leading-[1.7] text-black/60">{@html data.glossaryItem.excerptHtml}</p>
+					<a href={data.glossaryItem.href} class="mt-3 block font-mono text-[11px] text-black/35 no-underline hover:text-black hover:underline">{m.spotlight_read_more()}</a>
+				</div>
+			{/if}
 		</div>
 
 		<div class="cell-roomy lg:col-span-2 lg:border-r lg:border-line">
