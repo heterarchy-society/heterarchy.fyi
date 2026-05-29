@@ -18,6 +18,6 @@ steps:
       - git config user.name "Woodpecker CI"
       - git add src/lib/data/term-history.csv
       - git diff --staged --quiet && echo "Nothing to commit" && exit 0
-      - git commit -m "chore: record term of day $(date +%Y-%m-%d)"
+      - 'git commit -m "chore: record term of day $(date +%Y-%m-%d)"'
       - git remote set-url origin https://woodpecker:$GITEA_TOKEN@git.heterarchy.fyi/heterarchy-society/heterarchy.fyi.git
       - git push origin HEAD:main
