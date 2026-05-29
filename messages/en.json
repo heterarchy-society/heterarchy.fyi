@@ -328,5 +328,11 @@
 	"about_meta_title": "About us — The Heterarchy Society",
 	"about_meta_desc": "The Heterarchy Society manifesto — a community around sovereign technologies, decentralized systems and non-hierarchical forms of organization.",
 	"writings_link": "→ all writings",
-	"partners_label": "Friends"
+	"partners_label": "Friends",
+	"term_of_day_title": "Term of the Day",
+	"term_of_day_desc": "Each day a glossary term is automatically selected and shown on the homepage. The pick is deterministic — the pool of {count} terms with descriptions is shuffled once per year using the year as a seed, then terms are assigned to days in order. Every term appears 2–3 times per year, and the order changes each year.",
+	"term_of_day_today": "← today",
+	"term_of_day_hide_past": "hide past",
+	"term_of_day_show_past": "show {count} past",
+	"term_of_day_pool": "pool: {count} terms"
 }

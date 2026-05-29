@@ -48,7 +48,7 @@
 						{:else}
 							<span></span>
 						{/if}
-						<p class="font-mono text-[10px] uppercase tracking-widest text-black">{m.glossary_term_of_the_day()}</p>
+						<a href="/term-of-the-day" class="font-mono text-[10px] uppercase tracking-widest text-black no-underline hover:underline">{m.glossary_term_of_the_day()}</a>
 					</div>
 					<h2 class="mb-3 font-mono text-[1.1rem] leading-snug">
 						<a href={data.glossaryItem.href} class="hover:underline">{data.glossaryItem.name}</a>

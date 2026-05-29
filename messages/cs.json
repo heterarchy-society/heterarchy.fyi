@@ -328,5 +328,11 @@
 	"about_meta_title": "O nás — The Heterarchy Society",
 	"about_meta_desc": "Manifesto The Heterarchy Society — komunita kolem suverénních technologií, decentralizovaných systémů a nehierarchických forem organizace.",
 	"writings_link": "→ všechny texty",
-	"partners_label": "Přátelé"
+	"partners_label": "Přátelé",
+	"term_of_day_title": "Termín dne",
+	"term_of_day_desc": "Každý den je automaticky vybrán termín z glosáře a zobrazen na úvodní stránce. Výběr je deterministický — soubor {count} termínů s popisem je jednou ročně zamíchán pomocí roku jako semínka a termíny jsou přiřazeny ke dnům v pořadí. Každý termín se objeví 2–3× ročně a pořadí se každý rok mění.",
+	"term_of_day_today": "← dnes",
+	"term_of_day_hide_past": "skrýt minulé",
+	"term_of_day_show_past": "zobrazit {count} minulých",
+	"term_of_day_pool": "pool: {count} termínů"
 }

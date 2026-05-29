@@ -1,6 +1,7 @@
 import glossaryData from '$lib/data/glossary.json';
 import { getLocale, localizeUrl } from '$lib/i18n';
 import { renderMarkdownInline } from '$lib/markdown';
+import { termForDate } from '$lib/data/term-of-day';
 
 type GlossaryTerm = {
 	id: string;
@@ -49,19 +50,11 @@ function renderExcerpt(term: GlossaryTerm, termsById: Map<string, GlossaryTerm>,
 	return renderMarkdownInline(markdown);
 }
 
-function dailyIndex(len: number): number {
-	const d = new Date();
-	const seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-	return seed % len;
-}
-
 function randomGlossaryItem(locale: string) {
 	const terms = (glossaryData as { terms: GlossaryTerm[] }).terms;
 	const termsById = new Map(terms.map((term) => [term.id, term]));
-	const pool = terms.filter((term) => renderExcerpt(term, termsById, locale));
-	if (!pool.length) return null;
 
-	const term = pool[dailyIndex(pool.length)];
+	const term = termForDate(new Date()) as typeof terms[number];
 
 	return {
 		id: term.id,
