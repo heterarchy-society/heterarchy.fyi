@@ -4,6 +4,7 @@
 	import Seo from '$lib/components/Seo.svelte';
 	import LibraryBookCard from '$lib/components/library/LibraryBookCard.svelte';
 	import TalkGrid from '$lib/components/talks/TalkGrid.svelte';
+	import WritingItem from '$lib/components/writings/WritingItem.svelte';
 	import { localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
@@ -11,6 +12,15 @@
 	let { data }: { data: PageData } = $props();
 
 	const person = $derived(data.person);
+
+	const quickLinks = $derived(
+		[
+			{ href: '#books', label: m.books_label(), count: data.books.length },
+			{ href: '#writings', label: m.writings_page_label(), count: data.writings.length },
+			{ href: '#events', label: m.events_label(), count: data.events.length },
+			{ href: '#talks', label: m.talks_page_label(), count: data.talks.length }
+		].filter((l) => l.count > 0)
+	);
 
 	function refHref(kind: string, value: string): string {
 		if (/^https?:\/\//.test(value)) return value;
@@ -162,8 +172,22 @@
 			</div>
 
 			<!-- Dataset references -->
+			{#if quickLinks.length > 0}
+				<nav class="mt-12 flex flex-wrap gap-x-6 gap-y-2 border-t border-line pt-8">
+					{#each quickLinks as link (link.href)}
+						<a
+							href={link.href}
+							class="group flex items-baseline gap-1.5 font-mono text-[11px] uppercase tracking-widest text-black/50 no-underline transition-colors hover:text-black"
+						>
+							<span class="group-hover:underline">{link.label}</span>
+							<span class="text-black/30">{link.count}</span>
+						</a>
+					{/each}
+				</nav>
+			{/if}
+
 			{#if data.books.length > 0}
-				<div class="mt-12 border-t border-line pt-10 mb-10">
+				<div id="books" class="mt-12 scroll-mt-6 border-t border-line pt-10 mb-10">
 					<p class="label mb-4">{m.books_label()}</p>
 					<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
 						{#each data.books as book (book.id)}
@@ -174,15 +198,12 @@
 			{/if}
 
 			{#if data.writings.length > 0}
-				<div class="mt-12 border-t border-line pt-10 mb-10">
-					<p class="label mb-4">{m.writings_page_label()}</p>
-					<ul class="max-w-3xl divide-y divide-line">
+				<div id="writings" class="mt-12 scroll-mt-6 border-t border-line pt-10 mb-10">
+					<p class="label mb-6">{m.writings_page_label()}</p>
+					<ul class="flex flex-col divide-y divide-line">
 						{#each data.writings as writing (writing.id)}
-							<li>
-								<a href={localizeUrl(`/writings/${writing.id}`)} class="group flex items-baseline justify-between gap-4 py-3 no-underline">
-									<span class="font-mono text-[13px] text-black group-hover:underline">{writing.title}</span>
-									<span class="shrink-0 font-mono text-[11px] text-black/35">{writing.year ?? ''}</span>
-								</a>
+							<li class="py-6 first:pt-0">
+								<WritingItem {writing} variant="compact" />
 							</li>
 						{/each}
 					</ul>
@@ -190,7 +211,7 @@
 			{/if}
 
 			{#if data.events.length > 0}
-				<div class="mt-12 border-t border-line pt-10 mb-10">
+				<div id="events" class="mt-12 scroll-mt-6 border-t border-line pt-10 mb-10">
 					<p class="label mb-4">{m.events_label()}</p>
 					<ul class="max-w-3xl divide-y divide-line">
 						{#each data.events as event (event.id)}
@@ -206,7 +227,7 @@
 			{/if}
 
 			{#if data.talks.length > 0}
-				<div class="mt-12 border-t border-line pt-10 mb-10">
+				<div id="talks" class="mt-12 scroll-mt-6 border-t border-line pt-10 mb-10">
 					<p class="label mb-4">{m.talks_page_label()}</p>
 					<TalkGrid talks={data.talks} />
 				</div>

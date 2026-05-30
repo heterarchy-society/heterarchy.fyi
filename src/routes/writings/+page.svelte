@@ -6,26 +6,9 @@
 	import { localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
-	import { Headphones } from 'lucide-svelte';
-	import { writingAuthorRefs } from '$lib/data/writings';
-	import { personAvatarUrl } from '$lib/data/people';
+	import WritingItem from '$lib/components/writings/WritingItem.svelte';
 
 	let { data }: { data: PageData } = $props();
-
-	function wordCount(writing: PageData['writings'][number]): number | null {
-		if (!writing._assets) return null;
-		for (const s of writing.sources) {
-			if (['md', 'txt'].includes(s.format) && !s.generated_from) {
-				const w = writing._assets[s.path]?.text?.words;
-				if (w) return w;
-			}
-		}
-		return null;
-	}
-
-	function fmtWords(n: number): string {
-		return n >= 1000 ? `${Math.round(n / 100) / 10}k` : String(n);
-	}
 </script>
 
 <svelte:head>
@@ -53,31 +36,7 @@
 		{#if data.writings.length > 0}
 			<section>
 				{#each data.writings as writing (writing.id)}
-					{@const authors = writingAuthorRefs(writing.authors)}
-					<a href={localizeUrl(`/writings/${writing.id}`)} class="group block border-b border-line px-8 py-8 no-underline lg:px-10">
-						<div class="max-w-2xl">
-							<div class="mb-2 flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-black/35">
-								{#each authors as author}
-									{#if author.person}
-										{@const avatarUrl = personAvatarUrl(author.person)}
-										{#if avatarUrl}
-											<img src={avatarUrl} alt={author.person.name} width={18} height={18} class="size-[18px] shrink-0 border border-line object-cover" />
-										{/if}
-									{/if}
-								{/each}
-								<span>{authors.map(a => a.person?.name ?? a.name).join(', ')}{#if writing.year} · {writing.year}{/if}{#if wordCount(writing) !== null} · {fmtWords(wordCount(writing)!)}W{/if}</span>
-								{#if writing.audio?.length}
-									<span class="flex items-center gap-1"> · <Headphones size={11} strokeWidth={1.8} />{#if writing.audio[0].duration}<span class="ml-1">{writing.audio[0].duration}</span>{/if}</span>
-								{/if}
-							</div>
-							<h2 class="mb-3 font-mono text-[20px] leading-snug text-black underline decoration-transparent underline-offset-4 transition-colors group-hover:decoration-current">{writing.title}</h2>
-							{#if writing.description}
-								<p class="text-[14px] leading-[1.65] text-black/60">
-									{writing.description.split(/\n\n+/)[0].replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, '$1').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')}
-								</p>
-							{/if}
-						</div>
-					</a>
+					<WritingItem {writing} variant="full" class="border-b border-line px-8 py-8 lg:px-10" />
 				{/each}
 				<p class="px-8 py-6 font-mono text-[11px] text-black/35 lg:px-10">{m.writings_count({ count: String(data.writings.length) })}</p>
 			</section>

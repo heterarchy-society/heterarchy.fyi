@@ -10,8 +10,8 @@
 	import { localizeUrl } from '$lib/i18n';
 	import { libraryPreview } from '$lib/data/library';
 	import { siteMeta } from '$lib/data/placeholder';
-	import { latestWritings, writingAuthorRefs, writingExcerpt } from '$lib/data/writings';
-	import { personAvatarUrl } from '$lib/data/people';
+	import { latestWritings } from '$lib/data/writings';
+	import WritingItem from '$lib/components/writings/WritingItem.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
@@ -63,35 +63,8 @@
 			<p class="label mb-6">{m.writings_page_label()}</p>
 			<ul class="flex flex-col divide-y divide-line">
 				{#each latestWritings as writing (writing.id)}
-					{@const authors = writingAuthorRefs(writing.authors)}
-					{@const excerpt = writingExcerpt(writing)}
-					{@const meta = [authors.map(a => a.person?.name ?? a.name).join(', '), writing.year, writing.type].filter(Boolean).join(' · ')}
 					<li class="py-6 first:pt-0">
-						<a href={localizeUrl(`/writings/${writing.id}`)} class="group block no-underline">
-							<div class="mb-2 flex items-center gap-2">
-								{#each authors as author}
-									{#if author.person}
-										{@const avatarUrl = personAvatarUrl(author.person)}
-										{#if avatarUrl}
-											<img
-												src={avatarUrl}
-												alt={author.person.name}
-												width={20}
-												height={20}
-												class="size-5 border border-line object-cover"
-											/>
-										{/if}
-									{/if}
-								{/each}
-								<p class="font-mono text-[11px] text-black/35">{meta}</p>
-							</div>
-							<h2 class="font-mono text-[19px] leading-snug text-black underline decoration-transparent underline-offset-4 transition-colors group-hover:decoration-current">
-								{writing.title}
-							</h2>
-							{#if excerpt}
-								<p class="mt-2 max-w-2xl text-[13px] leading-[1.65] text-black/50">{excerpt}</p>
-							{/if}
-						</a>
+						<WritingItem {writing} variant="compact" />
 					</li>
 				{/each}
 			</ul>
