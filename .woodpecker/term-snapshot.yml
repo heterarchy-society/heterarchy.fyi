@@ -15,13 +15,12 @@ steps:
 
   - name: commit-and-push
     image: alpine/git
-    environment:
-      GITEA_TOKEN:
-        from_secret: GITEA_TOKEN
     commands:
       - git config user.email "ci@heterarchy.fyi"
       - git config user.name "Woodpecker CI"
+      - printf "machine %s\nlogin %s\npassword %s\n" "$CI_NETRC_MACHINE" "$CI_NETRC_USERNAME" "$CI_NETRC_PASSWORD" >> ~/.netrc
+      - chmod 600 ~/.netrc
       - git add src/lib/data/term-history.csv
       - git diff --staged --quiet && echo "Nothing to commit" && exit 0
       - 'git commit -m "chore: record term of day $(date +%Y-%m-%d)"'
-      - 'git -c http.extraheader="Authorization: token $GITEA_TOKEN" push origin HEAD:main'
+      - git push origin HEAD:main
