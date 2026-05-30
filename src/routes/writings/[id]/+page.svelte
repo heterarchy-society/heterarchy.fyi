@@ -57,6 +57,17 @@
 		};
 	});
 
+	const writingWordCount = $derived((() => {
+		if (!writing._assets) return null;
+		for (const s of writing.sources) {
+			if (['md', 'txt'].includes(s.format) && !s.generated_from) {
+				const w = writing._assets[s.path]?.text?.words;
+				if (w) return w;
+			}
+		}
+		return null;
+	})());
+
 	// Estimated reading time remaining (≈238 wpm).
 	const totalMinutes = $derived(writingWordCount ? Math.max(1, Math.round(writingWordCount / 238)) : null);
 	const minutesLeft = $derived(totalMinutes == null ? null : Math.ceil(totalMinutes * (1 - readingProgress)));
@@ -75,17 +86,6 @@
 			totalMinutes !== null ? m.writings_read_time({ count: String(totalMinutes) }) : null
 		].filter((v): v is string => Boolean(v))
 	);
-
-	const writingWordCount = $derived((() => {
-		if (!writing._assets) return null;
-		for (const s of writing.sources) {
-			if (['md', 'txt'].includes(s.format) && !s.generated_from) {
-				const w = writing._assets[s.path]?.text?.words;
-				if (w) return w;
-			}
-		}
-		return null;
-	})());
 
 	const paragraphs = $derived(
 		activeContent
