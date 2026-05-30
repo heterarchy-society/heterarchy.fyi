@@ -3,6 +3,11 @@ when:
     cron: term-snapshot
 
 steps:
+  - name: fetch-data
+    image: node:22-alpine
+    commands:
+      - node scripts/fetch-data.js
+
   - name: record-term
     image: node:22-alpine
     commands:
