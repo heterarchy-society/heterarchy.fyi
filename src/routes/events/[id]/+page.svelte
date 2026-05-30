@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
-	import TalkCard from '$lib/components/talks/TalkCard.svelte';
+	import TalkGrid from '$lib/components/talks/TalkGrid.svelte';
 	import Seo from '$lib/components/Seo.svelte';
 	import { localizeUrl } from '$lib/i18n';
 	import { eventPrimaryHref, isUpcomingEvent, eventEndDate } from '$lib/data/events';
@@ -215,12 +215,8 @@
 
 				{#if data.talks.length > 0}
 					<div class="mb-10 border-t border-line pt-10">
-						<p class="label mb-6">{m.events_detail_talks()}</p>
-						<div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-							{#each data.talks as talk (talk.id)}
-								<TalkCard {talk} />
-							{/each}
-						</div>
+						<p class="label mb-4">{m.events_detail_talks()}</p>
+						<TalkGrid talks={data.talks} />
 					</div>
 				{/if}
 			</section>

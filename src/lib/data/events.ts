@@ -68,6 +68,15 @@ export function eventPath(id: string): string {
 	return `/events/${id}`;
 }
 
+export function getEventsByPersonId(personId: string): Event[] {
+	return events.filter((e) =>
+		(e.speakers ?? []).some((s) => {
+			const resolved = resolveSpeaker(s);
+			return resolved.type === 'person' && resolved.id === personId;
+		})
+	);
+}
+
 export function eventImageUrl(event: Event, img: EventImage): string {
 	return `${EVENTS_BASE}/events/${event.id}/${img.path}`;
 }

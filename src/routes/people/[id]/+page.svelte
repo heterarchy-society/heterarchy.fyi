@@ -3,7 +3,7 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import Seo from '$lib/components/Seo.svelte';
 	import LibraryBookCard from '$lib/components/library/LibraryBookCard.svelte';
-	import TalkCard from '$lib/components/talks/TalkCard.svelte';
+	import TalkGrid from '$lib/components/talks/TalkGrid.svelte';
 	import { localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
@@ -162,45 +162,53 @@
 			</div>
 
 			<!-- Dataset references -->
-			{#if data.books.length > 0 || data.writings.length > 0 || data.talks.length > 0}
-				<div class="mt-12 border-t border-line pt-10">
-					{#if data.books.length > 0}
-						<div class="mb-10">
-							<p class="label mb-4">{m.books_label()}</p>
-							<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-								{#each data.books as book (book.id)}
-									<LibraryBookCard {book} compact />
-								{/each}
-							</div>
-						</div>
-					{/if}
+			{#if data.books.length > 0}
+				<div class="mt-12 border-t border-line pt-10 mb-10">
+					<p class="label mb-4">{m.books_label()}</p>
+					<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+						{#each data.books as book (book.id)}
+							<LibraryBookCard {book} compact />
+						{/each}
+					</div>
+				</div>
+			{/if}
 
-					{#if data.writings.length > 0}
-						<div class="mb-10">
-							<p class="label mb-4">{m.writings_page_label()}</p>
-							<ul class="max-w-3xl divide-y divide-line">
-								{#each data.writings as writing (writing.id)}
-									<li>
-										<a href={localizeUrl(`/writings/${writing.id}`)} class="group flex items-baseline justify-between gap-4 py-3 no-underline">
-											<span class="font-mono text-[13px] text-black group-hover:underline">{writing.title}</span>
-											<span class="shrink-0 font-mono text-[11px] text-black/35">{writing.year ?? ''}</span>
-										</a>
-									</li>
-								{/each}
-							</ul>
-						</div>
-					{/if}
+			{#if data.writings.length > 0}
+				<div class="mt-12 border-t border-line pt-10 mb-10">
+					<p class="label mb-4">{m.writings_page_label()}</p>
+					<ul class="max-w-3xl divide-y divide-line">
+						{#each data.writings as writing (writing.id)}
+							<li>
+								<a href={localizeUrl(`/writings/${writing.id}`)} class="group flex items-baseline justify-between gap-4 py-3 no-underline">
+									<span class="font-mono text-[13px] text-black group-hover:underline">{writing.title}</span>
+									<span class="shrink-0 font-mono text-[11px] text-black/35">{writing.year ?? ''}</span>
+								</a>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			{/if}
 
-					{#if data.talks.length > 0}
-						<div class="mb-10">
-							<p class="label mb-4">{m.talks_page_label()}</p>
-							<div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-								{#each data.talks as talk (talk.id)}
-									<TalkCard {talk} />
-								{/each}
-							</div>
-						</div>
-					{/if}
+			{#if data.events.length > 0}
+				<div class="mt-12 border-t border-line pt-10 mb-10">
+					<p class="label mb-4">{m.events_label()}</p>
+					<ul class="max-w-3xl divide-y divide-line">
+						{#each data.events as event (event.id)}
+							<li>
+								<a href={localizeUrl(`/events/${event.id}`)} class="group flex items-baseline justify-between gap-4 py-3 no-underline">
+									<span class="font-mono text-[13px] text-black group-hover:underline">{event.name}</span>
+									<span class="shrink-0 font-mono text-[11px] text-black/35">{event.date.slice(0, 4)}</span>
+								</a>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			{/if}
+
+			{#if data.talks.length > 0}
+				<div class="mt-12 border-t border-line pt-10 mb-10">
+					<p class="label mb-4">{m.talks_page_label()}</p>
+					<TalkGrid talks={data.talks} />
 				</div>
 			{/if}
 		</section>

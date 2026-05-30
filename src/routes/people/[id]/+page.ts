@@ -3,6 +3,7 @@ import { bookAuthorRefs, libraryBooks } from '$lib/data/library';
 import { peopleById, personAvatarUrl, personAvatarAltUrls, imageSrcset } from '$lib/data/people';
 import { getWritingsByPersonId } from '$lib/data/writings';
 import { getTalksByPersonId } from '$lib/data/talks';
+import { getEventsByPersonId, enrichEventForList } from '$lib/data/events';
 import { datasetConfigs } from '$lib/data/datasets';
 import type { PageLoad } from './$types';
 
@@ -27,6 +28,9 @@ export function load({ params, data }: Parameters<PageLoad>[0]) {
 		books: libraryBooks.filter((book) => bookAuthorRefs(book).some((author) => author.personId === person.id)),
 		writings: getWritingsByPersonId(person.id),
 		talks: getTalksByPersonId(person.id),
+		events: getEventsByPersonId(person.id)
+			.sort((a, b) => b.date.localeCompare(a.date))
+			.map((e) => enrichEventForList(e)),
 		repository: peopleRepository,
 	};
 }
