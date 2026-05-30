@@ -14,7 +14,7 @@
 	import { personAvatarUrl, imageSrcset, personPath } from '$lib/data/people';
 	import { tick, untrack } from 'svelte';
 	import { fly, slide } from 'svelte/transition';
-	import { Captions, Download, Highlighter, Info, Pencil, RotateCcw, X } from 'lucide-svelte';
+	import { Captions, Check, ChevronUp, Download, Highlighter, Info, Pencil, Pin, RotateCcw, X } from 'lucide-svelte';
 	import { mediaPlayer, type MediaTrack } from '$lib/media/player.svelte';
 	import { decodePeaks, drawWaveform as drawWaveformCanvas, hoverTimeFromPointer, seekTimeFromPointer } from '$lib/media/waveform';
 
@@ -31,6 +31,50 @@
 		activeContent = data.content;
 		activeContentHtml = data.contentHtml;
 	});
+
+	// Reading progress (0–1) based on whole-page scroll — matches the CSS
+	// scroll-driven bar (animation-timeline: scroll(root)). Drives the "min left" pill.
+	let readingProgress = $state(0);
+
+	$effect(() => {
+		if (!browser) return;
+		let raf = 0;
+		const update = () => {
+			raf = 0;
+			const max = document.documentElement.scrollHeight - window.innerHeight;
+			readingProgress = max <= 0 ? 0 : Math.min(1, Math.max(0, window.scrollY / max));
+		};
+		const onScroll = () => {
+			if (!raf) raf = requestAnimationFrame(update);
+		};
+		update();
+		window.addEventListener('scroll', onScroll, { passive: true });
+		window.addEventListener('resize', onScroll, { passive: true });
+		return () => {
+			window.removeEventListener('scroll', onScroll);
+			window.removeEventListener('resize', onScroll);
+			if (raf) cancelAnimationFrame(raf);
+		};
+	});
+
+	// Estimated reading time remaining (≈238 wpm).
+	const totalMinutes = $derived(writingWordCount ? Math.max(1, Math.round(writingWordCount / 238)) : null);
+	const minutesLeft = $derived(totalMinutes == null ? null : Math.ceil(totalMinutes * (1 - readingProgress)));
+	// "Reading" once the user has scrolled into the article (and not yet at the very end).
+	const reading = $derived(readingProgress > 0.02 && readingProgress < 0.999);
+	const finished = $derived(readingProgress >= 0.999);
+	const showReadingStatus = $derived(totalMinutes !== null && (reading || finished));
+
+	const authors = $derived(writingAuthorRefs(writing.authors));
+	const headerMeta = $derived(
+		[
+			writing.year ? String(writing.year) : null,
+			writing.language
+				? (new Intl.DisplayNames([getLocale()], { type: 'language' }).of(writing.language) ?? writing.language)
+				: null,
+			totalMinutes !== null ? m.writings_read_time({ count: String(totalMinutes) }) : null
+		].filter((v): v is string => Boolean(v))
+	);
 
 	const writingWordCount = $derived((() => {
 		if (!writing._assets) return null;
@@ -77,11 +121,6 @@
 		return new Date(iso).toLocaleDateString(getLocale(), { day: 'numeric', month: 'short', year: 'numeric' });
 	}
 
-	function formatWordCount(count: number): string {
-		const label = count >= 1000 ? `${Math.round(count / 100) / 10}k` : String(count);
-		return m.writings_word_count({ count: label });
-	}
-
 	function formatLabel(source: { format: string; variant?: string }): string {
 		const formatMap: Record<string, string> = {
 			md: m.writings_format_md(),
@@ -121,6 +160,114 @@
 	type Transcript = { words: Word[]; paragraphs: number[] };
 	let transcript: Transcript | null = $state(null);
 	let proseEl: HTMLElement | undefined = $state();
+
+	// Table of contents — extracted from rendered headings, rebuilt on format switch.
+	type TocItem = { id: string; text: string; level: number; intro?: boolean };
+	let toc = $state<TocItem[]>([]);
+	let activeHeadingId = $state<string | null>(null);
+	let tocPinned = $state(false);
+	// Expand the TOC only while the cursor is over its margin zone; otherwise fade to the line.
+	let tocHover = $state(false);
+	const tocFaded = $derived(reading && !tocHover && !tocPinned);
+	// Mobile: the bottom "min left" pill expands into the TOC.
+	let mobileTocOpen = $state(false);
+
+	function slugify(s: string): string {
+		return (
+			s
+				.toLowerCase()
+				.normalize('NFKD')
+				.replace(/[̀-ͯ]/g, '')
+				.replace(/[^\w\s-]/g, '')
+				.trim()
+				.replace(/\s+/g, '-')
+				.slice(0, 60) || 'section'
+		);
+	}
+
+	function scrollToHeading(e: MouseEvent, id: string) {
+		e.preventDefault();
+		const el = document.getElementById(id);
+		if (!el) return;
+		el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		history.replaceState(null, '', `#${id}`);
+	}
+
+	$effect(() => {
+		activeContentHtml; // rebuild when content (or format) changes
+		if (!browser || !proseEl) {
+			toc = [];
+			return;
+		}
+		let cancelled = false;
+		let cleanupSpy: (() => void) | null = null;
+		tick().then(() => {
+			if (cancelled || !proseEl) return;
+			const heads = [...proseEl.querySelectorAll('h2, h3, h4')] as HTMLElement[];
+			const used = new Set<string>();
+			const items: TocItem[] = heads.map((h) => {
+				const text = h.textContent?.trim() ?? '';
+				let id = h.id || slugify(text);
+				let base = id;
+				let n = 1;
+				while (used.has(id)) id = `${base}-${n++}`;
+				used.add(id);
+				h.id = id;
+				h.style.scrollMarginTop = '6rem';
+				const level = h.tagName === 'H4' ? 4 : h.tagName === 'H3' ? 3 : 2;
+				return { id, text, level };
+			});
+
+			// If body text precedes the first heading, prepend an "Introduction" entry.
+			let introId: string | null = null;
+			if (items.length) {
+				let node = proseEl.firstElementChild;
+				let hasIntro = false;
+				while (node && node !== heads[0]) {
+					if (node.textContent?.trim()) {
+						hasIntro = true;
+						break;
+					}
+					node = node.nextElementSibling;
+				}
+				if (hasIntro) {
+					introId = proseEl.id || 'writing-body';
+					proseEl.id = introId;
+					proseEl.style.scrollMarginTop = '6rem';
+					items.unshift({ id: introId, text: m.writings_toc_intro(), level: 2, intro: true });
+				}
+			}
+			toc = items;
+
+			if (items.length) {
+				let raf = 0;
+				const compute = () => {
+					raf = 0;
+					let current = introId ?? heads[0]?.id ?? null;
+					for (const h of heads) {
+						if (h.getBoundingClientRect().top <= 100) current = h.id;
+						else break;
+					}
+					activeHeadingId = current;
+				};
+				const onScroll = () => {
+					if (!raf) raf = requestAnimationFrame(compute);
+				};
+				compute();
+				window.addEventListener('scroll', onScroll, { passive: true });
+				window.addEventListener('resize', onScroll, { passive: true });
+				cleanupSpy = () => {
+					window.removeEventListener('scroll', onScroll);
+					window.removeEventListener('resize', onScroll);
+					if (raf) cancelAnimationFrame(raf);
+				};
+			}
+		});
+		return () => {
+			cancelled = true;
+			cleanupSpy?.();
+		};
+	});
 	let handledTextFollowRequest = 0;
 	let pendingTextFollowRequest = $state(0);
 	let handledTimestampParam: string | null = null;
@@ -587,6 +734,58 @@
 <div class="min-h-screen w-full">
 	<Header />
 
+	<!-- Reading progress bar (CSS scroll-driven, JS-var fallback) -->
+	<div class="reading-bar" aria-hidden="true">
+		<div class="reading-bar__fill" style="--reading-progress: {readingProgress}"></div>
+	</div>
+
+	<!-- Mobile: time-remaining pill that expands into the TOC -->
+	{#if totalMinutes !== null}
+		<div class="fixed bottom-6 right-5 z-40 flex flex-col items-end xl:hidden">
+			{#if mobileTocOpen && toc.length > 0}
+				<nav
+					class="reading-sheet mb-2 max-h-[60vh] w-64 overflow-y-auto"
+					aria-label={m.writings_toc_label()}
+					transition:slide={{ duration: 200 }}
+				>
+					{#each toc as item (item.id)}
+						<a
+							href="#{item.id}"
+							onclick={(e) => {
+								scrollToHeading(e, item.id);
+								mobileTocOpen = false;
+							}}
+							class="block py-1 text-[12px] leading-snug no-underline transition-colors {item.level === 3 ? 'pl-4' : item.level === 4 ? 'pl-8' : ''} {item.intro ? 'italic' : ''} {activeHeadingId === item.id ? 'text-black' : 'text-black/50 hover:text-black/80'}"
+						>{item.text}</a>
+					{/each}
+				</nav>
+			{/if}
+			<button
+				type="button"
+				onclick={() => toc.length > 0 && (mobileTocOpen = !mobileTocOpen)}
+				class="reading-pill {toc.length > 0 ? 'cursor-pointer' : ''}"
+				aria-expanded={mobileTocOpen}
+			>
+				{#if finished}
+					<span class="reading-done flex size-3 items-center justify-center rounded-full bg-black text-white">
+						<Check size={8} strokeWidth={3} />
+					</span>
+					<span class="reading-done-text">{m.writings_done()}</span>
+				{:else}
+					<span class="reading-pill__dot" style="--reading-progress: {readingProgress}"></span>
+					{#if minutesLeft && minutesLeft > 0}
+						{m.writings_min_left({ count: String(minutesLeft) })}
+					{:else}
+						{m.writings_almost_done()}
+					{/if}
+				{/if}
+				{#if toc.length > 0}
+					<ChevronUp size={13} strokeWidth={1.8} class="ml-0.5 transition-transform duration-200 {mobileTocOpen ? '' : 'rotate-180'}" />
+				{/if}
+			</button>
+		</div>
+	{/if}
+
 	<main>
 		<article>
 			<!-- Header -->
@@ -596,8 +795,8 @@
 						<a href={localizeUrl('/writings')} class="label mb-4 inline-block no-underline hover:underline">{writing.type}</a>
 					{/if}
 					<h1 class="page-lead mb-4 font-mono">{writing.title.replace(/-/g, '‑')}</h1>
-					<div class="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[13px] text-black/55">
-						{#each writingAuthorRefs(writing.authors) as author}
+					<div class="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[13px] text-black/55">
+						{#each authors as author}
 							{#if author.person}
 								<a href={localizeUrl(personPath(author.person.id))} class="group inline-flex items-center gap-2 text-inherit no-underline hover:text-black">
 									{#if personAvatarUrl(author.person)}
@@ -609,9 +808,12 @@
 								<span>{author.name}</span>
 							{/if}
 						{/each}
-						{#if writing.year}<span class="text-black/35">·</span> <span>{writing.year}</span>{/if}
-						{#if writing.language}<span class="text-black/35">·</span> <span>{new Intl.DisplayNames([getLocale()], { type: 'language' }).of(writing.language) ?? writing.language}</span>{/if}
-						{#if writingWordCount !== null}<span class="text-black/35">·</span> <span class="text-black/40">{formatWordCount(writingWordCount)}</span>{/if}
+						{#if headerMeta.length}
+							<span class="inline-flex items-center">
+								{#if authors.length}<span class="px-2 text-black/25">·</span>{/if}
+								{#each headerMeta as seg, i}{#if i > 0}<span class="px-2 text-black/25">·</span>{/if}{seg}{/each}
+							</span>
+						{/if}
 					</div>
 
 					{#if descParagraphs.length > 0}
@@ -812,7 +1014,7 @@
 					{/if}
 
 					{#if data.readableSources.length > 1}
-						<nav class="-mb-10 mt-10 flex max-w-full flex-wrap items-end justify-center gap-x-4 gap-y-1 pt-1" aria-label={m.writings_formats_nav()}>
+						<nav class="-mb-10 mt-10 pb-3 lg:-mb-12 flex max-w-full flex-wrap items-end justify-center gap-x-4 gap-y-1 pt-1" aria-label={m.writings_formats_nav()}>
 							{#each data.readableSources as source}
 								{@const active = activeSource?.key === source.key}
 								<a
@@ -895,11 +1097,64 @@
 					{:else if isSourceText}
 						<pre class="mx-auto max-w-2xl overflow-x-auto border-l border-line pl-5 font-mono text-[12px] leading-[1.75] text-black/70"><code>{activeContent}</code></pre>
 					{:else}
-					<div
-						bind:this={proseEl}
-						class="prose mx-auto max-w-2xl"
-						class:seek-cursor={altPressed && isMarkdown && !!transcript}
-					>
+					<div class="relative mx-auto max-w-2xl">
+						{#if toc.length > 0}
+							<!-- Desktop: sticky left-margin rail -->
+							<nav
+								onmouseenter={() => (tocHover = true)}
+								onmouseleave={() => (tocHover = false)}
+								class="absolute right-full top-0 hidden h-full pr-10 xl:block"
+								aria-label={m.writings_toc_label()}
+							>
+								<div class="sticky top-24 max-h-[calc(100vh-8rem)] w-56 overflow-y-auto">
+									<!-- Reading status — appears once reading is underway -->
+									{#if showReadingStatus}
+										<div class="mb-4 flex items-center gap-2 font-mono text-[11px] {finished ? 'text-black' : 'text-black/55'}" transition:slide={{ duration: 200 }}>
+											{#if finished}
+												<span class="reading-done flex size-3 items-center justify-center rounded-full bg-black text-white">
+													<Check size={8} strokeWidth={3} />
+												</span>
+												<span class="reading-done-text">{m.writings_done()}</span>
+											{:else}
+												<span class="reading-pill__dot" style="--reading-progress: {readingProgress}"></span>
+												{#if minutesLeft && minutesLeft > 0}{m.writings_min_left({ count: String(minutesLeft) })}{:else}{m.writings_almost_done()}{/if}
+											{/if}
+										</div>
+									{/if}
+
+									<!-- Navigable TOC — dims to just the lines when not hovering -->
+									<div class="transition-opacity duration-300 {tocFaded ? 'opacity-30' : 'opacity-100'}">
+										<div class="mb-3 flex items-center gap-1.5 transition-opacity duration-300 {tocFaded ? 'opacity-0' : 'opacity-100'}">
+											<p class="text-[10px] uppercase tracking-widest text-black/30">{m.writings_toc_label()}</p>
+											<button
+												type="button"
+												onclick={() => (tocPinned = !tocPinned)}
+												aria-pressed={tocPinned}
+												title={tocPinned ? 'Unpin contents' : 'Pin contents'}
+												class="shrink-0 cursor-pointer p-0.5 transition-colors {tocPinned ? 'text-black/70' : 'text-black/20 hover:text-black/50'}"
+											>
+												<Pin size={12} strokeWidth={1.8} fill={tocPinned ? 'currentColor' : 'none'} />
+											</button>
+										</div>
+										{#each toc as item (item.id)}
+											<a
+												href="#{item.id}"
+												onclick={(e) => scrollToHeading(e, item.id)}
+												class="block border-l-2 py-1 pr-4 text-[12px] leading-snug no-underline transition-colors {item.level === 3 ? 'pl-6' : item.level === 4 ? 'pl-9' : 'pl-3'} {item.intro ? 'italic' : ''} {activeHeadingId === item.id ? 'border-black text-black' : 'border-black/10 text-black/40 hover:border-black/30 hover:text-black/80'}"
+											>
+												<span class="block transition-opacity duration-300 {tocFaded ? 'opacity-0' : 'opacity-100'}">{item.text}</span>
+											</a>
+										{/each}
+									</div>
+								</div>
+							</nav>
+						{/if}
+
+						<div
+							bind:this={proseEl}
+							class="prose"
+							class:seek-cursor={altPressed && isMarkdown && !!transcript}
+						>
 							{#if isMarkdown}
 								{@html activeContentHtml}
 							{:else if isPlainText}
@@ -908,6 +1163,7 @@
 								{/each}
 							{/if}
 						</div>
+					</div>
 					{/if}
 				</section>
 			{/if}
@@ -996,6 +1252,72 @@
 </div>
 
 <style>
+	/* Reading progress bar */
+	.reading-bar {
+		position: fixed;
+		inset: auto 0 0 0;
+		height: 3px;
+		z-index: 50;
+		pointer-events: none;
+	}
+	.reading-bar__fill {
+		height: 100%;
+		transform-origin: left center;
+		background: color-mix(in srgb, var(--theme-ink) 80%, transparent);
+		/* Fallback: JS-driven scaleX via --reading-progress */
+		transform: scaleX(var(--reading-progress, 0));
+	}
+	/* Modern path: pure CSS scroll-driven fill, no JS, runs on compositor */
+	@supports (animation-timeline: scroll()) {
+		.reading-bar__fill {
+			transform: scaleX(0);
+			animation: reading-grow linear both;
+			animation-timeline: scroll(root block);
+		}
+	}
+	@keyframes reading-grow {
+		to {
+			transform: scaleX(1);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.reading-bar__fill {
+			animation: none;
+			transform: scaleX(var(--reading-progress, 0));
+		}
+	}
+
+	/* Time-remaining pill (mobile TOC trigger) */
+	.reading-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.4rem 0.7rem;
+		border: 1px solid var(--theme-line, rgba(0, 0, 0, 0.12));
+		background: color-mix(in srgb, var(--theme-paper, #fff) 88%, transparent);
+		backdrop-filter: blur(8px);
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		font-size: 11px;
+		color: color-mix(in srgb, var(--theme-ink) 60%, transparent);
+		white-space: nowrap;
+	}
+	.reading-sheet {
+		border: 1px solid var(--theme-line, rgba(0, 0, 0, 0.12));
+		background: color-mix(in srgb, var(--theme-paper, #fff) 96%, transparent);
+		backdrop-filter: blur(8px);
+		padding: 0.6rem 0.9rem;
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	}
+	.reading-pill__dot {
+		width: 12px;
+		height: 12px;
+		border-radius: 9999px;
+		background: conic-gradient(
+			currentColor calc(var(--reading-progress, 0) * 360deg),
+			color-mix(in srgb, currentColor 22%, transparent) 0
+		);
+	}
+
 	.writing-paper {
 		background: var(--theme-paper);
 	}

@@ -2,6 +2,7 @@
 	import { localizeUrl } from '$lib/i18n';
 	import { writingAuthorRefs, writingExcerpt } from '$lib/data/writings';
 	import { personAvatarUrl } from '$lib/data/people';
+	import * as m from '$lib/paraglide/messages';
 	import { Headphones } from 'lucide-svelte';
 
 	type WritingLike = {
@@ -36,15 +37,13 @@
 		return null;
 	});
 
-	function fmtWords(n: number): string {
-		return n >= 1000 ? `${Math.round(n / 100) / 10}k` : String(n);
-	}
+	const minutes = $derived(words !== null ? Math.max(1, Math.round(words / 238)) : null);
 
 	const metaText = $derived(
 		[
 			authors.map((a) => a.person?.name ?? a.name).join(', '),
 			writing.year ?? undefined,
-			words !== null ? `${fmtWords(words)}W` : undefined
+			minutes !== null ? m.writings_read_time({ count: String(minutes) }) : undefined
 		]
 			.filter(Boolean)
 			.join(' · ')
@@ -74,10 +73,8 @@
 					{/if}
 				{/if}
 			{/each}
-			<span>
-				{metaText}{#if writing.audio?.length}
-					<span class="inline-flex items-center gap-1"> · <Headphones size={11} strokeWidth={1.8} />{#if writing.audio[0].duration}<span class="ml-1">{writing.audio[0].duration}</span>{/if}</span>
-				{/if}
+			<span class="inline-flex items-center gap-1.5">
+				<span>{metaText}</span>{#if writing.audio?.length}<span class="text-black/25">·</span><span class="inline-flex items-center gap-1"><Headphones size={11} strokeWidth={1.8} />{#if writing.audio[0].duration}{writing.audio[0].duration}{/if}</span>{/if}
 			</span>
 		</div>
 		<h2 class="{titleClass} font-mono leading-snug text-black underline decoration-transparent underline-offset-4 transition-colors group-hover:decoration-current">
