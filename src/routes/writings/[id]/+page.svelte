@@ -1326,6 +1326,8 @@
 		color: color-mix(in srgb, var(--theme-ink) 78%, transparent);
 		font-family: Iowan Old Style, Palatino Linotype, Palatino, Charter, Georgia, ui-serif, serif;
 		font-variant-ligatures: common-ligatures;
+		min-width: 0;
+		max-width: 100%;
 		--prose-text: color-mix(in srgb, var(--theme-ink) 78%, transparent);
 		--prose-strong: color-mix(in srgb, var(--theme-ink) 88%, transparent);
 		--prose-heading: color-mix(in srgb, var(--theme-ink) 86%, transparent);
@@ -1428,6 +1430,7 @@
 
 	.prose :global(a) {
 		color: inherit;
+		overflow-wrap: anywhere;
 		text-decoration: underline;
 		text-decoration-color: color-mix(in srgb, var(--theme-ink) 28%, transparent);
 		text-underline-offset: 0.16em;
@@ -1544,6 +1547,8 @@
 	.prose :global(img) {
 		border: 1px solid var(--prose-line);
 		display: block;
+		max-width: 100%;
+		height: auto;
 		margin-left: auto;
 		margin-right: auto;
 	}
@@ -1626,13 +1631,18 @@
 	/* Math */
 	.prose :global(.math-block) {
 		margin: 1.75rem 0;
+		max-width: 100%;
+		overflow-x: auto;
+		overflow-y: hidden;
+		padding: 0.15rem 0 0.45rem;
 		text-align: center;
+		scrollbar-width: thin;
 	}
 
 	.prose :global(.katex-display) {
 		margin: 0;
-		overflow-x: visible;
-		overflow-y: visible;
+		min-width: fit-content;
+		overflow: visible;
 	}
 
 	.prose :global(.katex) {
