@@ -11,6 +11,28 @@
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
+	const PAGE_SIZE = 24;
+	const totalCount = libraryBooks.length;
+	let visibleCount = $state(PAGE_SIZE);
+	let sentinel = $state<HTMLElement | null>(null);
+
+	const visibleBooks = $derived(libraryBooks.slice(0, visibleCount));
+	const hasMore = $derived(visibleCount < totalCount);
+
+	$effect(() => {
+		if (!sentinel) return;
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting) {
+					visibleCount = Math.min(visibleCount + PAGE_SIZE, totalCount);
+				}
+			},
+			{ rootMargin: '600px' }
+		);
+		observer.observe(sentinel);
+		return () => observer.disconnect();
+	});
 </script>
 
 <svelte:head>
@@ -48,12 +70,18 @@
 		{#if libraryBooks.length > 0}
 			<section class="border-b border-line">
 				<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-					{#each libraryBooks as book (book.id)}
+					{#each visibleBooks as book (book.id)}
 						<article class="border-r border-b border-line p-5 lg:p-6">
 							<LibraryBookCard {book} large />
 						</article>
 					{/each}
 				</div>
+				{#if hasMore}
+					<div bind:this={sentinel} class="h-1" aria-hidden="true"></div>
+				{/if}
+				<p class="px-8 py-6 font-mono text-[11px] text-black/35 lg:px-10">
+					{m.books_count({ count: String(totalCount) })}
+				</p>
 			</section>
 		{/if}
 

@@ -40,6 +40,7 @@
 	"books_contribute_text": "Missing a book? Let us know.",
 	"books_contribute_where": "→ where to find us?",
 	"books_contribute_join": "→ get involved",
+	"books_count": "{count} books",
 	"books_detail_label": "Book",
 	"books_detail_back": "← library",
 	"books_detail_cover_alt": "Cover: {title}",

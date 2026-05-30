@@ -40,6 +40,7 @@
 	"books_contribute_text": "Chybí kniha? Napiš nám.",
 	"books_contribute_where": "→ kde nás najdete?",
 	"books_contribute_join": "→ zapojit se",
+	"books_count": "{count} knih",
 	"books_detail_label": "Kniha",
 	"books_detail_back": "← knihovna",
 	"books_detail_cover_alt": "Obálka: {title}",
