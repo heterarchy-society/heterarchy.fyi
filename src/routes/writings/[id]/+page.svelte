@@ -32,25 +32,46 @@
 		activeContentHtml = data.contentHtml;
 	});
 
-	// Reading progress (0–1) based on whole-page scroll — matches the CSS
-	// scroll-driven bar (animation-timeline: scroll(root)). Drives the "min left" pill.
+	// Reading progress (0-1) based on the writing body only. Header and footer
+	// metadata do not count toward the article progress.
 	let readingProgress = $state(0);
+	let writingPaperEl: HTMLElement | undefined = $state();
 
 	$effect(() => {
 		if (!browser) return;
+		const el = writingPaperEl;
 		let raf = 0;
+		let observer: ResizeObserver | null = null;
 		const update = () => {
 			raf = 0;
-			const max = document.documentElement.scrollHeight - window.innerHeight;
-			readingProgress = max <= 0 ? 0 : Math.min(1, Math.max(0, window.scrollY / max));
+			if (!el) {
+				readingProgress = 0;
+				return;
+			}
+			const rect = el.getBoundingClientRect();
+			const top = window.scrollY + rect.top;
+			const viewportBuffer = window.innerHeight * 0.2;
+			const start = top - viewportBuffer;
+			const height = Math.max(el.scrollHeight, rect.height);
+			const end = top + height - window.innerHeight + viewportBuffer;
+			if (end <= start) {
+				readingProgress = window.scrollY < start ? 0 : 1;
+				return;
+			}
+			readingProgress = Math.min(1, Math.max(0, (window.scrollY - start) / (end - start)));
 		};
 		const onScroll = () => {
 			if (!raf) raf = requestAnimationFrame(update);
 		};
+		if (el && typeof ResizeObserver !== 'undefined') {
+			observer = new ResizeObserver(onScroll);
+			observer.observe(el);
+		}
 		update();
 		window.addEventListener('scroll', onScroll, { passive: true });
 		window.addEventListener('resize', onScroll, { passive: true });
 		return () => {
+			observer?.disconnect();
 			window.removeEventListener('scroll', onScroll);
 			window.removeEventListener('resize', onScroll);
 			if (raf) cancelAnimationFrame(raf);
@@ -203,9 +224,12 @@
 		let cleanupSpy: (() => void) | null = null;
 		tick().then(() => {
 			if (cancelled || !proseEl) return;
-			const heads = [...proseEl.querySelectorAll('h2, h3, h4')] as HTMLElement[];
+			const heads = [...proseEl.querySelectorAll('h1, h2, h3, h4, h5, h6')]
+				.filter((h) => h.tagName !== 'H1') as HTMLElement[];
 			const used = new Set<string>();
-			const items: TocItem[] = heads.map((h) => {
+			const headingLevels = heads.map((h) => Number(h.tagName.replace('H', '')));
+			const baseLevel = headingLevels.length ? Math.min(...headingLevels) : 1;
+			const items: TocItem[] = heads.map((h, i) => {
 				const text = h.textContent?.trim() ?? '';
 				let id = h.id || slugify(text);
 				let base = id;
@@ -214,7 +238,7 @@
 				used.add(id);
 				h.id = id;
 				h.style.scrollMarginTop = '6rem';
-				const level = h.tagName === 'H4' ? 4 : h.tagName === 'H3' ? 3 : 2;
+				const level = headingLevels[i] - baseLevel + 1;
 				return { id, text, level };
 			});
 
@@ -234,7 +258,7 @@
 					introId = proseEl.id || 'writing-body';
 					proseEl.id = introId;
 					proseEl.style.scrollMarginTop = '6rem';
-					items.unshift({ id: introId, text: m.writings_toc_intro(), level: 2, intro: true });
+					items.unshift({ id: introId, text: m.writings_toc_intro(), level: 1, intro: true });
 				}
 			}
 			toc = items;
@@ -734,7 +758,7 @@
 <div class="min-h-screen w-full">
 	<Header />
 
-	<!-- Reading progress bar (CSS scroll-driven, JS-var fallback) -->
+	<!-- Reading progress bar, scoped to the writing body -->
 	<div class="reading-bar" aria-hidden="true">
 		<div class="reading-bar__fill" style="--reading-progress: {readingProgress}"></div>
 	</div>
@@ -755,7 +779,7 @@
 								scrollToHeading(e, item.id);
 								mobileTocOpen = false;
 							}}
-							class="block py-1 text-[12px] leading-snug no-underline transition-colors {item.level === 3 ? 'pl-4' : item.level === 4 ? 'pl-8' : ''} {item.intro ? 'italic' : ''} {activeHeadingId === item.id ? 'text-black' : 'text-black/50 hover:text-black/80'}"
+							class="block py-1 text-[12px] leading-snug no-underline transition-colors {item.level === 2 ? 'pl-4' : item.level >= 3 ? 'pl-8' : ''} {item.intro ? 'italic' : ''} {activeHeadingId === item.id ? 'text-black' : 'text-black/50 hover:text-black/80'}"
 						>{item.text}</a>
 					{/each}
 				</nav>
@@ -1069,7 +1093,7 @@
 
 			<!-- Body -->
 			{#if loadingContent}
-				<section class="writing-paper border-b border-line px-8 py-10 lg:px-10 lg:py-12">
+				<section bind:this={writingPaperEl} class="writing-paper border-b border-line px-8 py-10 lg:px-10 lg:py-12">
 					<div class="mx-auto max-w-2xl space-y-3 animate-pulse">
 						{#each [1, 0.95, 0.88, 1, 0.6, 0.92, 0.78, 1, 0.85, 0.4] as w}
 							<div class="h-[1.1em] rounded-sm bg-black/8" style="width: {w * 100}%"></div>
@@ -1077,7 +1101,7 @@
 					</div>
 				</section>
 			{:else if isMarkdown || paragraphs.length > 0 || isPdf || isSourceText}
-				<section class={isPdf ? 'cell-roomy border-b border-line' : 'writing-paper border-b border-line px-8 py-10 lg:px-10 lg:py-12'}>
+				<section bind:this={writingPaperEl} class={isPdf ? 'cell-roomy border-b border-line' : 'writing-paper border-b border-line px-8 py-10 lg:px-10 lg:py-12'}>
 					{#if isPdf && activeSource}
 						<div class="mx-auto max-w-4xl">
 							<iframe
@@ -1098,13 +1122,12 @@
 						<pre class="mx-auto max-w-2xl overflow-x-auto border-l border-line pl-5 font-mono text-[12px] leading-[1.75] text-black/70"><code>{activeContent}</code></pre>
 					{:else}
 					<div class="relative mx-auto max-w-2xl">
-						{#if toc.length > 0}
+						{#if toc.length > 0 || showReadingStatus}
 							<!-- Desktop: sticky left-margin rail -->
-							<nav
+							<aside
 								onmouseenter={() => (tocHover = true)}
 								onmouseleave={() => (tocHover = false)}
 								class="absolute right-full top-0 hidden h-full pr-10 xl:block"
-								aria-label={m.writings_toc_label()}
 							>
 								<div class="sticky top-24 max-h-[calc(100vh-8rem)] w-56 overflow-y-auto">
 									<!-- Reading status — appears once reading is underway -->
@@ -1122,32 +1145,36 @@
 										</div>
 									{/if}
 
-									<!-- Navigable TOC — dims to just the lines when not hovering -->
-									<div class="transition-opacity duration-300 {tocFaded ? 'opacity-30' : 'opacity-100'}">
-										<div class="mb-3 flex items-center gap-1.5 transition-opacity duration-300 {tocFaded ? 'opacity-0' : 'opacity-100'}">
-											<p class="text-[10px] uppercase tracking-widest text-black/30">{m.writings_toc_label()}</p>
-											<button
-												type="button"
-												onclick={() => (tocPinned = !tocPinned)}
-												aria-pressed={tocPinned}
-												title={tocPinned ? 'Unpin contents' : 'Pin contents'}
-												class="shrink-0 cursor-pointer p-0.5 transition-colors {tocPinned ? 'text-black/70' : 'text-black/20 hover:text-black/50'}"
-											>
-												<Pin size={12} strokeWidth={1.8} fill={tocPinned ? 'currentColor' : 'none'} />
-											</button>
+									{#if toc.length > 0}
+										<nav aria-label={m.writings_toc_label()}>
+											<!-- Navigable TOC — stays quiet until hover or pin -->
+											<div class="transition-opacity duration-300 {tocFaded ? 'opacity-30' : 'opacity-100'}">
+												<div class="mb-3 flex items-center gap-1.5 transition-opacity duration-300 {tocFaded ? 'opacity-0' : 'opacity-100'}">
+													<p class="text-[10px] uppercase tracking-widest text-black/30">{m.writings_toc_label()}</p>
+													<button
+														type="button"
+														onclick={() => (tocPinned = !tocPinned)}
+														aria-pressed={tocPinned}
+														title={tocPinned ? 'Unpin contents' : 'Pin contents'}
+														class="shrink-0 cursor-pointer p-0.5 transition-colors {tocPinned ? 'text-black/70' : 'text-black/20 hover:text-black/50'}"
+													>
+														<Pin size={12} strokeWidth={1.8} fill={tocPinned ? 'currentColor' : 'none'} />
+													</button>
+												</div>
+												{#each toc as item (item.id)}
+													<a
+														href="#{item.id}"
+														onclick={(e) => scrollToHeading(e, item.id)}
+														class="block border-l-2 py-1 pr-4 text-[12px] leading-snug no-underline transition-colors {item.level === 2 ? 'pl-6' : item.level >= 3 ? 'pl-9' : 'pl-3'} {item.intro ? 'italic' : ''} {tocFaded ? 'border-transparent' : activeHeadingId === item.id ? 'border-black text-black' : 'border-black/10 text-black/40 hover:border-black/30 hover:text-black/80'}"
+													>
+														<span class="block transition-opacity duration-300 {tocFaded ? 'opacity-0' : 'opacity-100'}">{item.text}</span>
+													</a>
+												{/each}
+											</div>
+										</nav>
+									{/if}
 										</div>
-										{#each toc as item (item.id)}
-											<a
-												href="#{item.id}"
-												onclick={(e) => scrollToHeading(e, item.id)}
-												class="block border-l-2 py-1 pr-4 text-[12px] leading-snug no-underline transition-colors {item.level === 3 ? 'pl-6' : item.level === 4 ? 'pl-9' : 'pl-3'} {item.intro ? 'italic' : ''} {activeHeadingId === item.id ? 'border-black text-black' : 'border-black/10 text-black/40 hover:border-black/30 hover:text-black/80'}"
-											>
-												<span class="block transition-opacity duration-300 {tocFaded ? 'opacity-0' : 'opacity-100'}">{item.text}</span>
-											</a>
-										{/each}
-									</div>
-								</div>
-							</nav>
+							</aside>
 						{/if}
 
 						<div
@@ -1264,27 +1291,7 @@
 		height: 100%;
 		transform-origin: left center;
 		background: color-mix(in srgb, var(--theme-ink) 80%, transparent);
-		/* Fallback: JS-driven scaleX via --reading-progress */
 		transform: scaleX(var(--reading-progress, 0));
-	}
-	/* Modern path: pure CSS scroll-driven fill, no JS, runs on compositor */
-	@supports (animation-timeline: scroll()) {
-		.reading-bar__fill {
-			transform: scaleX(0);
-			animation: reading-grow linear both;
-			animation-timeline: scroll(root block);
-		}
-	}
-	@keyframes reading-grow {
-		to {
-			transform: scaleX(1);
-		}
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.reading-bar__fill {
-			animation: none;
-			transform: scaleX(var(--reading-progress, 0));
-		}
 	}
 
 	/* Time-remaining pill (mobile TOC trigger) */
