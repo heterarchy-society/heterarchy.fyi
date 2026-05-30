@@ -5,6 +5,7 @@
 	import LibraryBookCard from '$lib/components/library/LibraryBookCard.svelte';
 	import TalkGrid from '$lib/components/talks/TalkGrid.svelte';
 	import WritingItem from '$lib/components/writings/WritingItem.svelte';
+	import DatasetRevision from '$lib/components/DatasetRevision.svelte';
 	import { localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
@@ -80,8 +81,9 @@
 
 	<main>
 		<section class="cell-roomy">
-			<!-- Avatar + basic info -->
-			<div class="grid gap-10 lg:grid-cols-[minmax(180px,260px)_1fr] lg:gap-14">
+			<div class="grid gap-12 lg:grid-cols-[1fr_240px] lg:gap-16">
+			<!-- Main: avatar + basic info -->
+			<div class="grid min-w-0 gap-10 lg:grid-cols-[minmax(180px,260px)_1fr] lg:gap-14">
 				<div class="mx-auto w-full max-w-65 lg:mx-0">
 					{#if activeAvatar}
 						<img
@@ -157,18 +159,10 @@
 							</ul>
 						</div>
 					{/if}
-
-					<p class="mt-10 font-mono text-[11px] text-black/45">
-						<a
-							href="{data.repository}/src/branch/main/people/{person.id}"
-							class="link-external"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							{m.people_detail_source()}
-						</a>
-					</p>
 				</div>
+			</div>
+
+			<DatasetRevision history={person.history ?? []} repository={data.repository} path="people/{person.id}" />
 			</div>
 
 			<!-- Dataset references -->

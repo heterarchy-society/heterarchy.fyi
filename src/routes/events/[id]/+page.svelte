@@ -6,6 +6,7 @@
 	import { localizeUrl } from '$lib/i18n';
 	import { eventPrimaryHref, isUpcomingEvent, eventEndDate } from '$lib/data/events';
 	import EventDaysLeft from '$lib/components/events/EventDaysLeft.svelte';
+	import DatasetRevision from '$lib/components/DatasetRevision.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
@@ -81,8 +82,9 @@
 	<main>
 		<section class="border-b border-line">
 <div class="cell-roomy">
+			<div class="grid gap-12 lg:grid-cols-[1fr_240px] lg:gap-16">
 			<div
-				class="grid gap-10 lg:gap-14"
+				class="grid min-w-0 gap-10 lg:gap-14"
 				class:lg:grid-cols-[minmax(180px,240px)_1fr]={!!sideImageUrl}
 			>
 				{#if sideImageUrl}
@@ -154,6 +156,9 @@
 						</a>
 					{/if}
 				</div>
+			</div>
+
+			<DatasetRevision history={event.history ?? []} repository={data.repository} path="events/{event.id}" />
 			</div>
 			</div>
 		</section>

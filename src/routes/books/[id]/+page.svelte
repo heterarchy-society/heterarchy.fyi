@@ -6,6 +6,7 @@
 	import Seo from '$lib/components/Seo.svelte';
 	import LibraryBookAuthors from '$lib/components/library/LibraryBookAuthors.svelte';
 	import LibraryBookMeta from '$lib/components/library/LibraryBookMeta.svelte';
+	import DatasetRevision from '$lib/components/DatasetRevision.svelte';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
 
@@ -47,7 +48,8 @@
 
 	<main>
 		<section class="cell-roomy border-b border-line">
-			<div class="grid gap-10 lg:grid-cols-[minmax(200px,280px)_1fr] lg:gap-14">
+			<div class="grid gap-12 lg:grid-cols-[1fr_240px] lg:gap-16">
+			<div class="grid min-w-0 gap-10 lg:grid-cols-[minmax(200px,280px)_1fr] lg:gap-14">
 				<div class="mx-auto w-full max-w-70 lg:mx-0">
 					<div class="overflow-hidden border border-line bg-bg-muted">
 						<img
@@ -129,6 +131,9 @@
 						</p>
 					{/if}
 				</div>
+			</div>
+
+			<DatasetRevision history={book.history ?? []} repository={data.repository} path="books/{book.id}" />
 			</div>
 		</section>
 	</main>

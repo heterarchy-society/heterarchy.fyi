@@ -24,4 +24,6 @@ export type LibraryBook = {
 	links: LibraryLink[];
 	source?: { name: string; href: string };
 	glossary?: string[];
+	history?: { hash: string; date: string; author: string; message: string }[];
+	contributors?: { name: string }[];
 };

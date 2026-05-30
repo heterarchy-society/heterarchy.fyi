@@ -23,11 +23,11 @@ const raw = await fetchJson(`${BOOKS_BASE}/index.json`);
 const books = raw.books.map(({ cover, _assets, ...rest }) => {
   const item = { ...rest, cover };
   if (cover) {
-    item.coverUrl = `${BOOKS_BASE}/assets/${cover}`;
+    item.coverUrl = `${BOOKS_BASE}/books/${rest.id}/${cover}`;
     if (_assets && _assets[cover] && _assets[cover].image && _assets[cover].image.versions) {
       item.coverVersions = {};
       for (const [w, v] of Object.entries(_assets[cover].image.versions)) {
-        item.coverVersions[w] = `${BOOKS_BASE}/assets/${v.src}`;
+        item.coverVersions[w] = `${BOOKS_BASE}/books/${rest.id}/${v.src}`;
       }
     }
   }

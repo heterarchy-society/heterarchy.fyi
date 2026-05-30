@@ -1,7 +1,10 @@
 import { error } from '@sveltejs/kit';
 import { getBookById, libraryBooks } from '$lib/data/library';
+import { datasetConfigs } from '$lib/data/datasets';
 import glossaryData from '$lib/data/glossary.json';
 import type { PageLoad } from './$types';
+
+const booksRepository = datasetConfigs.find((d) => d.id === 'books')!.repository;
 
 type GlossaryTermSummary = {
 	id: string;
@@ -25,7 +28,7 @@ export function load({ params }: Parameters<PageLoad>[0]) {
 		error(404, 'Kniha nenalezena');
 	}
 
-	return { book, glossary: relatedGlossary(book) };
+	return { book, glossary: relatedGlossary(book), repository: booksRepository };
 }
 
 export function entries() {
