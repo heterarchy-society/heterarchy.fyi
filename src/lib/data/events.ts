@@ -26,6 +26,17 @@ export type EventRefs = {
 	[key: string]: string | undefined;
 };
 
+export type EventOrganizer =
+	| string
+	| {
+		id?: string;
+		person?: string;
+		name?: string;
+		label?: string;
+		role?: string;
+		roles?: string[] | string;
+	};
+
 export type Event = {
 	id: string;
 	name: string;
@@ -42,7 +53,7 @@ export type Event = {
 	imgs?: EventImage[];
 	imgVersions?: Record<string, ImageVersions>;
 	speakers?: string[];
-	organizers?: string[];
+	organizers?: EventOrganizer[];
 	langs?: string[];
 	caption?: string;
 	description?: string;

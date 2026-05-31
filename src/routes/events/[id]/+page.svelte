@@ -5,6 +5,8 @@
 	import Seo from '$lib/components/Seo.svelte';
 	import { localizeUrl } from '$lib/i18n';
 	import { eventPrimaryHref, isUpcomingEvent, eventEndDate } from '$lib/data/events';
+	import { peopleById, personAvatarUrl, personAvatarAltUrl, imageSrcset } from '$lib/data/people';
+	import PersonTile from '$lib/components/people/PersonTile.svelte';
 	import EventDaysLeft from '$lib/components/events/EventDaysLeft.svelte';
 	import DatasetRevision from '$lib/components/DatasetRevision.svelte';
 	import * as m from '$lib/paraglide/messages';
@@ -40,10 +42,52 @@
 		)
 	);
 
+	type OrganizerEntry =
+		| string
+		| {
+			id?: string;
+			person?: string;
+			name?: string;
+			label?: string;
+			role?: string;
+			roles?: string[] | string;
+		};
+
+	function organizerName(entry: OrganizerEntry): string {
+		if (typeof entry === 'string') return entry;
+		return entry.name ?? entry.label ?? entry.person ?? entry.id ?? '';
+	}
+
+	function organizerRole(entry: OrganizerEntry): string | null {
+		if (typeof entry === 'string') return null;
+		if (Array.isArray(entry.roles)) return entry.roles.join(', ');
+		return entry.roles ?? entry.role ?? null;
+	}
+
+	function organizerPersonId(entry: OrganizerEntry): string | null {
+		const raw = typeof entry === 'string' ? entry : (entry.person ?? entry.id ?? entry.name ?? entry.label);
+		if (!raw) return null;
+		const slug = raw.toLowerCase().replace(/\s+/g, '-');
+		if (peopleById.has(slug)) return slug;
+		if (peopleById.has(raw)) return raw;
+		return null;
+	}
+
+	const organizers = $derived(
+		((event.organizers ?? []) as OrganizerEntry[])
+			.map((entry) => {
+				const personId = organizerPersonId(entry);
+				const person = personId ? peopleById.get(personId) : null;
+				const name = person?.name ?? organizerName(entry);
+				return { entry, person, personId, name, role: organizerRole(entry) };
+			})
+			.filter((organizer) => organizer.name)
+	);
+
 	const hasExtra = $derived(
 		!!data.descriptionHtml ||
 		data.speakers.length > 0 ||
-		(event.organizers?.length ?? 0) > 0 ||
+		organizers.length > 0 ||
 		!!event.aftermovie ||
 		data.talks.length > 0
 	);
@@ -51,6 +95,8 @@
 	const isBanner = $derived(event.heroImageType === 'banner');
 	const sideImageUrl = $derived(isBanner ? event.cardImageUrl : (event.heroImageUrl ?? event.cardImageUrl));
 	const sideImageSrcset = $derived(isBanner ? event.cardImageSrcset : (event.heroImageSrcset ?? event.cardImageSrcset));
+	const linkedSpeakers = $derived(data.speakers.filter((speaker) => speaker.type === 'person'));
+	const textSpeakers = $derived(data.speakers.filter((speaker) => speaker.type === 'text'));
 
 	const timeAgo = $derived((): string | null => {
 		if (isUpcomingEvent(event)) return null;
@@ -80,7 +126,7 @@
 	<Header />
 
 	<main>
-		<section class="border-b border-line">
+		<section>
 <div class="cell-roomy">
 			<div class="grid gap-12 lg:grid-cols-[1fr_240px] lg:gap-16">
 			<div
@@ -179,27 +225,66 @@
 				{#if data.speakers.length > 0}
 					<div class="mb-10">
 						<p class="label mb-4">{m.events_detail_speakers()}</p>
-						<p class="font-mono text-[14px] leading-relaxed">
-							{#each data.speakers as speaker, i}
-								{#if i > 0}<span class="text-black/25"> · </span>{/if}
-								{#if speaker.type === 'person'}
-									<a href={localizeUrl(`/people/${speaker.id}`)} class="hover:underline">{speaker.name}</a>
-								{:else}
-									{speaker.label}
-								{/if}
-							{/each}
-						</p>
+						{#if linkedSpeakers.length > 0}
+							<div class="grid grid-cols-3 gap-x-4 gap-y-6 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-8 xl:grid-cols-9">
+								{#each linkedSpeakers as speaker}
+									{@const person = peopleById.get(speaker.id)}
+									<PersonTile
+										href={localizeUrl(`/people/${speaker.id}`)}
+										name={speaker.name}
+										avatarUrl={person ? personAvatarUrl(person) : null}
+										avatarSrcset={person ? imageSrcset(person.avatarVersions) : undefined}
+										avatarAltUrl={person ? personAvatarAltUrl(person) : null}
+										avatarAltSrcset={person ? imageSrcset(person.avatarsAltVersions?.[0] ?? undefined) : undefined}
+										sizes="(min-width: 1280px) 80px, (min-width: 1024px) 10vw, (min-width: 640px) 20vw, 30vw"
+										variant="compact"
+									/>
+								{/each}
+							</div>
+						{/if}
+
+						{#if textSpeakers.length > 0}
+							<p class="flex max-w-4xl flex-wrap gap-x-5 gap-y-2 font-mono text-[13px] leading-relaxed text-black/55 {linkedSpeakers.length > 0 ? 'mt-7' : ''}">
+								{#each textSpeakers as speaker, i}
+									<span>{speaker.label}</span>
+								{/each}
+							</p>
+						{/if}
 					</div>
 				{/if}
 
-				{#if event.organizers?.length}
+				{#if organizers.length > 0}
 					<div class="mb-10">
 						<p class="label mb-4">{m.events_detail_organizers()}</p>
-						<ul class="flex flex-wrap gap-x-4 gap-y-2 font-mono text-[14px] text-black/70">
-							{#each event.organizers as org}
-								<li>{org}</li>
+						<div class="grid grid-cols-3 gap-x-4 gap-y-6 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-8 xl:grid-cols-9">
+							{#each organizers as organizer}
+								{#if organizer.personId}
+									<PersonTile
+										href={localizeUrl(`/people/${organizer.personId}`)}
+										name={organizer.name}
+										subtitle={organizer.role}
+										avatarUrl={organizer.person ? personAvatarUrl(organizer.person) : null}
+										avatarSrcset={organizer.person ? imageSrcset(organizer.person.avatarVersions) : undefined}
+										avatarAltUrl={organizer.person ? personAvatarAltUrl(organizer.person) : null}
+										avatarAltSrcset={organizer.person ? imageSrcset(organizer.person.avatarsAltVersions?.[0] ?? undefined) : undefined}
+										sizes="(min-width: 1280px) 80px, (min-width: 1024px) 10vw, (min-width: 640px) 20vw, 30vw"
+										variant="compact"
+									/>
+								{:else}
+									<div class="min-w-0">
+										<div class="aspect-square w-full border border-line bg-bg-muted" aria-hidden="true"></div>
+										<h3 class="mt-2 break-words font-mono text-[13px] leading-tight text-black/75 [overflow-wrap:anywhere]">
+											{organizer.name}
+										</h3>
+										{#if organizer.role}
+											<p class="mt-1 break-words font-mono text-[11px] leading-tight text-black/40 [overflow-wrap:anywhere]">
+												{organizer.role}
+											</p>
+										{/if}
+									</div>
+								{/if}
 							{/each}
-						</ul>
+						</div>
 					</div>
 				{/if}
 

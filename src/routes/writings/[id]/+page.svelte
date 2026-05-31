@@ -2,6 +2,8 @@
 	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import Seo from '$lib/components/Seo.svelte';
+	import DatasetRevision from '$lib/components/DatasetRevision.svelte';
+	import { base } from '$app/paths';
 	import { browser } from '$app/environment';
 	import { replaceState } from '$app/navigation';
 	import { renderMarkdown } from '$lib/markdown';
@@ -10,16 +12,17 @@
 	import { getLocale, localizeUrl } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import type { PageData } from './$types';
-	import { writingAuthorRefs, writingAuthorText } from '$lib/data/writings';
+	import { writingAuthorRefs, writingAuthorText, writingReadingMinutes } from '$lib/data/writings';
 	import { personAvatarUrl, imageSrcset, personPath } from '$lib/data/people';
 	import { tick, untrack } from 'svelte';
 	import { fly, slide } from 'svelte/transition';
-	import { Captions, Check, ChevronUp, Download, Highlighter, Info, Pencil, Pin, RotateCcw, X } from 'lucide-svelte';
+	import { Captions, Check, ChevronUp, Download, Highlighter, Info, Pin, RotateCcw, X } from 'lucide-svelte';
 	import { mediaPlayer, type MediaTrack } from '$lib/media/player.svelte';
 	import { decodePeaks, drawWaveform as drawWaveformCanvas, hoverTimeFromPointer, seekTimeFromPointer } from '$lib/media/waveform';
 
 	let { data }: { data: PageData } = $props();
 	const writing = $derived(data.writing);
+	const ogImage = $derived(`${page.url.origin}${base}/og/writings/${writing.id}.png`);
 
 	let activeSource = $state(untrack(() => data.selectedSource));
 	let activeContent = $state(untrack(() => data.content));
@@ -78,19 +81,7 @@
 		};
 	});
 
-	const writingWordCount = $derived((() => {
-		if (!writing._assets) return null;
-		for (const s of writing.sources) {
-			if (['md', 'txt'].includes(s.format) && !s.generated_from) {
-				const w = writing._assets[s.path]?.text?.words;
-				if (w) return w;
-			}
-		}
-		return null;
-	})());
-
-	// Estimated reading time remaining (≈238 wpm).
-	const totalMinutes = $derived(writingWordCount ? Math.max(1, Math.round(writingWordCount / 238)) : null);
+	const totalMinutes = $derived(writingReadingMinutes(writing));
 	const minutesLeft = $derived(totalMinutes == null ? null : Math.ceil(totalMinutes * (1 - readingProgress)));
 	// "Reading" once the user has scrolled into the article (and not yet at the very end).
 	const reading = $derived(readingProgress > 0.02 && readingProgress < 0.999);
@@ -137,10 +128,6 @@
 	const hiddenWordCount = $derived(
 		descParagraphs.slice(1).join(' ').replace(/<[^>]+>/g, '').trim().split(/\s+/).filter(Boolean).length
 	);
-
-	function formatDate(iso: string): string {
-		return new Date(iso).toLocaleDateString(getLocale(), { day: 'numeric', month: 'short', year: 'numeric' });
-	}
 
 	function formatLabel(source: { format: string; variant?: string }): string {
 		const formatMap: Record<string, string> = {
@@ -752,6 +739,7 @@
 <Seo
 	title="{writing.title} — {m.writings_page_title()}"
 	description={data.descriptionHtml?.replace(/<[^>]+>/g, '').slice(0, 160) ?? ''}
+	image={ogImage}
 	type="article"
 />
 
@@ -1250,25 +1238,13 @@
 						<p class="font-mono text-[11px] text-black/35">{writing.license}</p>
 					{/if}
 
-					<a href="{data.repository}/src/branch/main/writings/{writing.id}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 font-mono text-[11px] text-black/30 no-underline transition-colors hover:text-black/60" title={m.writings_edit_on_github()}>
-						<Pencil size={11} strokeWidth={1.8} />
-						view on Forgejo
-					</a>
-
 					{#if writing.history?.length}
-						<div>
-							<p class="label mb-3">{m.writings_detail_history()}</p>
-							<ul class="space-y-2">
-								{#each writing.history as entry}
-									<li class="flex flex-wrap items-baseline gap-x-4 gap-y-0.5 font-mono text-[12px]">
-										<a href="{data.repository}/commit/{entry.hash}" class="link-external tabular-nums text-black/45" target="_blank" rel="noopener noreferrer">{entry.hash.slice(0, 7)}</a>
-										<span class="text-black/30">{formatDate(entry.date)}</span>
-										<span class="text-black/55">{entry.author}</span>
-										<span class="text-black/65">{entry.message}</span>
-									</li>
-								{/each}
-							</ul>
-						</div>
+						<DatasetRevision
+							history={writing.history}
+							repository={data.repository}
+							path="writings/{writing.id}"
+							layout="horizontal"
+						/>
 					{/if}
 				</div>
 			</footer>

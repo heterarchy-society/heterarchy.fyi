@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { localizeUrl } from '$lib/i18n';
-	import { writingAuthorRefs, writingExcerpt } from '$lib/data/writings';
+	import { writingAuthorRefs, writingExcerpt, writingReadingMinutes } from '$lib/data/writings';
 	import { personAvatarUrl } from '$lib/data/people';
 	import * as m from '$lib/paraglide/messages';
 	import { Headphones } from 'lucide-svelte';
@@ -26,18 +26,7 @@
 	const authors = $derived(writingAuthorRefs(writing.authors));
 	const excerpt = $derived(writingExcerpt(writing as Parameters<typeof writingExcerpt>[0]));
 
-	const words = $derived.by(() => {
-		if (!writing._assets || !writing.sources) return null;
-		for (const s of writing.sources) {
-			if (['md', 'txt'].includes(s.format) && !s.generated_from) {
-				const w = writing._assets[s.path]?.text?.words;
-				if (w) return w;
-			}
-		}
-		return null;
-	});
-
-	const minutes = $derived(words !== null ? Math.max(1, Math.round(words / 238)) : null);
+	const minutes = $derived(writingReadingMinutes(writing));
 
 	const metaText = $derived(
 		[

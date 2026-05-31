@@ -28,6 +28,8 @@
 	<meta property="og:locale" content={locale} />
 	{#if image}
 		<meta property="og:image" content={image} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
 	{/if}
 	<meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
 	<meta name="twitter:title" content={title} />

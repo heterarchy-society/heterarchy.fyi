@@ -11,6 +11,12 @@ type Writing = {
 	description?: string;
 };
 
+type WritingWithTextStats = {
+	sources?: { path: string; format: string; generated_from?: string }[];
+	_assets?: Record<string, { text?: { words?: number } } | undefined>;
+};
+
+const writingReadingWordsPerMinute = 238;
 const writings: Writing[] = (writingsData as { writings: Writing[] }).writings;
 
 export const latestWritings = [...writings]
@@ -51,6 +57,30 @@ export function writingAuthorRefs(authors: string[]): WritingAuthorRef[] {
 
 export function writingAuthorText(authors: string[]): string {
 	return writingAuthorRefs(authors).map((a) => a.person?.name ?? a.name).join(', ');
+}
+
+export function writingWordCount(writing: WritingWithTextStats): number | null {
+	if (!writing._assets || !writing.sources) return null;
+	for (const source of writing.sources) {
+		if (['md', 'txt'].includes(source.format) && !source.generated_from) {
+			const words = writing._assets[source.path]?.text?.words;
+			if (words) return words;
+		}
+	}
+	return null;
+}
+
+export function writingReadingMinutes(writing: WritingWithTextStats): number | null {
+	const words = writingWordCount(writing);
+	return words ? Math.max(1, Math.round(words / writingReadingWordsPerMinute)) : null;
+}
+
+export function writingReadingLengthText(
+	writing: WritingWithTextStats,
+	format: (minutes: number) => string = (minutes) => `${minutes} min read`
+): string | null {
+	const minutes = writingReadingMinutes(writing);
+	return minutes === null ? null : format(minutes);
 }
 
 export function writingExcerpt(writing: Writing): string | null {
