@@ -1,11 +1,13 @@
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
+import { cwd } from 'node:process';
 import { Resvg } from '@resvg/resvg-js';
 import satori from 'satori';
 import { siteMeta } from '$lib/data/placeholder';
 
-const require = createRequire(import.meta.url);
+// Resolve from project root — import.meta.url breaks after OG endpoint bundling.
+const require = createRequire(join(cwd(), 'package.json'));
 const decompressWoff2 = require('wawoff2/decompress.js') as (buffer: Buffer) => Promise<Uint8Array>;
 
 export const ogImageSize = {
@@ -27,12 +29,12 @@ type OgElement = {
 };
 
 const fontFiles = {
-	inter: fileURLToPath(new URL('../../../node_modules/@fontsource/inter/files/inter-latin-400-normal.woff', import.meta.url)),
-	interBold: fileURLToPath(new URL('../../../node_modules/@fontsource/inter/files/inter-latin-700-normal.woff', import.meta.url)),
-	mono: fileURLToPath(new URL('../../../static/fonts/jetbrains-mono/JetBrainsMono-SemiBold.woff2', import.meta.url)),
+	inter: require.resolve('@fontsource/inter/files/inter-latin-400-normal.woff'),
+	interBold: require.resolve('@fontsource/inter/files/inter-latin-700-normal.woff'),
+	mono: join(cwd(), 'static/fonts/jetbrains-mono/JetBrainsMono-SemiBold.woff2'),
 };
 
-const logoFile = fileURLToPath(new URL('../../../static/logo.svg', import.meta.url));
+const logoFile = join(cwd(), 'static/logo.svg');
 
 let fontsPromise: Promise<Awaited<Parameters<typeof satori>[1]['fonts']>> | null = null;
 let logoPathPromise: Promise<string> | null = null;
@@ -126,6 +128,8 @@ function loadImageData(url: string | null | undefined): Promise<string | null> {
 			.then(async (response) => {
 				if (!response.ok) return null;
 				const contentType = response.headers.get('content-type') ?? 'image/jpeg';
+				// satori (Node prerender) only supports raster types like PNG/JPEG in <img>.
+				if (contentType === 'image/webp') return null;
 				const bytes = Buffer.from(await response.arrayBuffer());
 				return `data:${contentType};base64,${bytes.toString('base64')}`;
 			})
@@ -188,8 +192,8 @@ export async function renderOgImage(input: OgImageInput): Promise<ArrayBuffer> {
 		loadLogoPath(),
 		loadImageData(input.avatarUrl),
 	]);
-	const description = truncate(cleanText(input.description), 360);
-	const descriptionFontSize = description.length > 260 ? 25 : description.length > 190 ? 27 : 30;
+	const description = truncate(cleanText(input.description), 320);
+	const descriptionFontSize = description.length > 280 ? 22 : description.length > 220 ? 24 : description.length > 170 ? 27 : 30;
 
 	const svg = await satori(
 		h(
@@ -243,15 +247,19 @@ export async function renderOgImage(input: OgImageInput): Promise<ArrayBuffer> {
 				'div',
 				{
 					style: {
+						position: 'absolute',
+						left: '64px',
+						right: '186px',
+						top: '174px',
+						bottom: '150px',
 						display: 'flex',
 						flexDirection: 'column',
-						gap: '34px',
-						maxWidth: '1010px',
-						marginTop: '18px',
+						gap: '30px',
 					},
 				},
 				h('div', {
 					style: {
+						fontFamily: 'JetBrains Mono',
 						fontSize: '74px',
 						lineHeight: 1.02,
 						fontWeight: 700,
@@ -261,7 +269,7 @@ export async function renderOgImage(input: OgImageInput): Promise<ArrayBuffer> {
 				description
 					? h('div', {
 						style: {
-							maxWidth: '980px',
+							maxWidth: '950px',
 							color: '#3f3a34',
 							fontSize: `${descriptionFontSize}px`,
 							lineHeight: 1.34,
@@ -269,29 +277,31 @@ export async function renderOgImage(input: OgImageInput): Promise<ArrayBuffer> {
 					}, description)
 					: null
 			),
-			h(
-				'div',
-				{ style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' } },
-				h('div', {
-					style: {
-						fontFamily: 'JetBrains Mono',
-						fontSize: '23px',
-						color: '#111111',
-					},
-				}, siteMeta.title),
-				h('svg', {
-					viewBox: '0 0 1254 1254',
-					style: {
-						width: '126px',
-						height: '126px',
-					},
-				}, h('g', {
-					transform: 'translate(0,1254) scale(0.1,-0.1)',
-				}, h('path', {
-					d: logoPath,
-					fill: '#111111',
-				})))
-			)
+			h('div', {
+				style: {
+					position: 'absolute',
+					left: '64px',
+					bottom: '54px',
+					fontFamily: 'JetBrains Mono',
+					fontSize: '23px',
+					color: '#111111',
+				},
+			}, siteMeta.title),
+			h('svg', {
+				viewBox: '0 0 1254 1254',
+				style: {
+					position: 'absolute',
+					right: '64px',
+					bottom: '54px',
+					width: '126px',
+					height: '126px',
+				},
+			}, h('g', {
+				transform: 'translate(0,1254) scale(0.1,-0.1)',
+			}, h('path', {
+				d: logoPath,
+				fill: '#111111',
+			})))
 		),
 		{
 			...ogImageSize,
