@@ -22,7 +22,7 @@
 
 	let { data }: { data: PageData } = $props();
 	const writing = $derived(data.writing);
-	const ogImage = $derived(`${page.url.origin}${base}/og/writings/${writing.id}.png`);
+	const ogImage = $derived(new URL(`${base}/og/writings/${writing.id}.png`, page.url).href);
 
 	let activeSource = $state(untrack(() => data.selectedSource));
 	let activeContent = $state(untrack(() => data.content));

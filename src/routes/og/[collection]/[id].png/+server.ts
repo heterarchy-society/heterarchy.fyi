@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit';
 import writingsData from '$lib/data/writings.json';
+import glossaryData from '$lib/data/glossary.json';
 import { writingAuthorRefs, writingAuthorText, writingExcerpt, writingReadingLengthText, type Writing } from '$lib/data/writings';
 import { personAvatarUrl } from '$lib/data/people';
 import { renderOgImage } from '$lib/server/og';
@@ -25,7 +26,16 @@ type WritingWithAssets = Writing & {
 	_assets?: Record<string, { text?: { words?: number } } | undefined>;
 };
 
+type GlossaryTerm = {
+	id: string;
+	name: string;
+	type?: string;
+	description?: string;
+	history?: { date?: string }[];
+};
+
 const writings = (writingsData as unknown as { writings: WritingWithAssets[] }).writings;
+const glossaryTerms = (glossaryData as { terms: GlossaryTerm[] }).terms;
 
 function formatDate(date: string | undefined, locale = 'en'): string | null {
 	if (!date) return null;
@@ -34,6 +44,10 @@ function formatDate(date: string | undefined, locale = 'en'): string | null {
 		month: 'short',
 		year: 'numeric',
 	});
+}
+
+function firstParagraph(text: string | undefined): string | null {
+	return text?.split(/\n\n+/)[0]?.trim() || null;
 }
 
 const collections: Record<string, OgCollection> = {
@@ -52,6 +66,20 @@ const collections: Record<string, OgCollection> = {
 				].filter((value): value is string => Boolean(value)),
 			})),
 		find: (id) => collections.writings.entries().find((entry) => entry.id === id) ?? null,
+	},
+	glossary: {
+		entries: () =>
+			glossaryTerms.map((term) => ({
+				id: term.id,
+				collection: 'Glossary',
+				title: term.name,
+				description: firstParagraph(term.description),
+				meta: [
+					term.type,
+					formatDate(term.history?.[0]?.date),
+				].filter((value): value is string => Boolean(value)),
+			})),
+		find: (id) => collections.glossary.entries().find((entry) => entry.id === id) ?? null,
 	},
 };
 

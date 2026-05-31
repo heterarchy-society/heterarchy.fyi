@@ -5,6 +5,7 @@
 	import LibraryBookCard from '$lib/components/library/LibraryBookCard.svelte';
 	import { renderMarkdown } from '$lib/markdown';
 	import { writingAuthorText } from '$lib/data/writings';
+	import { base } from '$app/paths';
 	import { page } from '$app/stores';
 	import { localizeUrl, getLocale } from '$lib/i18n';
 	import { datasetUrl, knownCollections } from '$lib/data/routes';
@@ -21,6 +22,7 @@
 	const activeName = $derived(showTranslation ? translation.name : data.term.name);
 	const activeType = $derived(showTranslation && translation?.type ? translation.type : data.term.type);
 	const activeDescription = $derived(showTranslation ? translation.description : data.term.description);
+	const ogImage = $derived(new URL(`${base}/og/glossary/${data.term.id}.png`, $page.url).href);
 	const relatedTermsById = $derived(new Map(data.relatedTerms.map((term) => [term.id, term])));
 
 	function slugForId(id: string): string {
@@ -89,6 +91,7 @@
 <Seo
 	title="{activeName} — {m.glossary_label()} — The Heterarchy Society"
 	description={activeDescription.slice(0, 160).replace(/\[\[.*?\]\]/g, '')}
+	image={ogImage}
 />
 
 <div class="min-h-screen w-full">
