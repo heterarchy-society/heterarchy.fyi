@@ -16,7 +16,8 @@
 		type?: string;
 	} = $props();
 
-	const url = $derived(absoluteSiteUrl(`${page.url.pathname}${page.url.search}`));
+	// search/hash are unavailable while prerendering (SvelteKit throws on access).
+	const url = $derived(absoluteSiteUrl(page.url.pathname));
 	const locale = $derived(getLocale());
 </script>
 
