@@ -1,6 +1,12 @@
 <script lang="ts">
-	import { getLocale } from '$lib/i18n';
+	import { getLocale, localizeUrl } from '$lib/i18n';
 	import { timeAgo } from '$lib/time';
+	import {
+		imageSrcset,
+		personAvatarUrl,
+		personForContributor,
+		personPath,
+	} from '$lib/data/people';
 	import * as m from '$lib/paraglide/messages';
 
 	type HistoryEntry = { hash: string; date: string; author: string; message?: string };
@@ -49,6 +55,42 @@
 	}
 </script>
 
+{#snippet contributorItem(author: string)}
+	{@const person = personForContributor(author)}
+	{@const avatarUrl = person ? personAvatarUrl(person) : null}
+	<li class="flex items-center gap-2.5">
+		{#if avatarUrl}
+			<img
+				src={avatarUrl}
+				srcset={imageSrcset(person?.avatarVersions)}
+				sizes="24px"
+				alt={person?.name ?? author}
+				width={24}
+				height={24}
+				loading="lazy"
+				class="size-6 shrink-0 border border-line object-cover"
+			/>
+		{:else}
+			<img
+				src={gravatarUrl(author)}
+				alt={author}
+				width={24}
+				height={24}
+				loading="lazy"
+				class="size-6 shrink-0 rounded-full border border-line bg-bg-muted"
+			/>
+		{/if}
+		{#if person}
+			<a
+				href={localizeUrl(personPath(person.id))}
+				class="font-mono text-[12px] text-black/70 no-underline transition-colors hover:text-black hover:underline"
+			>{person.name}</a>
+		{:else}
+			<span class="font-mono text-[12px] text-black/70">{author}</span>
+		{/if}
+	</li>
+{/snippet}
+
 {#if layout === 'horizontal'}
 	<aside class="border-t border-line pt-8">
 		<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -88,17 +130,7 @@
 				<p class="label mb-0">{m.dataset_contributors()}</p>
 				<ul class="flex flex-wrap items-center gap-x-4 gap-y-2">
 					{#each contributors as contributor}
-						<li class="flex items-center gap-2.5">
-							<img
-								src={gravatarUrl(contributor)}
-								alt={contributor}
-								width={24}
-								height={24}
-								loading="lazy"
-								class="size-6 shrink-0 rounded-full border border-line bg-bg-muted"
-							/>
-							<span class="font-mono text-[12px] text-black/70">{contributor}</span>
-						</li>
+						{@render contributorItem(contributor)}
 					{/each}
 				</ul>
 			</div>
@@ -153,17 +185,7 @@
 				<p class="label mb-3">{m.dataset_contributors()}</p>
 				<ul class="flex flex-col gap-2.5">
 					{#each contributors as contributor}
-						<li class="flex items-center gap-2.5">
-							<img
-								src={gravatarUrl(contributor)}
-								alt={contributor}
-								width={24}
-								height={24}
-								loading="lazy"
-								class="size-6 shrink-0 rounded-full border border-line bg-bg-muted"
-							/>
-							<span class="font-mono text-[12px] text-black/70">{contributor}</span>
-						</li>
+						{@render contributorItem(contributor)}
 					{/each}
 				</ul>
 			</div>

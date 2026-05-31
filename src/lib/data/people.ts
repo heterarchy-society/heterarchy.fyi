@@ -30,6 +30,30 @@ const PEOPLE_BASE = 'https://people.data.heterarchy.fyi';
 export const people = (peopleData as { people: Person[] }).people;
 export const peopleById = new Map(people.map((person) => [person.id, person]));
 
+const peopleByContributorKey = new Map<string, Person>();
+
+function contributorKey(value: string): string {
+	return value.trim().toLowerCase();
+}
+
+for (const person of people) {
+	const keys = new Set<string>([
+		person.id,
+		person.name,
+		...(person.altNames ?? []),
+		...(person.refs?.github ? [person.refs.github] : []),
+	]);
+	for (const key of keys) {
+		if (key) peopleByContributorKey.set(contributorKey(key), person);
+	}
+}
+
+/** Match git/forgejo author strings from dataset history to a people profile. */
+export function personForContributor(author: string): Person | null {
+	const key = contributorKey(author);
+	return peopleByContributorKey.get(key) ?? null;
+}
+
 export function personPath(id: string): string {
 	return `/people/${id}`;
 }

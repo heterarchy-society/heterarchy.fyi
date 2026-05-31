@@ -21,7 +21,7 @@ const config = {
 			pollInterval: 60_000
 		},
 		prerender: {
-			concurrency: 4,
+			concurrency: 2,
 			handleHttpError: ({ message }) => {
 				// Ignore 404s for paths not part of this site (e.g. external wiki links in glossary)
 				if (message.includes('404')) return;
