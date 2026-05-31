@@ -7,6 +7,7 @@
 	import { writingAuthorText } from '$lib/data/writings';
 	import { base } from '$app/paths';
 	import { page } from '$app/stores';
+	import { absoluteOgImageUrl } from '$lib/site';
 	import { localizeUrl, getLocale } from '$lib/i18n';
 	import { datasetUrl, knownCollections } from '$lib/data/routes';
 	import * as m from '$lib/paraglide/messages';
@@ -22,7 +23,7 @@
 	const activeName = $derived(showTranslation ? translation.name : data.term.name);
 	const activeType = $derived(showTranslation && translation?.type ? translation.type : data.term.type);
 	const activeDescription = $derived(showTranslation ? translation.description : data.term.description);
-	const ogImage = $derived(new URL(`${base}/og/glossary/${data.term.id}.png`, $page.url).href);
+	const ogImage = $derived(absoluteOgImageUrl('glossary', data.term.id, base));
 	const relatedTermsById = $derived(new Map(data.relatedTerms.map((term) => [term.id, term])));
 
 	function slugForId(id: string): string {

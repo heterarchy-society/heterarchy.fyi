@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { getLocale } from '$lib/i18n';
 	import { siteMeta } from '$lib/data/placeholder';
+	import { absoluteSiteUrl } from '$lib/site';
 
 	let {
 		title,
@@ -15,7 +16,7 @@
 		type?: string;
 	} = $props();
 
-	const url = $derived(`${page.url.origin}${page.url.pathname}`);
+	const url = $derived(absoluteSiteUrl(`${page.url.pathname}${page.url.search}`));
 	const locale = $derived(getLocale());
 </script>
 

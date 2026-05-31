@@ -19,10 +19,11 @@
 	import { Captions, Check, ChevronUp, Download, Highlighter, Info, Pin, RotateCcw, X } from 'lucide-svelte';
 	import { mediaPlayer, type MediaTrack } from '$lib/media/player.svelte';
 	import { decodePeaks, drawWaveform as drawWaveformCanvas, hoverTimeFromPointer, seekTimeFromPointer } from '$lib/media/waveform';
+	import { absoluteOgImageUrl } from '$lib/site';
 
 	let { data }: { data: PageData } = $props();
 	const writing = $derived(data.writing);
-	const ogImage = $derived(new URL(`${base}/og/writings/${writing.id}.png`, page.url).href);
+	const ogImage = $derived(absoluteOgImageUrl('writings', writing.id, base));
 
 	let activeSource = $state(untrack(() => data.selectedSource));
 	let activeContent = $state(untrack(() => data.content));
