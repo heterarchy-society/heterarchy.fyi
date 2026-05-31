@@ -5,8 +5,37 @@
 	import { getLocale } from '$lib/i18n';
 	import * as m from '$lib/paraglide/messages';
 	import { timeAgo } from '$lib/time';
+	import { browser } from '$app/environment';
+	import { Check } from 'lucide-svelte';
 
 	const { data } = $props();
+
+	// Live comparison: fetch each dataset's build.json and diff against this page's snapshot.
+	type LiveInfo = { hash: string; date: string; collections: Record<string, number> };
+	// undefined = not checked yet, null = unavailable, object = loaded
+	let live = $state<Record<string, LiveInfo | null>>({});
+
+	$effect(() => {
+		if (!browser) return;
+		for (const ds of data.datasets) {
+			const url = new URL('build.json', ds.endpoint).href;
+			fetch(url)
+				.then((r) => (r.ok ? r.json() : null))
+				.then((j) => {
+					live[ds.id] = j?.commit?.hash
+						? { hash: j.commit.hash, date: j.commit.date, collections: j.collections ?? {} }
+						: null;
+				})
+				.catch(() => {
+					live[ds.id] = null;
+				});
+		}
+	});
+
+	function isBehind(ds: (typeof data.datasets)[number]): boolean {
+		const l = live[ds.id];
+		return !!(l && ds.commit && l.hash !== ds.commit);
+	}
 
 	function formatDate(iso: string): string {
 		if (!iso) return 'unknown';
@@ -123,6 +152,7 @@
 			<p class="page-lead mb-6">{m.data_lead()}</p>
 			<p class="mb-12 max-w-3xl text-[16px] leading-[1.7] text-black/75">{m.data_intro()}</p>
 
+			<p class="mb-3 font-mono text-[11px] text-black/35">{m.data_live_note()}</p>
 			<div class="overflow-x-auto border-y border-line">
 				<table class="w-full min-w-[720px] border-collapse font-mono text-[12px]">
 					<thead>
@@ -136,7 +166,12 @@
 					</thead>
 					<tbody>
 						{#each data.datasets as dataset}
+					{@const liveDs = live[dataset.id]}
 							{#each dataset.collections as collection, i}
+						{@const liveCount = liveDs?.collections?.[collection.name]}
+						{@const countChanged = liveCount != null && liveCount !== collection.count}
+						{@const commitChanged = !!liveDs && !!dataset.commit && liveDs.hash !== dataset.commit}
+						{@const rowBehind = countChanged || commitChanged}
 								<tr class="align-top {i === dataset.collections.length - 1 ? 'border-b border-line' : ''}">
 									{#if i === 0}
 										<td rowspan={dataset.collections.length} class="py-5 pr-10 align-top">
@@ -153,19 +188,24 @@
 											</div>
 										</td>
 									{/if}
-									<td class="py-5 pr-6 text-black/65">{collection.name}</td>
-									<td class="py-5 pr-6 tabular-nums text-black/65">{collection.count ?? 'unknown'}</td>
 									<td class="py-5 pr-6 text-black/65">
-										{#if collection.commit}
-											<a href="{dataset.repository}/commit/{collection.commit}" target="_blank" rel="noopener noreferrer" class="link-external tabular-nums text-black/70">{collection.commit.slice(0, 7)}</a>
+									<span class="inline-flex items-center gap-2">
+										{#if liveDs}{#if rowBehind}<span class="size-1.5 shrink-0 rounded-full bg-amber-500" title={m.data_live_behind()}></span>{:else}<span class="inline-flex text-green-600" title={m.data_live_current()}><Check size={13} strokeWidth={2.5} /></span>{/if}{/if}
+										{collection.name}
+									</span>
+								</td>
+									<td class="py-5 pr-6 tabular-nums text-black/65">{collection.count ?? 'unknown'}{#if liveCount != null && liveCount !== collection.count}<span class="ml-1 text-amber-600">→ {liveCount}</span>{/if}</td>
+									<td class="py-5 pr-6 text-black/65">
+										{#if dataset.commit}
+											<a href="{dataset.repository}/commit/{dataset.commit}" target="_blank" rel="noopener noreferrer" class="link-external tabular-nums text-black/70">{dataset.commit.slice(0, 7)}</a>{#if commitChanged}<a href="{dataset.repository}/commit/{liveDs.hash}" target="_blank" rel="noopener noreferrer" class="ml-1 tabular-nums text-amber-600 no-underline hover:underline">→ {liveDs.hash.slice(0, 7)}</a>{/if}
 										{:else}
 											<span>unknown</span>
 										{/if}
 									</td>
 									<td class="py-5 whitespace-nowrap tabular-nums text-black/65">
-										{#if collection.updatedAt}
-											<a href={collection.changelogPath} class="hover:text-black">{formatDate(collection.updatedAt)}</a>
-											<span class="mt-1 block text-black/25">({timeAgo(collection.updatedAt, getLocale())})</span>
+										{#if dataset.updatedAt}
+											<a href={collection.changelogPath} class="hover:text-black">{formatDate(dataset.updatedAt)}</a>
+											<span class="mt-1 block text-black/25">({timeAgo(dataset.updatedAt, getLocale())})</span>{#if commitChanged}<span class="mt-1 block text-amber-600">→ {timeAgo(liveDs.date, getLocale())}</span>{/if}
 										{:else}
 											<span>unknown</span>
 										{/if}

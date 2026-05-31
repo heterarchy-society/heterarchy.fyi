@@ -22,4 +22,5 @@ steps:
       DEPLOY_PASSWORD:
         from_secret: DEPLOY_SECRET
     commands:
-      - rclone sync build/ ":sftp,host=sftpgo.heterarchy.fyi,port=2222,user=heterarchy,pass=$DEPLOY_PASSWORD:/public/heterarchy.fyi" -v
+      - touch ipfs-trigger.flag
+      - rclone sync build/ ipfs-trigger.flag ":sftp,host=sftpgo.heterarchy.fyi,port=2222,user=heterarchy,pass=$DEPLOY_PASSWORD:/public/heterarchy.fyi" -v
